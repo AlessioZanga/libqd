@@ -1,0 +1,9 @@
+qd for Debian
+-------------
+
+Debian provides both static and dynamic libraries for qd.  Note that
+on Intel cpu you need to use fpu_fix_start and fpu_fix_end in order
+for the library to function properly, see the "Note on Intel x86
+Processors" in the README file.
+
+ -- Christophe Prud'homme <prudhomm@debian.org>, Sun Jul 31 08:36:35 2005

@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+
+## control update does not seem t be a good practice
+## DEB_AUTO_UPDATE_DEBIAN_CONTROL := yes
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/autotools.mk
+
+DEB_CONFIGURE_EXTRA_FLAGS := --enable-shared
+

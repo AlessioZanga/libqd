@@ -1,0 +1,21 @@
+For 2.1.x series:
+  * fix test programs to return 1 on exit on failure         ... done
+  * import doc sources                                       ... done
+  * add automake / libtool support                           ... done
+  * explicit check for etime for all compilers.              ... done
+  * add --enable-debug feature                               ... done
+  * support ifort before ifc.                                ... done
+  * remove dependencies of qd.ps.
+  * mention 'make demo' in fortran and tests directory.
+  * update documentation
+
+For 2.2.x series:
+  * use fma in C99.
+  * add integer format support
+  * support complex types.
+  * partial template specialization for complex divide.
+  * support x86 double-extended format (see Hladky's work)
+
+For 3.0.x series.
+  * rewrite core code in C preprocessor, with C/C++ wrappers.
+
