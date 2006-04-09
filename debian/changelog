@@ -1,3 +1,26 @@
+qd (2.1.200-1) unstable; urgency=low
+
+  * New upstream release
+  * Changed library package name to libqd2c2a
+  * Enabled some operations between dd_real/qd_real and integers/floating
+    types
+  * Changed Maintainer to Debian Scientific Computing Team and added
+    myself as uploader
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Sun,  9 Apr 2006 22:50:45 +0200
+
+qd (2.1.142-3) unstable; urgency=low
+
+  * c++ transition
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Tue, 10 Jan 2006 16:01:53 +0100
+
+qd (2.1.142-2) unstable; urgency=low
+
+  * patch to support unsigned ints
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Sun, 14 Aug 2005 23:00:09 +0200
+
 qd (2.1.142-1) unstable; urgency=low
 
   * Initial release

@@ -1,5 +1,5 @@
 SRC = c_dd.cpp c_qd.cpp dd.cpp f_dd.cpp \
-      f_qd.cpp fpu.cpp qd.cpp qd_const.cpp
+      f_qd.cpp fpu.cpp qd.cpp qd_const.cpp util.cpp util.h
 DEBUG_SRC = bits.cpp
 
 lib_LTLIBRARIES = libqd.la

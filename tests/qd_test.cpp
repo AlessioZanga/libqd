@@ -19,9 +19,16 @@
 using std::cout;
 using std::cerr;
 using std::endl;
+
+#if !defined(_MSC_VER) || (_MSC_VER > 1200)
 using std::abs;
 using std::sqrt;
 using std::strcmp;
+using std::exit;
+#else
+static double abs(double x) { return fabs(x); }
+#endif
+
 
 // Global flags passed to the main program.
 static bool flag_test_dd = false;
@@ -38,6 +45,7 @@ bool print_result(bool result) {
 
 template <class T>
 class TestSuite {
+  static const int double_digits;
 public:
   bool test1();
   bool test2();
@@ -48,6 +56,8 @@ public:
   bool testall();
 };
 
+template <class T>
+const int TestSuite<T>::double_digits = 6;
 
 /* Test 1.   Polynomial Evaluation / Polynomial Solving */
 template <class T>
@@ -66,6 +76,7 @@ bool TestSuite<T>::test1() {
   y = polyeval(c, n-1, x);
 
   if (flag_verbose) {
+    cout.precision(T::_ndigits);
     cout << "Root Found:  x  = " << x << endl;
     cout << "           p(x) = " << y << endl;
   }
@@ -148,8 +159,11 @@ bool TestSuite<T>::test2() {
   err = abs((double) (p - T::_pi));
 
   if (flag_verbose) {
+    cout.precision(T::_ndigits);
     cout << "   pi = " << p << endl;
     cout << "  _pi = " << T::_pi << endl;
+
+    cout.precision(double_digits);
     cout << "error = " << err << " = " << err / T::_eps << " eps" << endl;
   }
 
@@ -161,6 +175,7 @@ template <class T>
 bool TestSuite<T>::test3() {
   cout << endl;
   cout << "Test 3.  (Salamin-Brent Quadratic Formula for Pi)." << endl;
+  cout.precision(T::_ndigits);
 
   T a, b, s, p;
   T a_new, b_new, s_new;
@@ -192,6 +207,7 @@ bool TestSuite<T>::test3() {
 
   if (flag_verbose) {
     cout << "        _pi: " << T::_pi << endl;
+    cout.precision(double_digits);
     cout << "      error: " << err << " = " << err / T::_eps << " eps" << endl;
   }
 
@@ -205,6 +221,7 @@ template <class T>
 bool TestSuite<T>::test4() {
   cout << endl;
   cout << "Test 4.  (Borwein Quartic Formula for Pi)." << endl;
+  cout.precision(T::_ndigits);
 
   T a, y, p, r;
   double m;
@@ -232,6 +249,7 @@ bool TestSuite<T>::test4() {
   err = abs((double) (p - T::_pi));
   if (flag_verbose) {
     cout << "        _pi: " << T::_pi << endl;
+    cout.precision(double_digits);
     cout << "      error: " << err << " = " << err / T::_eps << " eps" << endl;
   }  
 
@@ -244,6 +262,7 @@ bool TestSuite<T>::test5() {
 
   cout << endl;
   cout << "Test 5.  (Taylor Series Formula for E)." << endl;
+  cout.precision(T::_ndigits);
 
   /* Use Taylor series
 
@@ -269,6 +288,8 @@ bool TestSuite<T>::test5() {
   if (flag_verbose) {
     cout << "    e = " << s << endl;
     cout << "   _e = " << T::_e << endl;
+
+    cout.precision(double_digits);
     cout << "error = " << delta << " = " << delta / T::_eps << " eps" << endl;
     cout << i << " iterations." << endl;
   }
@@ -281,6 +302,7 @@ template <class T>
 bool TestSuite<T>::test6() {
   cout << endl;
   cout << "Test 6.  (Taylor Series Formula for Log 2)." << endl;
+  cout.precision(T::_ndigits);
 
   /* Use the Taylor series
 
@@ -307,6 +329,8 @@ bool TestSuite<T>::test6() {
   if (flag_verbose) {
     cout << " log2 = " << s << endl;
     cout << "_log2 = " << T::_log2 << endl;
+
+    cout.precision(double_digits);
     cout << "error = " << delta << " = " << (delta / T::_eps) 
          << " eps" << endl;
     cout << i << " iterations." << endl;
@@ -354,7 +378,7 @@ int main(int argc, char *argv[]) {
     arg = argv[i];
     if (strcmp(arg, "-h") == 0 || strcmp(arg, "-help") == 0) {
       print_usage();
-      std::exit(0);
+      exit(0);
     } else if (strcmp(arg, "-dd") == 0) {
       flag_test_dd = true;
     } else if (strcmp(arg, "-qd") == 0) {
@@ -397,8 +421,4 @@ int main(int argc, char *argv[]) {
   fpu_fix_end(&old_cw);
   return (pass ? 0 : 1);
 }
-
-
-
-
 
