@@ -16,6 +16,7 @@
 #include <climits>
 
 #include "config.h"
+#include <qd/inline.h>
 #include <qd/bits.h>
 
 #ifdef HAVE_IEEEFP_H
@@ -56,7 +57,7 @@ int get_double_expn(double x) {
   if (!finite(x) || isnan(x))
     return INT_MAX;
 
-  double y = std::abs(x);
+  double y = _QD_STD_ABS(x);
   int i = 0;
   if (y < 1.0) {
     while (y < 1.0) {
@@ -94,9 +95,9 @@ void print_double_info(double x) {
 
   /* Now that we handled NaNs, Infs, and Zeros, 
      x should be a normal number. */
-  x = std::abs(x);
+  x = _QD_STD_ABS(x);
   int expn = get_double_expn(x);
-  double d = std::ldexp(1.0, expn);
+  double d = _QD_STD_LDEXP(1.0, expn);
   cout << expn << " ";
   while (x != 0.0) {
     if (x >= d) {

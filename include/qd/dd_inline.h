@@ -53,7 +53,7 @@ inline dd_real operator+(const dd_real &a, const dd_real &b) {
   return dd_real(s, e);
 #else
 
-  /* This one satisfies IEEE style error bound, 
+  /* This one satisfies IEEE style error bound,
      due to K. Briggs and W. Kahan.                   */
   double s1, s2, t1, t2;
 
@@ -197,7 +197,7 @@ inline dd_real dd_real::mul(double a, double b) {
 
 /* double-double * (2.0 ^ exp) */
 inline dd_real ldexp(const dd_real &a, int exp) {
-  return dd_real(std::ldexp(a.hi, exp), std::ldexp(a.lo, exp));
+  return dd_real(_QD_STD_LDEXP(a.hi, exp), _QD_STD_LDEXP(a.lo, exp));
 }
 
 /* double-double * double,  where double is a power of 2. */
@@ -205,15 +205,29 @@ inline dd_real mul_pwr2(const dd_real &a, double b) {
   return dd_real(a.hi * b, a.lo * b);
 }
 
-/* double-double * double */
-inline dd_real operator*(const dd_real &a, double b) {
-  double p1, p2;
-
-  p1 = qd::two_prod(a.hi, b, p2);
-  p2 += (a.lo * b);
-  p1 = qd::quick_two_sum(p1, p2, p2);
-  return dd_real(p1, p2);
+#define DD_REAL_OP_MUL_T_IMPL( T )				\
+inline dd_real operator*(const dd_real &a, T __b) {		\
+  double b = __b;						\
+  double p1, p2;						\
+								\
+  p1 = qd::two_prod(a.hi, b, p2);				\
+  p2 += (a.lo * b);						\
+  p1 = qd::quick_two_sum(p1, p2, p2);				\
+  return dd_real(p1, p2);					\
+}								\
+inline dd_real operator*(T a, const dd_real &b) {		\
+  return (b * a);						\
 }
+
+
+DD_REAL_OP_MUL_T_IMPL( int )
+DD_REAL_OP_MUL_T_IMPL( long int )
+DD_REAL_OP_MUL_T_IMPL( unsigned int )
+DD_REAL_OP_MUL_T_IMPL( unsigned long int )
+DD_REAL_OP_MUL_T_IMPL( float )
+DD_REAL_OP_MUL_T_IMPL( double )
+DD_REAL_OP_MUL_T_IMPL( long double )
+
 
 /* double-double * double-double */
 inline dd_real operator*(const dd_real &a, const dd_real &b) {
@@ -226,10 +240,7 @@ inline dd_real operator*(const dd_real &a, const dd_real &b) {
   return dd_real(p1, p2);
 }
 
-/* double * double-double */
-inline dd_real operator*(double a, const dd_real &b) {
-  return (b * a);
-}
+
 
 /*********** Self-Multiplications ************/
 /* double-double *= double */
@@ -279,7 +290,7 @@ inline dd_real operator/(const dd_real &a, double b) {
   double p1, p2;
   double s, e;
   dd_real r;
-  
+
   q1 = a.hi / b;   /* approximate quotient. */
 
   /* Compute  this - q1 * d */
@@ -287,7 +298,7 @@ inline dd_real operator/(const dd_real &a, double b) {
   s = qd::two_diff(a.hi, p1, e);
   e += a.lo;
   e -= p2;
-  
+
   /* get next approximation. */
   q2 = (s + e) / b;
 
@@ -322,7 +333,7 @@ inline dd_real operator/(const dd_real &a, const dd_real &b) {
 #else
   double q3;
   r = a - q1 * b;
-  
+
   q2 = r.hi / b.hi;
   r -= (q2 * b);
 
@@ -534,14 +545,14 @@ inline dd_real nint(const dd_real &a) {
   if (hi == a.hi) {
     /* High word is an integer already.  Round the low word.*/
     lo = qd::nint(a.lo);
-    
+
     /* Renormalize. This is needed if hi = some integer, lo = 1/2.*/
     hi = qd::quick_two_sum(hi, lo, lo);
   } else {
     /* High word is not an integer. */
     lo = 0.0;
-    if (std::abs(hi-a.hi) == 0.5 && a.lo < 0.0) {
-      /* There is a tie in the high word, consult the low word 
+    if (_QD_STD_ABS(hi-a.hi) == 0.5 && a.lo < 0.0) {
+      /* There is a tie in the high word, consult the low word
          to break the tie. */
       hi -= 1.0;      /* NOTE: This does not cause INEXACT. */
     }

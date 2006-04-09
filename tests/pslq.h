@@ -24,8 +24,13 @@
 #include <qd/dd.h>
 #include <qd/qd.h>
 
+#if !defined(_MSC_VER) || (_MSC_VER > 1200)
 using std::sqrt;
 using std::abs;
+#else
+inline double abs(double x) { return fabs(x); }
+#endif
+
 using namespace qd;
 
 #define MIN(a, b) ( ((a)<(b)) ? (a) : (b) )

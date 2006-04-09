@@ -9,8 +9,8 @@
  *
  * Quad-double precision (>= 212-bit significand) floating point arithmetic
  * package, written in ANSI C++, taking full advantage of operator overloading.
- * Uses similar techniques as that of David Bailey's double-double package 
- * and that of Jonathan Shewchuk's adaptive precision floating point 
+ * Uses similar techniques as that of David Bailey's double-double package
+ * and that of Jonathan Shewchuk's adaptive precision floating point
  * arithmetic package.  See
  *
  *   http://www.nersc.gov/~dhbailey/mpdist/mpdist.html
@@ -24,6 +24,7 @@
 #define _QD_QD_H
 
 #include <iostream>
+#include <string>
 #include <qd/qd_config.h>
 #include <qd/dd.h>
 
@@ -67,8 +68,10 @@ public:
   static const qd_real _e;
   static const qd_real _log2;
   static const qd_real _log10;
+  static const qd_real _nan;
 
   static const double _eps;      /* = 2^-212. */
+  static const int _ndigits;     /* = 64.     */
 
   /* Constructors */
   qd_real();
@@ -76,11 +79,14 @@ public:
   qd_real(const dd_real &dd);
   qd_real(double d);
   qd_real(int i);
+  qd_real(long int i);
+  qd_real(unsigned int i);
+  qd_real(unsigned long int i);
 
   /* Member Access */
   double operator[](int i) const;
 
-  static void abort();
+  static void abort(const char *msg);
 
   /* Addition */
   friend qd_real operator+(const qd_real &a, const qd_real &b);
@@ -110,11 +116,22 @@ public:
   friend qd_real operator*(const qd_real &a, const qd_real &b);
   friend qd_real operator*(const dd_real &a, const qd_real &b);
   friend qd_real operator*(const qd_real &a, const dd_real &b);
-  friend qd_real operator*(const qd_real &a, double b);
-  friend qd_real operator*(double a, const qd_real &b);
+
+#define QD_REAL_OP_MUL_T_DECL( T )			\
+  friend qd_real operator*(const qd_real &a, T b);	\
+  friend qd_real operator*(T a, const qd_real &b);
+
+  QD_REAL_OP_MUL_T_DECL( int );
+  QD_REAL_OP_MUL_T_DECL( long int );
+  QD_REAL_OP_MUL_T_DECL( unsigned int );
+  QD_REAL_OP_MUL_T_DECL( unsigned long int );
+  QD_REAL_OP_MUL_T_DECL( float );
+  QD_REAL_OP_MUL_T_DECL( double );
+  QD_REAL_OP_MUL_T_DECL( long double );
 
   /* Self-Multiplication */
-  qd_real &operator*=(double a);
+  template<typename T>
+  qd_real &operator*=(T a);
   qd_real &operator*=(const dd_real &a);
   qd_real &operator*=(const qd_real &a);
 
@@ -134,6 +151,7 @@ public:
   friend qd_real sqr(const qd_real &a);
   friend qd_real sqrt(const qd_real &a);
   friend qd_real pow(const qd_real &a, int n);
+  friend qd_real pow(const qd_real &a, const qd_real &b);
   friend qd_real npwr(const qd_real &a, int n);
   qd_real operator^(int n) const;
   friend qd_real nroot(const qd_real &a, int n);
@@ -147,7 +165,17 @@ public:
   friend qd_real divrem(const qd_real &a, const qd_real &b, qd_real &r);
 
   /* Assignment */
-  qd_real &operator=(double a);
+#define QD_REAL_OP_EQUAL_T_DECL( T ) \
+  qd_real &operator=(T a);
+
+  QD_REAL_OP_EQUAL_T_DECL( int );
+  QD_REAL_OP_EQUAL_T_DECL( long int );
+  QD_REAL_OP_EQUAL_T_DECL( unsigned int );
+  QD_REAL_OP_EQUAL_T_DECL( unsigned long int );
+  QD_REAL_OP_EQUAL_T_DECL( float );
+  QD_REAL_OP_EQUAL_T_DECL( double );
+  QD_REAL_OP_EQUAL_T_DECL( long double );
+
   qd_real &operator=(const dd_real &a);
   qd_real &operator=(const char *s);
 
@@ -258,15 +286,22 @@ public:
   friend qd_real min(const qd_real &a, const qd_real &b, const qd_real &c);
 
   /* Polynomial Evaluator / Solver */
-  friend qd_real polyroot(const qd_real *c, int n, 
+  friend qd_real polyroot(const qd_real *c, int n,
                           const qd_real &x0, double thresh);
   friend qd_real polyeval(const qd_real *c, int n, const qd_real &x);
 
   /* Input / Output */
   friend std::ostream &operator<<(std::ostream &s, const qd_real &a);
   friend std::istream &operator>>(std::istream &s, qd_real &a);
-  
-  void write(char *s, int d = 64) const;  /* Note: s must hold d+8 chars. */
+
+  void to_digits(char *s, int &expn, int precision = _ndigits) const;
+  void write(char *s, int precision = _ndigits,
+      bool showpos = false, bool uppercase = false) const;
+      /* Note: s must hold d+8 chars. */
+  std::string write(int precision = _ndigits, int width = 0,
+      std::ios_base::fmtflags floatfield = (std::ios_base::fmtflags) 0,
+      std::ios_base::fmtflags adjustfield = (std::ios_base::fmtflags) 0,
+      bool showpos = false, bool uppercase = false, char fill = ' ') const;
   static int read(const char *s, qd_real &a);
 
 #ifdef QD_DEBUG
@@ -280,7 +315,7 @@ public:
 
 };
 
-qd_real polyroot(const qd_real *c, int n, 
+qd_real polyroot(const qd_real *c, int n,
                  const qd_real &x0, double thresh = 1.0e-62);
 
 qd_real qdrand(void);

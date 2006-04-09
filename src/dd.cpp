@@ -14,9 +14,11 @@
 #include <cstdio>
 #include <cmath>
 #include <iostream>
+#include <string>
 
 #include "config.h"
 #include <qd/dd.h>
+#include "util.h"
 
 #ifdef QD_DEBUG
 #include <qd/bits.h>
@@ -37,9 +39,15 @@ using std::cerr;
 using std::endl;
 using std::ostream;
 using std::istream;
-using std::printf;
+using std::ios_base;
+using std::string;
 
-static const char *digits = "0123456789";
+#if !defined(_MSC_VER) || (_MSC_VER > 1200)
+using std::printf;
+using std::sprintf;
+using std::exit;
+#endif
+
 
 const dd_real dd_real::_2pi = dd_real(6.283185307179586232e+00,
                                       2.449293598294706414e-16);
@@ -61,11 +69,14 @@ const dd_real dd_real::_log2 = dd_real(6.931471805599452862e-01,
                                        2.319046813846299558e-17);
 const dd_real dd_real::_log10 = dd_real(2.302585092994045901e+00,
                                         -2.170756223382249351e-16);
+const dd_real dd_real::_nan = dd_real(qd::_d_nan, qd::_d_nan);
+
 const double dd_real::_eps = 1.23259516440783e-32;  /* = 2^-106 */
+const int dd_real::_ndigits = 32;
 
 /* This routine is called whenever a fatal error occurs. */
-void dd_real::abort() {
-  std::exit(-1);
+void dd_real::abort(const char *msg) {
+  if (msg) { cerr << "ERROR " << msg << endl; }
 }
 
 /* Computes the square root of the double-double number dd.
@@ -85,12 +96,11 @@ dd_real sqrt(const dd_real &a) {
     return 0.0;
 
   if (a.is_negative()) {
-    cerr << "ERROR (dd_real::sqrt): Negative argument." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::sqrt): Negative argument.");
     return 0.0;
   }
 
-  double x = 1.0 / std::sqrt(a.hi);
+  double x = 1.0 / _QD_STD_SQRT(a.hi);
   double ax = a.hi * x;
   return dd_real::add(ax, (a - dd_real::sqr(ax)).hi * (x * 0.5));
 }
@@ -118,14 +128,12 @@ dd_real nroot(const dd_real &a, int n) {
   */
 
   if (n <= 0) {
-    cerr << "ERROR (dd_real::nroot): N must be positive." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::nroot): N must be positive.");
     return 0.0;
   }
 
   if (n%2 == 0 && a.is_negative()) {
-    cerr << "ERROR (dd_real::nroot): Negative argument." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::nroot): Negative argument.");
     return 0.0;
   }
 
@@ -141,7 +149,7 @@ dd_real nroot(const dd_real &a, int n) {
 
   /* Note  a^{-1/n} = exp(-log(a)/n) */
   dd_real r = abs(a);
-  dd_real x = std::exp(-std::log(r.hi) / n);
+  dd_real x = _QD_STD_EXP(-_QD_STD_LOG(r.hi) / n);
 
   /* Perform Newton's iteration. */
   x += x * (1.0 - r * npwr(x, n)) / (double) n;
@@ -156,8 +164,7 @@ dd_real npwr(const dd_real &a, int n) {
 
   if (n == 0) {
     if (a.is_zero()) {
-      cerr << "ERROR (dd_real::npwr): Invalid argument." << endl;
-      dd_real::abort();
+      dd_real::abort("(dd_real::npwr): Invalid argument.");
       return 0.0;
     }
     return 1.0;
@@ -165,7 +172,7 @@ dd_real npwr(const dd_real &a, int n) {
 
   dd_real r = a;
   dd_real s = 1.0;
-  int N = std::abs(n);
+  int N = _QD_STD_ABS(n);
 
   if (N > 1) {
     /* Use binary exponentiation */
@@ -189,7 +196,11 @@ dd_real npwr(const dd_real &a, int n) {
 }
 
 dd_real pow(const dd_real &a, int n) {
-    return npwr( a, n );
+  return npwr(a, n);
+}
+
+dd_real pow(const dd_real &a, const dd_real &b) {
+  return exp(b * log(a));
 }
 
 /* Exponential.  Computes exp(x) in double-double precision. */
@@ -214,8 +225,7 @@ dd_real exp(const dd_real &a) {
     return 0.0;
 
   if (a.hi >=  709.0) {
-    cerr << "ERROR (dd_real::exp): Argument too large." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::exp): Argument too large.");
     return 0.0;
   }
 
@@ -246,8 +256,8 @@ dd_real exp(const dd_real &a) {
   } while (abs(t) > 1.0e-35);
 
   s += t;
-  r = npwr(s, k);
-  r *= std::pow(2.0, z);
+  r = pow(s, k);
+  r = mul_pwr2(r, _QD_STD_LDEXP(1.0, z));
 
   return r;
 }
@@ -276,12 +286,11 @@ dd_real log(const dd_real &a) {
   }
 
   if (a.hi <= 0.0) {
-    cerr << "ERROR (dd_real::log): Non-positive argument." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::log): Non-positive argument.");
     return 0.0;
   }
 
-  dd_real x = std::log(a.hi);   /* Initial approximation */
+  dd_real x = _QD_STD_LOG(a.hi);   /* Initial approximation */
 
   x = x + a * exp(-x) - 1.0;
   return x;
@@ -296,7 +305,7 @@ dd_real log10(const dd_real &a) {
    Assumes |a| <= pi/32.                           */
 static void sincos_taylor(const dd_real &a,
                           dd_real &sin_a, dd_real &cos_a) {
-  const double thresh = 1.0e-35 * std::abs((double) a);
+  const double thresh = 1.0e-35 * _QD_STD_ABS((double) a);
   dd_real t;  /* Term being added. */
   dd_real p;  /* Current power of a. */
   dd_real f;  /* Denominator. */
@@ -368,19 +377,17 @@ dd_real sin(const dd_real &a) {
   dd_real sin_t, cos_t;
   dd_real s, c;
   int j = (int) divrem(r, dd_real::_pi2, t);
-  int abs_j = std::abs(j);
+  int abs_j = _QD_STD_ABS(j);
   int k = (int) divrem(t, dd_real::_pi16, t);
-  int abs_k = std::abs(k);
+  int abs_k = _QD_STD_ABS(k);
 
   if (abs_j > 2) {
-    cerr << "ERROR (dd_real::sin): Cannot reduce modulo pi/2." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::sin): Cannot reduce modulo pi/2.");
     return 0.0;
   }
 
   if (abs_k > 4) {
-    cerr << "ERROR (dd_real::sin): Cannot reduce modulo pi/16." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::sin): Cannot reduce modulo pi/16.");
     return 0.0;
   }
 
@@ -430,19 +437,17 @@ dd_real cos(const dd_real &a) {
   dd_real sin_t, cos_t;
   dd_real s, c;
   int j = (int) divrem(r, dd_real::_pi2, t);
-  int abs_j = std::abs(j);
+  int abs_j = _QD_STD_ABS(j);
   int k = (int) divrem(t, dd_real::_pi16, t);
-  int abs_k = std::abs(k);
+  int abs_k = _QD_STD_ABS(k);
 
   if (abs_j > 2) {
-    cerr << "ERROR (dd_real::cos): Cannot reduce modulo pi/2." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::cos): Cannot reduce modulo pi/2.");
     return 0.0;
   }
 
   if (abs_k > 4) {
-    cerr << "ERROR (dd_real::cos): Cannot reduce modulo pi/16." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::cos): Cannot reduce modulo pi/16.");
     return 0.0;
   }
 
@@ -494,19 +499,17 @@ void sincos(const dd_real &a, dd_real &sin_a, dd_real &cos_a) {
   dd_real sin_t, cos_t;
   dd_real s, c;
   int j = (int) divrem(r, dd_real::_pi2, t);
-  int abs_j = std::abs(j);
+  int abs_j = _QD_STD_ABS(j);
   int k = (int) divrem(t, dd_real::_pi16, t);
-  int abs_k = std::abs(k);
+  int abs_k = _QD_STD_ABS(k);
 
   if (abs_j > 2) {
-    cerr << "ERROR (dd_real::sincos): Cannot reduce modulo pi/2." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::sincos): Cannot reduce modulo pi/2.");
     return;
   }
 
   if (abs_k > 4) {
-    cerr << "ERROR (dd_real::sincos): Cannot reduce modulo pi/16." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::sincos): Cannot reduce modulo pi/16.");
     return;
   }
 
@@ -570,8 +573,7 @@ dd_real atan2(const dd_real &y, const dd_real &x) {
 
     if (y.is_zero()) {
       /* Both x and y is zero. */
-      cerr << "ERROR (dd_real::atan2): Both arguments zero." << endl;
-      dd_real::abort();
+      dd_real::abort("(dd_real::atan2): Both arguments zero.");
       return 0.0;
     }
 
@@ -593,7 +595,7 @@ dd_real atan2(const dd_real &y, const dd_real &x) {
   dd_real yy = y / r;
 
   /* Compute double precision approximation to atan. */
-  dd_real z = std::atan2((double) y, (double) x);
+  dd_real z = _QD_STD_ATAN2((double) y, (double) x);
   dd_real sin_z, cos_z;
 
   if (xx > yy) {
@@ -619,8 +621,7 @@ dd_real asin(const dd_real &a) {
   dd_real abs_a = abs(a);
 
   if (abs_a > 1.0) {
-    cerr << "ERROR (dd_real::asin): Argument out of domain." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::asin): Argument out of domain.");
     return 0.0;
   }
 
@@ -635,8 +636,7 @@ dd_real acos(const dd_real &a) {
   dd_real abs_a = abs(a);
 
   if (abs_a > 1.0) {
-    cerr << "ERROR (dd_real::acos): Argument out of domain." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::acos): Argument out of domain.");
     return 0.0;
   }
 
@@ -663,7 +663,7 @@ dd_real sinh(const dd_real &a) {
   dd_real t = a;
   dd_real r = sqr(t);
   double m = 1.0;
-  double thresh = std::abs(((double) a) * dd_real::_eps);
+  double thresh = _QD_STD_ABS(((double) a) * dd_real::_eps);
 
   do {
     m += 2.0;
@@ -707,8 +707,7 @@ dd_real asinh(const dd_real &a) {
 
 dd_real acosh(const dd_real &a) {
   if (a < 1.0) {
-    cerr << "ERROR (dd_real::acosh): Argument out of domain." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::acosh): Argument out of domain.");
     return 0.0;
   }
 
@@ -717,8 +716,7 @@ dd_real acosh(const dd_real &a) {
 
 dd_real atanh(const dd_real &a) {
   if (abs(a) >= 1.0) {
-    cerr << "ERROR (dd_real::atanh): Argument out of domain." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::atanh): Argument out of domain.");
     return 0.0;
   }
 
@@ -789,8 +787,7 @@ dd_real polyroot(const dd_real *c, int n, const dd_real &x0,
   delete [] d;
 
   if (!conv) {
-    cerr << "ERROR (qd_real::polyroot): Failed to converge." << endl;
-    dd_real::abort();
+    dd_real::abort("(dd_real::polyroot): Failed to converge.");
     return 0.0;
   }
 
@@ -810,11 +807,16 @@ dd_real &dd_real::operator=(const char *s) {
 }
 
 /* Outputs the double-double number dd. */
-ostream &operator<<(ostream &s, const dd_real &a) {
-  char str[40];
-
-  a.write(str);
-  return s << str;
+ostream &operator<<(ostream &os, const dd_real &dd) {
+  bool showpos = (bool) (os.flags() & ios_base::showpos);
+  bool uppercase = (bool) (os.flags() & ios_base::uppercase);
+  ios_base::fmtflags float_field = os.flags() & ios_base::floatfield;
+  ios_base::fmtflags adjust_field = os.flags() & ios_base::adjustfield;
+  string str = dd.write(os.precision(), os.width(), float_field,
+      adjust_field, showpos, uppercase, os.fill());
+  int i, len = str.length();
+  for (i = 0; i < len; i++) { os.put(str[i]); }
+  return os;
 }
 
 /* Reads in the double-double number a. */
@@ -825,31 +827,33 @@ istream &operator>>(istream &s, dd_real &a) {
   return s;
 }
 
-/* Writes the double-double number into the string s.
-   The integer d specifies how many significant digits to write.
-   The string s must be able to hold at least (d+8) characters.  */
-void dd_real::write(char *s, int d) const {
+void dd_real::to_digits(char *s, int &expn, int precision) const {
+  int D = precision + 1;  /* number of digits to compute */
 
-  int D = d + 1;
   dd_real r = abs(*this);
   dd_real p;
-  int e;
-  int i, j;
+  int e;  /* exponent */
+  int i;
 
   if (hi == 0.0) {
-    s[0] = digits[0];
-    s[1] = '\0';
+    /* this == 0.0 */
+    for (i = 0; i < precision; i++) s[i] = 0;
     return;
   }
 
-  int *a = new int[D];
-
   /* First determine the (approximate) exponent. */
-  e = (int) std::floor(std::log10(std::abs(hi)));
-  p = dd_real(10.0) ^ e;
+  e = (int) _QD_STD_FLOOR(_QD_STD_LOG10(_QD_STD_ABS(hi)));
 
-  /* Fix it if we are off by one. */
-  r /= p;
+  if (e < -300) {
+    r *= dd_real(10.0) ^ 300;
+    p = dd_real(10.0) ^ (e + 300);
+    r /= p;
+  } else {
+    p = dd_real(10.0) ^ e;
+    r /= p;
+  }
+
+  /* Fix exponent if we are off by one */
   if (r >= 10.0) {
     r /= 10.0;
     e++;
@@ -859,68 +863,167 @@ void dd_real::write(char *s, int d) const {
   }
 
   if (r >= 10.0 || r < 1.0) {
-    cerr << "ERROR (dd_real::to_str): can't compute exponent." << endl;
-    delete [] a;
-    dd_real::abort();
+    dd_real::abort("(dd_real::to_str): can't compute exponent.");
     return;
   }
 
   /* Extract the digits */
   for (i = 0; i < D; i++) {
-    a[i] = (int) r.hi;
-    r = r - (double) a[i];
+    s[i] = (int) r.hi;
+    r -= (double) s[i];
     r *= 10.0;
   }
 
   /* Fix negative digits. */
   for (i = D-1; i > 0; i--) {
-    if (a[i] < 0) {
-      a[i-1]--;
-      a[i] += 10;
+    if (s[i] < 0) {
+      s[i-1]--;
+      s[i] += 10;
     }
   }
 
-  if (a[0] <= 0) {
-    cerr << "ERROR (dd_real::to_str): non-positive leading digit." << endl;
-    delete [] a;
-    dd_real::abort();
+  if (s[0] <= 0) {
+    dd_real::abort("(dd_real::to_str): non-positive leading digit.");
     return;
   }
 
-  /* Round */
-  if (a[D-1] >= 5) {
-    a[D-2]++;
+  /* Round, handle carry */
+  if (s[D-1] >= 5) {
+    s[D-2]++;
 
     i = D-2;
-    while (i > 0 && a[i] >= 10) {
-      a[i] -= 10;
-      a[--i]++;
+    while (i > 0 && s[i] >= 10) {
+      s[i] -= 10;
+      s[--i]++;
     }
-
   }
 
-  /* Start fill in the string. */
+  /* If first digit is 10, shift everything. */
+  if (s[0] == 10) {
+    e++;
+    for (i = precision; i >= 1; i--) s[i] = s[i-1];
+  }
+
+  /* Convert to digits */
+  for (i = 0; i < precision; i++) s[i] += '0';
+  s[precision] = 0;
+
+  expn = e;
+}
+
+/* Writes the double-double number into the string s.
+   The integer d specifies how many significant digits to write.
+   The string s must be able to hold at least (d+8) characters.
+   showpos indicates whether to use the + sign, and uppercase indicates
+   whether the E or e is to be used for the exponent. */
+void dd_real::write(char *s, int precision, bool showpos, bool uppercase) const {
+  char *t = new char[precision + 1];
+  int e, i, j;
+
+  to_digits(t, e, precision);
+
   i = 0;
   if (hi < 0.0)
     s[i++] = '-';
+  else if (hi >= 0.0 && showpos)
+    s[i++] = '+';
 
-  if (a[0] >= 10) {
-    s[i++] = digits[1];
-    s[i++] = '.';
-    s[i++] = digits[0];
-    e++;
+  s[i++] = t[0];
+  s[i++] = '.';
+
+  for (j = 1; j < precision; j++, i++)
+    s[i] = t[j];
+
+  /* Fill in exponent part */
+  s[i++] = uppercase ? 'E' : 'e';
+  sprintf(&s[i], "%d", e);
+  delete [] t;
+}
+
+string dd_real::write(int precision, int width,
+    ios_base::fmtflags float_field, ios_base::fmtflags adjust_field,
+    bool showpos, bool uppercase, char fill) const {
+  string s;
+  bool fixed = (bool) (float_field & ios_base::fixed);
+  bool sgn = true;
+  int i, e = 0;
+
+  if (*this < 0.0)
+    s += '-';
+  else if (showpos)
+    s += '+';
+  else
+    sgn = false;
+
+  if (*this == 0.0) {
+    /* Zero case */
+    s += '0';
+    if (precision > 0) {
+      s += '.';
+      s.append(precision, '0');
+    }
   } else {
-    s[i++] = digits[a[0]];
-    s[i++] = '.';
+    /* Non-zero case */
+    int off = (fixed ? (1 + (int) floor(log10(abs(*this)))) : 1);
+    int d = precision + off;
+
+    if (fixed && d <= 0) {
+      s += '0';
+      if (precision > 0) {
+        s += '.';
+        s.append(precision, '0');
+      }
+    } else {
+      char *t = new char[d+1];
+      int j;
+
+      to_digits(t, e, d);
+
+      if (fixed) {
+        if (off > 0) {
+          for (i = 0; i < off; i++) s += t[i];
+          s += '.';
+          for (j = 0; j < precision; j++, i++) s += t[i];
+        } else {
+          s += "0.";
+          if (off < 0) s.append(-off, '0');
+          for (i = 0; i < d; i++) s += t[i];
+        }
+      } else {
+        s += t[0];
+        if (precision > 0) s += '.';
+
+        for (i = 1; i < precision; i++)
+          s += t[i];
+
+        delete [] t;
+      }
+    }
   }
 
-  for (j=1; j < D-1; j++, i++)
-    s[i] = digits[a[j]];
+  if (!fixed) {
+    /* Fill in exponent part */
+    s += uppercase ? 'E' : 'e';
+    append_expn(s, e);
+  }
 
-  s[i++] = 'E';
-  std::sprintf(&s[i], "%d", e);
+  /* Fill in the blanks */
+  int len = s.length();
+  if (len < width) {
+    int delta = width - len;
+    if (adjust_field & ios_base::internal) {
+      if (sgn)
+        s.insert(1, delta, fill);
+      else
+        s.insert((int) 0, delta, fill);
+    } else if (adjust_field & ios_base::left) {
+      s.append(delta, fill);
+    } else {
+      s.insert((int) 0, delta, fill);
+    }
+  }
 
-  delete [] a;
+  return s;
 }
 
 /* Reads in a double-double number from the string s. */
@@ -1021,7 +1124,7 @@ dd_real dd_real::debug_rand() {
   dd_real a = 0.0;
   double d;
   for (int i = 0; i < 2; i++) {
-    d = std::ldexp(((double) STD_RAND()) / RAND_MAX, -expn);
+    d = _QD_STD_LDEXP(((double) STD_RAND()) / RAND_MAX, -expn);
     a += d;
     expn = expn + 54 + STD_RAND() % 200;
   }

@@ -9,14 +9,14 @@
  *
  * Double-double precision (>= 106-bit significand) floating point
  * arithmetic package based on David Bailey's Fortran-90 double-double
- * package, with some changes. See  
+ * package, with some changes. See
  *
  *   http://www.nersc.gov/~dhbailey/mpdist/mpdist.html
- *   
+ *
  * for the original Fortran-90 version.
  *
  * Overall structure is similar to that of Keith Brigg's C++ double-double
- * package.  See  
+ * package.  See
  *
  *   http://www-epidem.plansci.cam.ac.uk/~kbriggs/doubledouble.html
  *
@@ -30,11 +30,12 @@
 #define _QD_DD_H
 
 #include <iostream>
+#include <string>
 #include <qd/qd_config.h>
 
 class dd_real {
-protected:
-  
+ protected:
+
   /* Computes  dd * d  where d is known to be a power of 2. */
   friend dd_real mul_pwr2(const dd_real &dd, double d);
 
@@ -43,19 +44,22 @@ protected:
   static const dd_real sin_table[];
   static const dd_real cos_table[];
 
-public:
+ public:
   double hi, lo;
 
   /* Constructor(s) */
-  dd_real(double hi, double lo) : hi(hi), lo(lo) {}
-  dd_real() : hi(0.0), lo(0.0) {}
-  dd_real(double h) : hi(h), lo(0.0) {}
-  dd_real(int h) : hi((double) h), lo(0.0) {}
-  dd_real (const char *s);
-  dd_real (const double *d) : hi(d[0]), lo(d[1]) {}
+ dd_real(double hi, double lo) : hi(hi), lo(lo) {}
+ dd_real() : hi(0.0), lo(0.0) {}
+ dd_real(double h) : hi(h), lo(0.0) {}
+ dd_real(int h) : hi((double) h), lo(0.0) {}
+ dd_real(long int h) : hi((double) h), lo(0.0) {}
+ dd_real(unsigned int h) : hi((double) h), lo(0.0) {}
+ dd_real(unsigned long h) : hi((double) h), lo(0.0) {}
+  dd_real(const char *s);
+ dd_real(const double *d) : hi(d[0]), lo(d[1]) {}
 
   /* Function to be called is a fatal error occurs. */
-  static void abort();
+  static void abort(const char *msg);
 
   /* Accessors */
   double _hi() const { return hi; }
@@ -71,8 +75,10 @@ public:
   static const dd_real _e;
   static const dd_real _log2;
   static const dd_real _log10;
+  static const dd_real _nan;
 
   static const double _eps;   /* = 2^-106 */
+  static const int _ndigits;  /* = 32     */
 
   /* Addition */
   friend dd_real operator+(const dd_real &a, double b);
@@ -98,8 +104,18 @@ public:
   dd_real operator-() const;
 
   /* Multiplication */
-  friend dd_real operator*(const dd_real &a, double b);
-  friend dd_real operator*(double a, const dd_real &b);
+#define DD_REAL_OP_MUL_T_DECL( T )			\
+  friend dd_real operator*(const dd_real &a, T b);	\
+  friend dd_real operator*(T a, const dd_real &b);
+
+  DD_REAL_OP_MUL_T_DECL( int );
+  DD_REAL_OP_MUL_T_DECL( long int );
+  DD_REAL_OP_MUL_T_DECL( unsigned int );
+  DD_REAL_OP_MUL_T_DECL( unsigned long int );
+  DD_REAL_OP_MUL_T_DECL( float );
+  DD_REAL_OP_MUL_T_DECL( double );
+  DD_REAL_OP_MUL_T_DECL( long double );
+
   friend dd_real operator*(const dd_real &a, const dd_real &b);
   static dd_real mul(double a, double b);
 
@@ -113,7 +129,7 @@ public:
   friend dd_real operator/(const dd_real &a, const dd_real &b);
   static dd_real div(double a, double b);
   friend dd_real inv(const dd_real &a);
-  
+
   /* Self-Division */
   dd_real &operator/=(double a);
   dd_real &operator/=(const dd_real &a);
@@ -130,6 +146,7 @@ public:
   /* N-th power.  NOTE: must be careful about order of precedence. */
   dd_real operator^(int n);
   friend dd_real pow(const dd_real &a, int n);
+  friend dd_real pow(const dd_real &a, const dd_real &b);
   friend dd_real npwr(const dd_real &a, int n);
   friend dd_real sqr(const dd_real &a);
   static dd_real sqr(double d);
@@ -138,7 +155,7 @@ public:
   static dd_real sqrt(double a);
   friend dd_real sqrt(const dd_real &a);
   friend dd_real nroot(const dd_real &a, int n);
-  
+
   /* Comparisons */
   friend bool operator==(const dd_real &a, double b);
   friend bool operator==(double a, const dd_real &b);
@@ -164,7 +181,7 @@ public:
   friend bool operator!=(double a, const dd_real &b);
   friend bool operator!=(const dd_real &a, const dd_real &b);
 
-  /* Other Comparisons.  These are faster than 
+  /* Other Comparisons.  These are faster than
      directly comparing to 0 or 1.             */
   bool is_zero() const;
   bool is_one() const;
@@ -182,7 +199,7 @@ public:
   static dd_real rand(void);
 
   /* Polynomial Solver */
-  friend dd_real polyroot(const dd_real *c, int n, 
+  friend dd_real polyroot(const dd_real *c, int n,
                           const dd_real &x0, double thresh);
   friend dd_real polyeval(const dd_real *c, int n, const dd_real &x);
 
@@ -212,7 +229,7 @@ public:
   friend dd_real sinh(const dd_real &a);
   friend dd_real cosh(const dd_real &a);
   friend dd_real tanh(const dd_real &a);
-  friend void sincosh(const dd_real &a, 
+  friend void sincosh(const dd_real &a,
                       dd_real &sinh_a, dd_real &cosh_a);
 
   /* Inverse Hyperbolic Functions */
@@ -225,7 +242,14 @@ public:
   friend dd_real abs(const dd_real &a);   /* same as fabs */
 
   /* Input/Output */
-  void write(char *s, int d = 32) const; /* s must hold d+8 chars */
+  void to_digits(char *s, int &expn, int precision = _ndigits) const;
+  void write(char *s, int precision = _ndigits,
+	     bool showpos = false, bool uppercase = false) const;
+  /* s must hold d+8 chars */
+  std::string write(int precision = _ndigits, int width = 0,
+		    std::ios_base::fmtflags floatfield = (std::ios_base::fmtflags) 0,
+		    std::ios_base::fmtflags adjustfield = (std::ios_base::fmtflags) 0,
+		    bool showpos = false, bool uppercase = false, char fill = ' ') const;
   int read(const char *s, dd_real &a);
 
   friend std::ostream& operator<<(std::ostream &s, const dd_real &a);
@@ -246,7 +270,7 @@ public:
 dd_real ddrand(void);
 dd_real sqrt(const dd_real &a);
 
-dd_real polyroot(const dd_real *c, int n, 
+dd_real polyroot(const dd_real *c, int n,
                  const dd_real &x0, double thresh = 1.0e-30);
 
 #ifdef QD_INLINE

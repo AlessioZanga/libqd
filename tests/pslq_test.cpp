@@ -24,13 +24,18 @@
 using std::cout;
 using std::cerr;
 using std::endl;
-using std::abs;
-using std::strcmp;
-using std::rand;
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || (_MSC_VER > 1200)
+using std::sqrt;
+using std::strcmp;
+using std::exit;
 using std::time;
 using std::atoi;
+using std::rand;
+using std::log10;
+using std::srand;
+#else
+
 #endif
 
 bool flag_random = false;
@@ -94,13 +99,14 @@ bool pslq_test(int n, double eps, int seed = 0, int max_itr = 1000) {
   int err;
   TimeVal tv;
   double tm;
+  int ndigits = (int) -log10(eps);
 
   a = new T[n];
   b = new T[n];
   x = new T[n];
 
   /* Randomize seed. */
-  std::srand((unsigned int) seed);
+  srand((unsigned int) seed);
 
   /* Construct a random polynomial, making sure the
      the first and the second coefficients are non-zero.  */
@@ -116,6 +122,7 @@ bool pslq_test(int n, double eps, int seed = 0, int max_itr = 1000) {
   }
 
   if (flag_verbose) {
+    cout.precision(6);
     cout << "Original polynomial:" << endl << "  ";
     for (int i = 0; i < n; i++)
       cout << (double) a[i] << " ";
@@ -123,6 +130,7 @@ bool pslq_test(int n, double eps, int seed = 0, int max_itr = 1000) {
   }
 
   /* Find a root */
+  cout.precision(ndigits);
   r = polyroot<T>(a, n-1, 0.0, eps);
   if (flag_verbose)
     cout << "Root: " << r << endl;
@@ -155,6 +163,7 @@ bool pslq_test(int n, double eps, int seed = 0, int max_itr = 1000) {
 
     if (flag_verbose) 
       cout << "Reconstructed polynomial:" << endl << "  ";
+    cout.precision(8);
     for (int i = 0; i < n; i++) {
       if (a[i] != sign * b[i])
         same = false;
@@ -175,6 +184,7 @@ bool pslq_test(int n, double eps, int seed = 0, int max_itr = 1000) {
     cout << "Test FAILED." << endl;
   else
     cout << "Test passed." << endl;
+  cout.precision(6);
   cout << "Elapsed time: " << tm << " seconds." << endl;
   return !err;
 }
