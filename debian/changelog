@@ -1,3 +1,9 @@
+qd (2.1.200-1build1) feisty; urgency=low
+
+  * Rebuild for ldbl128 change on powerpc and sparc.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu,  2 Nov 2006 10:25:45 +0000
+
 qd (2.1.200-1) unstable; urgency=low
 
   * New upstream release
