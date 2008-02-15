@@ -1,11 +1,29 @@
 #ifndef _QD_QD_CONFIG_H
 #define _QD_QD_CONFIG_H  1
 
-/* Set the following to 1 if the processor has a fused 
-   multiply-accumulate instruction, and the compiler correctly 
-   emits it.  Otherwise (or if unsure), make it 0. */
-#ifndef QD_HAS_FMA
-#undef QD_HAS_FMA 
+#ifndef QD_API
+#undef QD_API
+#endif
+
+/* Set to 1 if using VisualAge C++ compiler for __fmadd builtin. */
+#ifndef QD_VACPP_BUILTINS_H
+#undef QD_VACPP_BUILTINS_H
+#endif
+
+/* If fused multiply-add is available, define to correct macro for
+   using it.  It is invoked as QD_FMA(a, b, c) to compute fl(a * b + c). 
+   If correctly rounded multiply-add is not available (or if unsure), 
+   keep it undefined.*/
+#ifndef QD_FMA
+#undef QD_FMA
+#endif
+
+/* If fused multiply-subtract is available, define to correct macro for
+   using it.  It is invoked as QD_FMS(a, b, c) to compute fl(a * b - c). 
+   If correctly rounded multiply-add is not available (or if unsure), 
+   keep it undefined.*/
+#ifndef QD_FMS
+#undef QD_FMS
 #endif
 
 /* Set the following to 1 to define commonly used function
@@ -50,9 +68,20 @@
 #undef QD_SLOPPY_DIV
 #endif
 
-/* Set the following to 1 to enable debugging code. */
-#ifndef QD_DEBUG
-#undef QD_DEBUG
+/* Define this macro to be the isfinite(x) function. */
+#ifndef QD_ISFINITE
+#undef QD_ISFINITE
 #endif
+
+/* Define this macro to be the isinf(x) function. */
+#ifndef QD_ISINF
+#undef QD_ISINF
+#endif
+
+/* Define this macro to be the isnan(x) function. */
+#ifndef QD_ISNAN
+#undef QD_ISNAN
+#endif
+
 
 #endif /* _QD_QD_CONFIG_H */

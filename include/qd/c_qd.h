@@ -103,7 +103,7 @@ void c_qd_sincos(const double *a, double *s, double *c);
 void c_qd_sincosh(const double *a, double *s, double *c);
 
 void c_qd_read(const char *s, double *a);
-void c_qd_swrite(const double *a, char *s);
+void c_qd_swrite(const double *a, int precision, char *s, int len);
 void c_qd_write(const double *a);
 void c_qd_neg(const double *a, double *b);
 void c_qd_rand(double *a);

@@ -5,7 +5,7 @@ exec_prefix="@exec_prefix@"
 includedir="@includedir@"
 libdir="@libdir@"
 bindir="@bindir@"
-datadir="@datadir@"
+datadir="@datarootdir@"
 mandir="@mandir@"
 sysconfdir="@sysconfdir@"
 sharedstatedir="@sharedstatedir@"
@@ -28,6 +28,7 @@ CFLAGS="@CPPFLAGS@ -I$includedir"
 SRC_CFLAGS="-I$srcdir/src -I$builddir/src @CPPFLAGS@"
 
 FCLIBS="-L$libdir -lqdmod -lqd @LIBS@ @FCLIBS@"
+FMAINLIB="-L$libdir -lqd_f_main"
 FCFLAGS="@REQ_FCFLAGS@"
 MODFLAG="@ax_f90_modflag@$libdir/qd"
 
@@ -47,6 +48,7 @@ Options:
 	[--libs]
 	[--fclibs]
 	[--fcflags]
+        [--fmainlib]
 	[--cflags]
 	[--cxx]
 	[--cxxflags]
@@ -124,6 +126,9 @@ while test $# -gt 0; do
       ;;
     --fcflags)
       echo "$MODFLAG $FCFLAGS"
+      ;;
+    --fmainlib)
+      echo "$FMAINLIB"
       ;;
     --cxxflags)
       echo $CXXFLAGS

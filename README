@@ -5,12 +5,12 @@
 | Xiaoye S. Li     Lawrence Berkeley Natl Lab  xiaoye@nersc.gov        |
 | David H. Bailey  Lawrence Berkeley Natl Lab  dhbailey@lbl.gov        |
 |                                                                      |
-| Revised  2005-03-12  Copyright (c) 2005                              |
+| Revised  2007-01-10  Copyright (c) 2005-2007                         |
 ------------------------------------------------------------------------
 
 This work was supported by the Director, Office of Science, Division
 of Mathematical, Information, and Computational Sciences of the
-U.S. Department of Energy under contract number DE-AC03-76SF00098.
+U.S. Department of Energy under contract number DE-AC02-05CH11231.
 
 See the file COPYING for license information.
 See the file INSTALL for installation instructions.
@@ -69,7 +69,7 @@ C++ Usage
 Here is a sample C++ calling program:
 
     #include <iostream>
-    #include <qd/qd.h>
+    #include <qd/qd_real.h>
     using namespace std;
 
     int main() {
@@ -103,8 +103,8 @@ are not allowed with integer types; these must first be converted to
 double.
 
 In all C++ files that use double-double precision, include the header
-file <qd/dd.h>.  In all C++ files that use quad-double precision, include
-the header file "<qd/qd.h>".  
+file <qd/dd_real.h>.  In all C++ files that use quad-double precision, 
+include the header file "<qd/qd_real.h>".  
 
 Writing C++ programs that utilize these routines is straightforward.
 In many cases, it is only necessary to change the type statements for
@@ -126,6 +126,9 @@ in the test suite.
 
 Fortran-90 Usage
 ----------------
+
+NEW (2007-01-10): The Fortran translation modules now support the
+complex datatypes "dd_complex" and "qd_complex".
 
 Since the quad-double library is written in C++, it must be linked
 in with a C++ compiler (so that C++ specific things such as

@@ -14,6 +14,7 @@
 #define _QD_C_DD_H
 
 #include <qd/qd_config.h>
+#include <qd/fpu.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,7 +82,7 @@ void c_dd_sincos(const double *a, double *s, double *c);
 void c_dd_sincosh(const double *a, double *s, double *c);
 
 void c_dd_read(const char *s, double *a);
-void c_dd_swrite(const double *a, char *s);
+void c_dd_swrite(const double *a, int precision, char *s, int len);
 void c_dd_write(const double *a);
 void c_dd_neg(const double *a, double *b);
 void c_dd_rand(double *a);

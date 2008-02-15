@@ -12,34 +12,21 @@
  */
 
 #include <cmath>
-#include <cstdlib>
-#include <cstring>
 #include <iostream>
 #include <ctime>
+#include <limits>
+#include <iomanip>
 #include <qd/fpu.h>
 
-#include "timer.h"
+#include "tictoc.h"
 #include "pslq.h"
 
 using std::cout;
 using std::cerr;
 using std::endl;
-
-#if !defined(_MSC_VER) || (_MSC_VER > 1200)
-using std::sqrt;
 using std::strcmp;
-using std::exit;
-using std::time;
-using std::atoi;
-using std::rand;
-using std::log10;
-using std::srand;
-#else
 
-#endif
-
-bool flag_random = false;
-bool flag_verbose = false;
+int g_verbose = 0;
 bool flag_double_pslq = false;
 bool flag_dd_pslq = false;
 bool flag_qd_pslq = false;
@@ -47,162 +34,112 @@ bool flag_qd_pslq = false;
 /* Computes the value of the given n-th degree polynomial at point x
    where the (n+1) coefficients of the polynomial is given in a. */
 template <class T>
-T polyeval(T *a, int n, T x) {
+T polyeval(T *a, int n, T &x, double &err_bnd) {
   /* Use Horner's evaluation scheme. */
 
   T t = a[n];
+  err_bnd = std::abs(to_double(t)) * 0.5;
   for (int i = n-1; i >= 0; i--) {
     t *= x;
     t += a[i];
+    err_bnd *= std::abs(to_double(x));
+    err_bnd += std::abs(to_double(t));
   }
+  err_bnd = (2.0 * err_bnd - to_double(t)) * std::numeric_limits<T>::epsilon();
 
   return t;
 }
 
-/* Computes a root near x0 of the given n-th degree polynomial
-   where the (n+1) coefficients of the polynomial is given in a. */
-template <class T>
-T polyroot(T *a, int n, T x0, double eps) {
-  /* Use Newton iteration. */
-
-  T *da = new T[n];
-  
-  /* Compute the coefficients of the derivatives. */
-  for (int i = 1; i <= n; i++)
-    da[i-1] = ((double) i) * a[i];
-  
-  /* Perform Newton iteration. */
-  T x = x0;
-  T corr;
-  static const double und = 2.22507385850721e-308;
-  do {
-    corr = polyeval<T>(a, n, x) / polyeval<T>(da, n-1, x);
-    x -= corr;
-  } while (abs(corr) > (eps * abs(x) + und));
-
-  delete [] da;
-  return x;
+double nroot(double x, int n) {
+  return std::pow(x, 1.0 / n);
 }
 
-/* Creates a random polynomial (integer coefficients) of degree
-   n-1, solves for one of its root, and tries to reconstruct the 
-   original polynomial from the root by performing PSLQ on 
-   1, r, r^2, ..., r^{n-1}.                                       
+bool is_int(double x) {
+  return (std::abs(x) <= std::numeric_limits<int>::max() &&
+          static_cast<int>(x) == x);
+}
 
-   Note that this test can report false failures, if the random
-   polynomial has a non-trivial factor (with real coefficients).
-*/
+/* Sets r = 2^(1/p) + 3^(1/q) and tries to recover the algebraic
+ * polynomial of degree pq performing PSLQ on 1, r, r^2, ..., r^n. */
 template <class T>
-bool pslq_test(int n, double eps, int seed = 0, int max_itr = 1000) {
-  T *x, *a, *b;
-  T r, t;
+bool pslq_test(int p, int q, double eps, int max_itr = 100000) {
+  T *x, *b;
+  T r = nroot(T(2.0), p) + nroot(T(3.0), q);
+  T t;
   int err;
-  TimeVal tv;
+  tictoc tv;
   double tm;
-  int ndigits = (int) -log10(eps);
+  int n = p * q + 1;
+  std::ios_base::fmtflags fmt = cout.flags();
 
-  a = new T[n];
   b = new T[n];
   x = new T[n];
 
-  /* Randomize seed. */
-  srand((unsigned int) seed);
-
-  /* Construct a random polynomial, making sure the
-     the first and the second coefficients are non-zero.  */
-  if (flag_random) {
-    a[0] = ((rand() % 2 == 0) ? 1 : -1) * (rand() % 9+1);
-    a[n-1] = ((rand() % 2 == 0) ? 1 : -1) * (rand() % 9+1);
-    for (int i = 1; i < n-1; i++) {
-      a[i] = (T) (rand() % 19 - 9);
-    }
-  } else {
-    for (int i = 0; i < n; i++)
-      a[i] = (T) (((7*i+3) % 19) - 9);
-  }
-
-  if (flag_verbose) {
-    cout.precision(6);
-    cout << "Original polynomial:" << endl << "  ";
-    for (int i = 0; i < n; i++)
-      cout << (double) a[i] << " ";
-    cout << endl;
-  }
-
-  /* Find a root */
-  cout.precision(ndigits);
-  r = polyroot<T>(a, n-1, 0.0, eps);
-  if (flag_verbose)
-    cout << "Root: " << r << endl;
-
-  /* Check the root. */
-  t = polyeval<T>(a, n-1, r);
-  if (flag_verbose)
-    cout << " p(r) = " << t << endl;
-
   /* Fill in vector x with powers of r. */
-  t = 1.0;
-  for (int i = 0; i < n; i++, t *= r)
-    x[i] = t;
+  x[0] = 1.0;
+  x[1] = r;
+  t = r*r;
+  for (int i = 2; i < n; i++, t *= r) x[i] = t;
   
-  /* Reconstruct polynomial. */
+  cout << "  testing pslq_test(" << p << ", " << q << ") ..." << endl;
+  if (g_verbose) cout << std::setprecision(std::numeric_limits<T>::digits10) << "    r = " << r << endl;
+
+  /* Construct algebraic relation */
   tic(&tv);
   err = pslq<T>(x, n, b, eps, max_itr);
   tm = toc(&tv);
 
+  cout << "    elapsed time = " << std::setprecision(4) << tm << " seconds." << endl;
+  cout << std::right << std::setprecision(2) << std::fixed;
   if (!err) {
-    bool same = true;
-    double sign = 0.0;
-
-    if (a[0] == b[0])
-      sign = 1.0;
-    else if (a[0] == -b[0])
-      sign = -1.0;
-    else 
-      same = false;
-
-    if (flag_verbose) 
-      cout << "Reconstructed polynomial:" << endl << "  ";
-    cout.precision(8);
-    for (int i = 0; i < n; i++) {
-      if (a[i] != sign * b[i])
-        same = false;
-      if (flag_verbose)
-        cout << (double) b[i] << " ";
+    if (g_verbose) {
+      cout << "    polynomial: ";
+      for (int i = 0; i < n; i++) { 
+        if (i > 0) cout << "                ";
+        cout << std::setprecision(0) << std::setw(24) << b[i] << endl;
+      }
     }
-    cout << endl;
 
-    if (!same)
-      err = -1;
+    /* Check if r satisfies the polynomial. */
+    double err_bnd;
+    t = abs(polyeval<T>(b, n-1, r, err_bnd));
+    err = t > 10.0 * err_bnd;
+    cout << std::scientific << std::setprecision(4);
+    if (err || g_verbose) {
+      cout << "    residual    = " << t << endl;
+      cout << "    error bound = " << err_bnd << endl;
+    }
   }
 
   delete [] x;
-  delete [] a;
   delete [] b;
 
   if (err)
-    cout << "Test FAILED." << endl;
+    cout << "  test FAILED." << endl;
   else
-    cout << "Test passed." << endl;
-  cout.precision(6);
-  cout << "Elapsed time: " << tm << " seconds." << endl;
+    cout << "  test passed." << endl;
+  cout << endl;
+
+  cout.flags(fmt);
   return !err;
+}
+
+/* We need this since Sun C++ compiler seems to miscompile when
+ * eps parameter is given default (templated) argument. */
+template <class T>
+bool pslq_test(int p, int q) {
+  return pslq_test<T>(p, q, std::numeric_limits<T>::epsilon());
 }
 
 void print_usage() {
   cout << "pslq_test [-h] [-n N] [-d] [-dd] [-qd] [-all] [-verbose]" << endl;
   cout << "  Performs the PSLQ algorithm on 1, r, r^2, ..., r^{n-1}" << endl;
-  cout << "  where r is a root of a randomly constructed integer " << endl;
-  cout << "  coefficient polynomial of degree n-1.  PSLQ algorithm" << endl;
-  cout << "  should reconstruct the polynomial in most cases where" << endl;
-  cout << "  the degree is not too high and the polynomial is" << endl;
-  cout << "  irreducible over the rationals." << endl;
+  cout << "  where r is a root of a constructed integer coefficient" << endl;
+  cout << "  polynomial.  PSLQ algorithm should reconstruct the polynomial" << endl;
+  cout << "  in most cases where the degree is not too high and the" << endl;
+  cout << "  polynomial is irreducible over the rationals." << endl;
   cout << endl;
   cout << "  -h -help  Print this usage message and exit." << endl;
-  cout << "  -n N      Use n reals in PSLQ algorithm (n-1 degree polynomial)." << endl;
-  cout << "            Here n should be even to ensure the polynomial has" << endl;
-  cout << "            at least one real root.  This flag will result" << endl;
-  cout << "            in random n-1 degree polynomial to be chosen." << endl;
   cout << "  -d        Perform PSLQ with double precision (53 bit mantissa)." << endl;
   cout << "  -dd       Perform PSLQ with double-double precision." << endl;
   cout << "            (about 106 bits of significand)." << endl;
@@ -210,15 +147,11 @@ void print_usage() {
   cout << "            (about 212 bits of significand).  This is the default." << endl;
   cout << "  -all      Perform PSLQ with all three precisions above." << endl;
   cout << "  -verbose" << endl;
-  cout << "  -v        Output PSLQ iteration step information.  Mostly" << endl;
-  cout << "            for debugging purposes." << endl;
+  cout << "  -v        Increase verbosity." << endl;
 }
 
 int main(int argc, char **argv) {
-  int n = 4;
   char *arg;
-  int tmp;
-  int seed;
 
   /* Parse the command-line arguments. */
   for (int i = 1; i < argc; i++) {
@@ -226,18 +159,6 @@ int main(int argc, char **argv) {
     if (strcmp(arg, "-h") == 0 || strcmp(arg, "-help") == 0) {
       print_usage();
       return 0;
-    } else if (strcmp(arg, "-n") == 0) {
-      if (++i < argc) {
-        tmp = atoi(argv[i]);
-        if (tmp <= 1 || tmp > 1024)
-          cerr << "Invalid n." << endl;
-        else {
-          n = tmp;
-          flag_random = true;
-        }
-      } else {
-        cerr << "Number expected after `-n'." << endl;
-      }
     } else if (strcmp(arg, "-d") == 0) {
       flag_double_pslq = true;
     } else if (strcmp(arg, "-dd") == 0) {
@@ -247,7 +168,7 @@ int main(int argc, char **argv) {
     } else if (strcmp(arg, "-all") == 0) {
       flag_double_pslq = flag_dd_pslq = flag_qd_pslq = true;
     } else if (strcmp(arg, "-v") == 0 || strcmp(arg, "-verbose") == 0) {
-      flag_verbose = true;
+      g_verbose++;
     } else {
       cerr << "Unknown flag `" << arg << "'." << endl;
     }
@@ -258,36 +179,39 @@ int main(int argc, char **argv) {
     flag_qd_pslq = true;
   }
 
-  /* Reset seed. */
-  seed = (int) time(NULL);
-
-  if (flag_random)
-    cout << "Using N = " << n << endl << endl;
-
   unsigned int old_cw;
   fpu_fix_start(&old_cw);
 
   bool pass = true;
   if (flag_double_pslq) {
     cout << "Performing double-precision PSLQ." << endl;
-    if (!flag_random)
-      n = 8;
-    pass &= pslq_test<double>(n, 1.0e-15, seed, 1000);
+    pass &= pslq_test<double>(2, 2);
+    pass &= pslq_test<double>(3, 2);
   }
 
   if (flag_dd_pslq) {
     cout << "Performing double-double precision PSLQ." << endl;
-    if (!flag_random)
-      n = 14;
-    pass &= pslq_test<dd_real>(n, 1.0e-30 , seed, 1000);
+    pass &= pslq_test<dd_real>(2, 2);
+    pass &= pslq_test<dd_real>(2, 3);
+    pass &= pslq_test<dd_real>(2, 4);
+    pass &= pslq_test<dd_real>(3, 3);
+    pass &= pslq_test<dd_real>(2, 5);
   }
 
   if (flag_qd_pslq) {
     cout << "Performing quad-double precision PSLQ." << endl;
-    if (!flag_random)
-      n = 26;
-    pass &= pslq_test<qd_real>(n, 1.0e-60, seed, 30000);
+    pass &= pslq_test<qd_real>(3, 3);
+    pass &= pslq_test<dd_real>(2, 5);
+    pass &= pslq_test<qd_real>(4, 3);
+    pass &= pslq_test<qd_real>(2, 6);
+    pass &= pslq_test<qd_real>(2, 7);
+    pass &= pslq_test<qd_real>(3, 5);
   }
+
+  if (pass)
+    cout << "All tests passed." << endl;
+  else
+    cout << "Some tests FAILED." << endl;
 
   fpu_fix_end(&old_cw);
   return (pass ? 0 : 1);

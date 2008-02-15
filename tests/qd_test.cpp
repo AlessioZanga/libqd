@@ -11,24 +11,22 @@
  * and quad-double library.
  */
 
+#include <cstdlib>
 #include <cmath>
 #include <iostream>
-#include <qd/qd.h>
+#include <iomanip>
+#include <algorithm>
+#include <qd/qd_real.h>
 #include <qd/fpu.h>
 
 using std::cout;
 using std::cerr;
 using std::endl;
 
-#if !defined(_MSC_VER) || (_MSC_VER > 1200)
 using std::abs;
 using std::sqrt;
 using std::strcmp;
 using std::exit;
-#else
-static double abs(double x) { return fabs(x); }
-#endif
-
 
 // Global flags passed to the main program.
 static bool flag_test_dd = false;
@@ -53,6 +51,8 @@ public:
   bool test4();
   bool test5();
   bool test6();
+  bool test7();
+  bool test8();
   bool testall();
 };
 
@@ -70,7 +70,7 @@ bool TestSuite<T>::test1() {
   T x, y;
 
   for (int i = 0; i < n; i++)
-    c[i] = (double) i+1;
+    c[i] = static_cast<double>(i+1);
 
   x = polyroot(c, n-1, T(0.0));
   y = polyeval(c, n-1, x);
@@ -82,7 +82,7 @@ bool TestSuite<T>::test1() {
   }
 
   delete [] c;
-  return (((double) y) < 4.0 * T::_eps);
+  return (to_double(y) < 4.0 * T::_eps);
 }
 
 /* Test 2.  Machin's Formula for Pi. */
@@ -156,7 +156,7 @@ bool TestSuite<T>::test2() {
   T p = 4.0 * s1 - s2;
 
   p *= 4.0;
-  err = abs((double) (p - T::_pi));
+  err = abs(to_double(p - T::_pi));
 
   if (flag_verbose) {
     cout.precision(T::_ndigits);
@@ -178,9 +178,10 @@ bool TestSuite<T>::test3() {
   cout.precision(T::_ndigits);
 
   T a, b, s, p;
-  T a_new, b_new, s_new;
+  T a_new, b_new, p_old;
   double m;
   double err;
+  const int max_iter = 20;
 
   a = 1.0;
   b = sqrt(T(0.5));
@@ -189,26 +190,28 @@ bool TestSuite<T>::test3() {
 
   p = 2.0 * sqr(a) / s;
   if (flag_verbose)
-    cout << "Iteration 0: " << p << endl;
-  for (int i = 1; i <= 9; i++) {
+    cout << "Iteration  0: " << p << endl;
+  for (int i = 1; i <= max_iter; i++) {
     m *= 2.0;
     a_new = 0.5 * (a + b);
-    b_new = sqrt(a * b);
-    s_new = s - m * (sqr(a_new) - sqr(b_new));
+    b_new = a * b;
+    s -= m * (sqr(a_new) - b_new);
     a = a_new;
-    b = b_new;
-    s = s_new;
+    b = sqrt(b_new);
+    p_old = p;
     p = 2.0 * sqr(a) / s;
     if (flag_verbose)
-      cout << "Iteration " << i << ": " << p << endl;
+      cout << "Iteration " << std::setw(2) << i << ": " << p << endl;
+    if (abs(to_double(p - p_old)) < 64 * T::_eps)
+      break;
   }
 
-  err = abs((double) (p - T::_pi));
+  err = abs(to_double(p - T::_pi));
 
   if (flag_verbose) {
-    cout << "        _pi: " << T::_pi << endl;
+    cout << "         _pi: " << T::_pi << endl;
     cout.precision(double_digits);
-    cout << "      error: " << err << " = " << err / T::_eps << " eps" << endl;
+    cout << "       error: " << err << " = " << err / T::_eps << " eps" << endl;
   }
 
   // for some reason, this test gives relatively large error compared
@@ -223,9 +226,10 @@ bool TestSuite<T>::test4() {
   cout << "Test 4.  (Borwein Quartic Formula for Pi)." << endl;
   cout.precision(T::_ndigits);
 
-  T a, y, p, r;
+  T a, y, p, r, p_old;
   double m;
   double err;
+  const int max_iter = 20;
 
   a = 6.0 - 4.0 * sqrt(T(2.0));
   y = sqrt(T(2.0)) - 1.0;
@@ -233,24 +237,27 @@ bool TestSuite<T>::test4() {
 
   p = 1.0 / a;
   if (flag_verbose)
-    cout << "Iteration 0: " << p << endl;
+    cout << "Iteration  0: " << p << endl;
 
-  for (int i = 1; i <= 9; i++) {
+  for (int i = 1; i <= max_iter; i++) {
     m *= 4.0;
     r = nroot(1.0 - sqr(sqr(y)), 4);
     y = (1.0 - r) / (1.0 + r);
     a = a * sqr(sqr(1.0 + y)) - m * y * (1.0 + y + sqr(y));
     
+    p_old = p;
     p = 1.0 / a;
     if (flag_verbose)
-      cout << "Iteration " << i << ": " << p << endl;
+      cout << "Iteration " << std::setw(2) << i << ": " << p << endl;
+    if (abs(to_double(p - p_old)) < 16 * T::_eps)
+      break;
   }
 
-  err = abs((double) (p - T::_pi));
+  err = abs(to_double(p - T::_pi));
   if (flag_verbose) {
-    cout << "        _pi: " << T::_pi << endl;
+    cout << "         _pi: " << T::_pi << endl;
     cout.precision(double_digits);
-    cout << "      error: " << err << " = " << err / T::_eps << " eps" << endl;
+    cout << "       error: " << err << " = " << err / T::_eps << " eps" << endl;
   }  
 
   return (err < 256.0 * T::_eps);
@@ -283,7 +290,7 @@ bool TestSuite<T>::test5() {
     s += t;
   }
 
-  delta = abs((double) (s - T::_e));
+  delta = abs(to_double(s - T::_e));
 
   if (flag_verbose) {
     cout << "    e = " << s << endl;
@@ -324,7 +331,7 @@ bool TestSuite<T>::test6() {
     s += (t/n);
   }
 
-  delta = abs((double) (s - T::_log2));
+  delta = abs(to_double(s - T::_log2));
 
   if (flag_verbose) {
     cout << " log2 = " << s << endl;
@@ -339,6 +346,84 @@ bool TestSuite<T>::test6() {
   return (delta < 4.0 * T::_eps);
 }
 
+/* Test 7.  Sanity check for exp. */
+template <class T>
+bool TestSuite<T>::test7() {
+  cout << endl;
+  cout << "Test 7.  (Sanity check for exp)." << endl;
+  cout.precision(T::_ndigits);
+
+  /* Do simple sanity check
+   *
+   *   e^2 = exp(2)
+   *       = exp(-13/4) * exp(-9/4) * exp(-5/4) * exp(-1/4) *
+   *         exp(3/4) * exp(7/4) * exp(11/4) * exp(15/4)
+   */
+
+  T t = -3.25;
+  T p =  1.0;
+
+  for (int i = 0; i < 8; i++, t += 1.0) {
+    /* For some reason gcc-4.1.x on x86_64 miscompiles p *= exp(t) here. */
+    p = p * exp(t);
+  }
+
+  T t1 = exp(T(2.0));
+  T t2 = sqr(T::_e);
+  double delta = std::max(abs(to_double(t1 - p)), abs(to_double(t2 - p)));
+
+  if (flag_verbose) {
+    cout << "result = " << p << endl;
+    cout << "exp(2) = " << t1 << endl;
+    cout << "   e^2 = " << t2 << endl;
+
+    cout.precision(double_digits);
+
+    cout << " error = " << delta << " = " << (delta / T::_eps)
+         << " eps" << endl;
+  }
+
+  return (delta < 16.0 * T::_eps);
+}
+
+template <class T>
+bool TestSuite<T>::test8() {
+  cout << endl;
+  cout << "Test 8.  (Sanity check for sin / cos)." << endl;
+  cout.precision(T::_ndigits);
+
+  /* Do simple sanity check
+   *
+   *  sin(x) = sin(5x/7)cos(2x/7) + cos(5x/7)sin(2x/7)
+   *
+   *  cos(x) = cos(5x/7)cos(2x/7) - sin(5x/7)sin(2x/7);
+   */
+
+  T x = T::_pi / 3.0;
+  T x1 = 5.0 * x / 7.0;
+  T x2 = 2.0 * x / 7.0;
+
+  T r1 = sin(x1)*cos(x2) + cos(x1)*sin(x2);
+  T r2 = cos(x1)*cos(x2) - sin(x1)*sin(x2);
+  T t1 = sqrt(T(3.0)) / 2.0;
+  T t2 = 0.5;
+
+  double delta = std::max(abs(to_double(t1 - r1)), abs(to_double(t2 - r2)));
+
+  if (flag_verbose) {
+    cout << "  r1 = " << r1 << endl;
+    cout << "  t1 = " << t1 << endl;
+    cout << "  r2 = " << r2 << endl;
+    cout << "  t2 = " << t2 << endl;
+
+    cout.precision(double_digits);
+    cout << " error = " << delta << " = " << (delta / T::_eps)
+         << " eps" << endl;
+  }
+
+  return (delta < 4.0 * T::_eps);
+}
+
 template <class T>
 bool TestSuite<T>::testall() {
   bool pass = true;
@@ -348,6 +433,8 @@ bool TestSuite<T>::testall() {
   pass &= print_result(test4());
   pass &= print_result(test5());
   pass &= print_result(test6());
+  pass &= print_result(test7());
+  pass &= print_result(test8());
   return pass;
 }
 

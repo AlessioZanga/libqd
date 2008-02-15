@@ -15,6 +15,8 @@
 #ifndef _QD_FPU_H
 #define _QD_FPU_H
 
+#include <qd/qd_config.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,12 +25,12 @@ extern "C" {
  * Set the round-to-double flag, and save the old control word in old_cw.
  * If old_cw is NULL, the old control word is not saved.
  */
-void fpu_fix_start(unsigned int *old_cw);
+QD_API void fpu_fix_start(unsigned int *old_cw);
 
 /*
  * Restore the control word.
  */
-void fpu_fix_end(unsigned int *old_cw);
+QD_API void fpu_fix_end(unsigned int *old_cw);
 
 #ifdef __cplusplus
 }
