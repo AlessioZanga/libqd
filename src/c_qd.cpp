@@ -13,7 +13,7 @@
 #include <cstring>
 
 #include "config.h"
-#include <qd/qd.h>
+#include <qd/qd_real.h>
 #include <qd/c_qd.h>
 
 #define TO_DOUBLE_PTR(a, ptr) ptr[0] = a.x[0]; ptr[1] = a.x[1]; \
@@ -392,13 +392,12 @@ void c_qd_read(const char *s, double *a) {
   TO_DOUBLE_PTR(aa, a);
 }
 
-void c_qd_swrite(const double *a, char *s) {
-  qd_real aa(a);
-  aa.write(s);
+void c_qd_swrite(const double *a, int precision, char *s, int len) {
+  qd_real(a).write(s, len, precision);
 }
 
 void c_qd_write(const double *a) {
-  std::cout << qd_real(a) << std::endl;
+  std::cout << qd_real(a).to_string(qd_real::_ndigits) << std::endl;
 }
 
 void c_qd_neg(const double *a, double *b) {

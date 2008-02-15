@@ -40,9 +40,7 @@ inline qd_real::qd_real(double x0) {
   x[1] = x[2] = x[3] = 0.0;
 }
 
-inline qd_real::qd_real() {
-  x[0] = x[1] = x[2] = x[3] = 0.0;
-}
+inline qd_real::qd_real() { }
 
 inline qd_real::qd_real(const dd_real &a) {
   x[0] = a._hi();
@@ -51,20 +49,7 @@ inline qd_real::qd_real(const dd_real &a) {
 }
 
 inline qd_real::qd_real(int i) {
-  x[0] = (double) i;
-  x[1] = x[2] = x[3] = 0.0;
-}
-inline qd_real::qd_real(long int i) {
-  x[0] = (double) i;
-  x[1] = x[2] = x[3] = 0.0;
-}
-
-inline qd_real::qd_real(unsigned int i) {
-  x[0] = (double) i;
-  x[1] = x[2] = x[3] = 0.0;
-}
-inline qd_real::qd_real(unsigned long int i) {
-  x[0] = (double) i;
+  x[0] = static_cast<double>(i);
   x[1] = x[2] = x[3] = 0.0;
 }
 
@@ -73,8 +58,17 @@ inline double qd_real::operator[](int i) const {
   return x[i];
 }
 
+inline double &qd_real::operator[](int i) {
+  return x[i];
+}
+
+inline bool qd_real::isnan() const {
+  return QD_ISNAN(x[0]) || QD_ISNAN(x[1]) || QD_ISNAN(x[2]) || QD_ISNAN(x[3]);
+}
+
 /********** Renormalization **********/
-inline void quick_renorm(double &c0, double &c1,
+namespace qd {
+inline void quick_renorm(double &c0, double &c1, 
                          double &c2, double &c3, double &c4) {
   double t0, t1, t2, t3;
   double s;
@@ -89,13 +83,15 @@ inline void quick_renorm(double &c0, double &c1,
 
   s  = qd::quick_two_sum(t1, t2, t1);
   c2 = qd::quick_two_sum(t0, s , t0);
-
+  
   c3 = t0 + t1;
 }
 
-inline void renorm(double &c0, double &c1,
+inline void renorm(double &c0, double &c1, 
                    double &c2, double &c3) {
   double s0, s1, s2 = 0.0, s3 = 0.0;
+
+  if (QD_ISINF(c0)) return;
 
   s0 = qd::quick_two_sum(c2, c3, c3);
   s0 = qd::quick_two_sum(c1, s0, c2);
@@ -123,9 +119,11 @@ inline void renorm(double &c0, double &c1,
   c3 = s3;
 }
 
-inline void renorm(double &c0, double &c1,
+inline void renorm(double &c0, double &c1, 
                    double &c2, double &c3, double &c4) {
   double s0, s1, s2 = 0.0, s3 = 0.0;
+
+  if (QD_ISINF(c0)) return;
 
   s0 = qd::quick_two_sum(c3, c4, c4);
   s0 = qd::quick_two_sum(c2, s0, c3);
@@ -173,6 +171,16 @@ inline void renorm(double &c0, double &c1,
   c2 = s2;
   c3 = s3;
 }
+}
+
+inline void qd_real::renorm() {
+  qd::renorm(x[0], x[1], x[2], x[3]);
+}
+
+inline void qd_real::renorm(double &e) {
+  qd::renorm(x[0], x[1], x[2], x[3], e);
+}
+
 
 /********** Additions ************/
 namespace qd {
@@ -203,7 +211,7 @@ inline qd_real operator+(const qd_real &a, double b) {
   c2 = qd::two_sum(a[2], e, e);
   c3 = qd::two_sum(a[3], e, e);
 
-  renorm(c0, c1, c2, c3, e);
+  qd::renorm(c0, c1, c2, c3, e);
 
   return qd_real(c0, c1, c2, c3);
 }
@@ -225,7 +233,7 @@ inline qd_real operator+(const qd_real &a, const dd_real &b) {
   s3 = qd::two_sum(t0, a[3], t0);
   t0 += t1;
 
-  renorm(s0, s1, s2, s3, t0);
+  qd::renorm(s0, s1, s2, s3, t0);
   return qd_real(s0, s1, s2, s3);
 }
 
@@ -242,6 +250,10 @@ inline qd_real operator+(const dd_real &a, const qd_real &b) {
 
 namespace qd {
 
+/* s = quick_three_accum(a, b, c) adds c to the dd-pair (a, b).
+ * If the result does not fit in two doubles, then the sum is 
+ * output into s and (a,b) contains the remainder.  Otherwise
+ * s is zero and (a,b) contains the sum. */
 inline double quick_three_accum(double &a, double &b, double c) {
   double s;
   bool za, zb;
@@ -255,12 +267,10 @@ inline double quick_three_accum(double &a, double &b, double c) {
   if (za && zb)
     return s;
 
-  if (!za) {
-    a = s;
-    s = 0.0;
-  }
   if (!zb) {
     b = a;
+    a = s;
+  } else {
     a = s;
   }
 
@@ -269,13 +279,63 @@ inline double quick_three_accum(double &a, double &b, double c) {
 
 }
 
-/* quad-double + quad-double */
-inline qd_real operator+(const qd_real &a, const qd_real &b) {
-#ifndef QD_IEEE_ADD
+inline qd_real qd_real::ieee_add(const qd_real &a, const qd_real &b) {
+  int i, j, k;
+  double s, t;
+  double u, v;   /* double-length accumulator */
+  double x[4] = {0.0, 0.0, 0.0, 0.0};
+  
+  i = j = k = 0;
+  if (std::abs(a[i]) > std::abs(b[j]))
+    u = a[i++];
+  else
+    u = b[j++];
+  if (std::abs(a[i]) > std::abs(b[j]))
+    v = a[i++];
+  else
+    v = b[j++];
+
+  u = qd::quick_two_sum(u, v, v);
+  
+  while (k < 4) {
+    if (i >= 4 && j >= 4) {
+      x[k] = u;
+      if (k < 3)
+        x[++k] = v;
+      break;
+    }
+
+    if (i >= 4)
+      t = b[j++];
+    else if (j >= 4)
+      t = a[i++];
+    else if (std::abs(a[i]) > std::abs(b[j])) {
+      t = a[i++];
+    } else
+      t = b[j++];
+
+    s = qd::quick_three_accum(u, v, t);
+
+    if (s != 0.0) {
+      x[k++] = s;
+    }
+  }
+
+  /* add the rest. */
+  for (k = i; k < 4; k++)
+    x[3] += a[k];
+  for (k = j; k < 4; k++)
+    x[3] += b[k];
+
+  qd::renorm(x[0], x[1], x[2], x[3]);
+  return qd_real(x[0], x[1], x[2], x[3]);
+}
+
+inline qd_real qd_real::sloppy_add(const qd_real &a, const qd_real &b) {
   /*
   double s0, s1, s2, s3;
   double t0, t1, t2, t3;
-
+  
   s0 = qd::two_sum(a[0], b[0], t0);
   s1 = qd::two_sum(a[1], b[1], t1);
   s2 = qd::two_sum(a[2], b[2], t2);
@@ -286,7 +346,7 @@ inline qd_real operator+(const qd_real &a, const qd_real &b) {
   qd::three_sum2(s3, t0, t2);
   t0 = t0 + t1 + t3;
 
-  renorm(s0, s1, s2, s3, t0);
+  qd::renorm(s0, s1, s2, s3, t0);
   return qd_real(s0, s1, s2, s3, t0);
   */
 
@@ -336,59 +396,16 @@ inline qd_real operator+(const qd_real &a, const qd_real &b) {
   t0 = t0 + t1 + t3;
 
   /* renormalize */
-  renorm(s0, s1, s2, s3, t0);
+  qd::renorm(s0, s1, s2, s3, t0);
   return qd_real(s0, s1, s2, s3);
+}
 
+/* quad-double + quad-double */
+inline qd_real operator+(const qd_real &a, const qd_real &b) {
+#ifndef QD_IEEE_ADD
+  return qd_real::sloppy_add(a, b);
 #else
-  int i, j, k;
-  double s, t;
-  double u, v;   /* double-length accumulator */
-  double x[4] = {0.0, 0.0, 0.0, 0.0};
-
-  i = j = k = 0;
-  if (_QD_STD_ABS(a[i]) > _QD_STD_ABS(b[j]))
-    u = a[i++];
-  else
-    u = b[j++];
-  if (_QD_STD_ABS(a[i]) > _QD_STD_ABS(b[j]))
-    v = a[i++];
-  else
-    v = b[j++];
-
-  u = qd::quick_two_sum(u, v, v);
-
-  while (k < 4) {
-    if (i >= 4 && j >= 4) {
-      x[k] = u;
-      if (k < 3)
-        x[++k] = v;
-      break;
-    }
-
-    if (i >= 4)
-      t = b[j++];
-    else if (j >= 4)
-      t = a[i++];
-    else if (_QD_STD_ABS(a[i]) > _QD_STD_ABS(b[j])) {
-      t = a[i++];
-    } else
-      t = b[j++];
-
-    s = qd::quick_three_accum(u, v, t);
-
-    if (s != 0.0) {
-      x[k++] = s;
-    }
-  }
-
-  /* add the rest. */
-  for (k = i; k < 4; k++)
-    x[3] += a[k];
-  for (k = j; k < 4; k++)
-    x[3] += b[k];
-
-  renorm(x[0], x[1], x[2], x[3]);
-  return qd_real(x[0], x[1], x[2], x[3]);
+  return qd_real::ieee_add(a, b);
 #endif
 }
 
@@ -452,45 +469,10 @@ inline qd_real &qd_real::operator-=(const qd_real &a) {
   return ((*this) += (-a));
 }
 
-#define QD_REAL_OP_MUL_T_IMPL( T )			\
-inline qd_real operator*(T a, const qd_real &b) {	\
-  return (b * a);					\
-}							\
-inline qd_real operator*(const qd_real &a, T __b) {	\
-  double b = __b;					\
-  double p0, p1, p2, p3;				\
-  double q0, q1, q2;					\
-  double s0, s1, s2, s3, s4;				\
-							\
-  p0 = qd::two_prod(a[0], b, q0);			\
-  p1 = qd::two_prod(a[1], b, q1);			\
-  p2 = qd::two_prod(a[2], b, q2);			\
-  p3 = a[3] * b;					\
-							\
-  s0 = p0;						\
-							\
-  s1 = qd::two_sum(q0, p1, s2);				\
-							\
-  qd::three_sum(s2, q1, p2);				\
-							\
-  qd::three_sum2(q1, q2, p3);				\
-  s3 = q1;						\
-							\
-  s4 = q2 + p2;						\
-							\
-  renorm(s0, s1, s2, s3, s4);				\
-  return qd_real(s0, s1, s2, s3);			\
-							\
+
+inline qd_real operator*(double a, const qd_real &b) {
+  return (b * a);
 }
-
-
-QD_REAL_OP_MUL_T_IMPL( int )
-QD_REAL_OP_MUL_T_IMPL( long int )
-QD_REAL_OP_MUL_T_IMPL( unsigned int )
-QD_REAL_OP_MUL_T_IMPL( unsigned long int )
-QD_REAL_OP_MUL_T_IMPL( float )
-QD_REAL_OP_MUL_T_IMPL( double )
-QD_REAL_OP_MUL_T_IMPL( long double )
 
 inline qd_real operator*(const dd_real &a, const qd_real &b) {
   return (b * a);
@@ -500,6 +482,32 @@ inline qd_real mul_pwr2(const qd_real &a, double b) {
   return qd_real(a[0] * b, a[1] * b, a[2] * b, a[3] * b);
 }
 
+/********** Multiplications **********/
+inline qd_real operator*(const qd_real &a, double b) {
+  double p0, p1, p2, p3;
+  double q0, q1, q2;
+  double s0, s1, s2, s3, s4;
+
+  p0 = qd::two_prod(a[0], b, q0);
+  p1 = qd::two_prod(a[1], b, q1);
+  p2 = qd::two_prod(a[2], b, q2);
+  p3 = a[3] * b;
+
+  s0 = p0;
+
+  s1 = qd::two_sum(q0, p1, s2);
+
+  qd::three_sum(s2, q1, p2);
+
+  qd::three_sum2(q1, q2, p3);
+  s3 = q1;
+
+  s4 = q2 + p2;
+
+  qd::renorm(s0, s1, s2, s3, s4);
+  return qd_real(s0, s1, s2, s3);
+
+}
 
 /* quad-double * double-double */
 /* a0 * b0                        0
@@ -521,9 +529,9 @@ inline qd_real operator*(const qd_real &a, const dd_real &b) {
   p2 = qd::two_prod(a[1], b._hi(), q2);
   p3 = qd::two_prod(a[1], b._lo(), q3);
   p4 = qd::two_prod(a[2], b._hi(), q4);
-
+  
   qd::three_sum(p1, p2, q0);
-
+  
   /* Five-Three-Sum */
   qd::three_sum(p2, p3, p4);
   q1 = qd::two_sum(q1, q2, q2);
@@ -537,8 +545,8 @@ inline qd_real operator*(const qd_real &a, const dd_real &b) {
   qd::three_sum2(p3, q0, s1);
   p4 = q0 + s2;
 
-  renorm(p0, p1, p2, p3, p4);
-  return qd_real(q0, q1, q2, q3);
+  qd::renorm(p0, p1, p2, p3, p4);
+  return qd_real(p0, p1, p2, p3);
 }
 
 /* quad-double * quad-double */
@@ -552,14 +560,9 @@ inline qd_real operator*(const qd_real &a, const dd_real &b) {
                   a1 * b2     7
                   a2 * b1     8
                   a3 * b0     9  */
-inline qd_real operator*(const qd_real &a, const qd_real &b) {
+inline qd_real qd_real::sloppy_mul(const qd_real &a, const qd_real &b) {
   double p0, p1, p2, p3, p4, p5;
   double q0, q1, q2, q3, q4, q5;
-#ifndef QD_SLOPPY_MUL
-  double p6, p7, p8, p9;
-  double q6, q7, q8, q9;
-  double r0, r1;
-#endif
   double t0, t1;
   double s0, s1, s2;
 
@@ -573,7 +576,6 @@ inline qd_real operator*(const qd_real &a, const qd_real &b) {
   p5 = qd::two_prod(a[2], b[0], q5);
 
   /* Start Accumulation */
-
   qd::three_sum(p1, p2, q0);
 
   /* Six-Three Sum  of p2, q1, q2, p3, p4, p5. */
@@ -587,11 +589,43 @@ inline qd_real operator*(const qd_real &a, const qd_real &b) {
   s2 += (t0 + t1);
 
   /* O(eps^3) order terms */
-#ifdef QD_SLOPPY_MUL
   s1 += a[0]*b[3] + a[1]*b[2] + a[2]*b[1] + a[3]*b[0] + q0 + q3 + q4 + q5;
-  renorm(p0, p1, s0, s1, s2);
+  qd::renorm(p0, p1, s0, s1, s2);
   return qd_real(p0, p1, s0, s1);
-#else
+}
+
+inline qd_real qd_real::accurate_mul(const qd_real &a, const qd_real &b) {
+  double p0, p1, p2, p3, p4, p5;
+  double q0, q1, q2, q3, q4, q5;
+  double p6, p7, p8, p9;
+  double q6, q7, q8, q9;
+  double r0, r1;
+  double t0, t1;
+  double s0, s1, s2;
+
+  p0 = qd::two_prod(a[0], b[0], q0);
+
+  p1 = qd::two_prod(a[0], b[1], q1);
+  p2 = qd::two_prod(a[1], b[0], q2);
+
+  p3 = qd::two_prod(a[0], b[2], q3);
+  p4 = qd::two_prod(a[1], b[1], q4);
+  p5 = qd::two_prod(a[2], b[0], q5);
+
+  /* Start Accumulation */
+  qd::three_sum(p1, p2, q0);
+
+  /* Six-Three Sum  of p2, q1, q2, p3, p4, p5. */
+  qd::three_sum(p2, q1, q2);
+  qd::three_sum(p3, p4, p5);
+  /* compute (s0, s1, s2) = (p2, q1, q2) + (p3, p4, p5). */
+  s0 = qd::two_sum(p2, p3, t0);
+  s1 = qd::two_sum(q1, p4, t1);
+  s2 = q2 + p5;
+  s1 = qd::two_sum(s1, t0, t0);
+  s2 += (t0 + t1);
+
+  /* O(eps^3) order terms */
   p6 = qd::two_prod(a[0], b[3], q6);
   p7 = qd::two_prod(a[1], b[2], q7);
   p8 = qd::two_prod(a[2], b[1], q8);
@@ -618,8 +652,15 @@ inline qd_real operator*(const qd_real &a, const qd_real &b) {
   /* O(eps^4) terms -- Nine-One-Sum */
   t1 += a[1] * b[3] + a[2] * b[2] + a[3] * b[1] + q6 + q7 + q8 + q9 + s2;
 
-  renorm(p0, p1, s0, t0, t1);
+  qd::renorm(p0, p1, s0, t0, t1);
   return qd_real(p0, p1, s0, t0);
+}
+
+inline qd_real operator*(const qd_real &a, const qd_real &b) {
+#ifdef QD_SLOPPY_MUL
+  return qd_real::sloppy_mul(a, b);
+#else
+  return qd_real::accurate_mul(a, b);
 #endif
 }
 
@@ -631,7 +672,7 @@ inline qd_real sqr(const qd_real &a) {
   double q0, q1, q2, q3;
   double s0, s1;
   double t0, t1;
-
+  
   p0 = qd::two_sqr(a[0], q0);
   p1 = qd::two_prod(2.0 * a[0], a[1], q1);
   p2 = qd::two_prod(2.0 * a[0], a[2], q2);
@@ -664,15 +705,14 @@ inline qd_real sqr(const qd_real &a) {
   p3 = qd::two_sum(p3, t0, p4);
   p4 = p4 + q0 + t1;
 
-  renorm(p0, p1, p2, p3, p4);
+  qd::renorm(p0, p1, p2, p3, p4);
   return qd_real(p0, p1, p2, p3);
 
 }
 
 /********** Self-Multiplication **********/
 /* quad-double *= double */
-template<typename T>
-inline qd_real &qd_real::operator*=(T a) {
+inline qd_real &qd_real::operator*=(double a) {
   *this = (*this * a);
   return *this;
 }
@@ -687,6 +727,22 @@ inline qd_real &qd_real::operator*=(const dd_real &a) {
 inline qd_real &qd_real::operator*=(const qd_real &a) {
   *this = *this * a;
   return *this;
+}
+
+inline qd_real operator/ (const qd_real &a, const dd_real &b) {
+#ifdef QD_SLOPPY_DIV
+  return qd_real::sloppy_div(a, b);
+#else
+  return qd_real::accurate_div(a, b);
+#endif
+}
+
+inline qd_real operator/(const qd_real &a, const qd_real &b) {
+#ifdef QD_SLOPPY_DIV
+  return qd_real::sloppy_div(a, b);
+#else
+  return qd_real::accurate_div(a, b);
+#endif
 }
 
 /* double / quad-double */
@@ -736,7 +792,7 @@ inline qd_real fabs(const qd_real &a) {
 /* Quick version.  May be off by one when qd is very close
    to the middle of two integers.                         */
 inline qd_real quick_nint(const qd_real &a) {
-  qd_real r = qd_real(qd::nint(a[0]), qd::nint(a[1]),
+  qd_real r = qd_real(qd::nint(a[0]), qd::nint(a[1]), 
       qd::nint(a[2]), qd::nint(a[3]));
   r.renorm();
   return r;
@@ -744,23 +800,11 @@ inline qd_real quick_nint(const qd_real &a) {
 
 /*********** Assignments ************/
 /* quad-double = double */
-#define QD_REAL_OP_EQUAL_T_IMPL(T)		\
-inline qd_real &qd_real::operator=(T a) {	\
-  x[0] = double(a);				\
-  x[1] = x[2] = x[3] = 0.0;			\
-  return *this;					\
+inline qd_real &qd_real::operator=(double a) {
+  x[0] = a;
+  x[1] = x[2] = x[3] = 0.0;
+  return *this;
 }
-
-QD_REAL_OP_EQUAL_T_IMPL( int )
-QD_REAL_OP_EQUAL_T_IMPL( long int )
-QD_REAL_OP_EQUAL_T_IMPL( unsigned int )
-QD_REAL_OP_EQUAL_T_IMPL( unsigned long int )
-QD_REAL_OP_EQUAL_T_IMPL( float )
-QD_REAL_OP_EQUAL_T_IMPL( double )
-QD_REAL_OP_EQUAL_T_IMPL( long double )
-
-
-
 
 /* quad-double = double-double */
 inline qd_real &qd_real::operator=(const dd_real &a) {
@@ -780,7 +824,7 @@ inline bool operator==(double a, const qd_real &b) {
 }
 
 inline bool operator==(const qd_real &a, const dd_real &b) {
-  return (a[0] == b._hi() && a[1] == b._lo() &&
+  return (a[0] == b._hi() && a[1] == b._lo() && 
           a[2] == 0.0 && a[3] == 0.0);
 }
 
@@ -789,7 +833,7 @@ inline bool operator==(const dd_real &a, const qd_real &b) {
 }
 
 inline bool operator==(const qd_real &a, const qd_real &b) {
-  return (a[0] == b[0] && a[1] == b[1] &&
+  return (a[0] == b[0] && a[1] == b[1] && 
           a[2] == b[2] && a[3] == b[3]);
 }
 
@@ -804,7 +848,7 @@ inline bool operator<(double a, const qd_real &b) {
 }
 
 inline bool operator<(const qd_real &a, const dd_real &b) {
-  return (a[0] < b._hi() ||
+  return (a[0] < b._hi() || 
           (a[0] == b._hi() && (a[1] < b._lo() ||
                             (a[1] == b._lo() && a[2] < 0.0))));
 }
@@ -830,7 +874,7 @@ inline bool operator>(double a, const qd_real &b) {
 }
 
 inline bool operator>(const qd_real &a, const dd_real &b) {
-  return (a[0] > b._hi() ||
+  return (a[0] > b._hi() || 
           (a[0] == b._hi() && (a[1] > b._lo() ||
                             (a[1] == b._lo() && a[2] > 0.0))));
 }
@@ -857,8 +901,8 @@ inline bool operator<=(double a, const qd_real &b) {
 }
 
 inline bool operator<=(const qd_real &a, const dd_real &b) {
-  return (a[0] < b._hi() ||
-          (a[0] == b._hi() && (a[1] < b._lo() ||
+  return (a[0] < b._hi() || 
+          (a[0] == b._hi() && (a[1] < b._lo() || 
                             (a[1] == b._lo() && a[2] <= 0.0))));
 }
 
@@ -867,7 +911,7 @@ inline bool operator<=(const dd_real &a, const qd_real &b) {
 }
 
 inline bool operator<=(const qd_real &a, const qd_real &b) {
-  return (a[0] < b[0] ||
+  return (a[0] < b[0] || 
           (a[0] == b[0] && (a[1] < b[1] ||
                             (a[1] == b[1] && (a[2] < b[2] ||
                                               (a[2] == b[2] && a[3] <= b[3]))))));
@@ -883,8 +927,8 @@ inline bool operator>=(double a, const qd_real &b) {
 }
 
 inline bool operator>=(const qd_real &a, const dd_real &b) {
-  return (a[0] > b._hi() ||
-          (a[0] == b._hi() && (a[1] > b._lo() ||
+  return (a[0] > b._hi() || 
+          (a[0] == b._hi() && (a[1] > b._lo() || 
                             (a[1] == b._lo() && a[2] >= 0.0))));
 }
 
@@ -893,7 +937,7 @@ inline bool operator>=(const dd_real &a, const qd_real &b) {
 }
 
 inline bool operator>=(const qd_real &a, const qd_real &b) {
-  return (a[0] > b[0] ||
+  return (a[0] > b[0] || 
           (a[0] == b[0] && (a[1] > b[1] ||
                             (a[1] == b[1] && (a[2] > b[2] ||
                                               (a[2] == b[2] && a[3] >= b[3]))))));
@@ -944,16 +988,16 @@ inline bool qd_real::is_negative() const {
   return (x[0] < 0.0);
 }
 
-inline qd_real::operator dd_real() const {
-  return dd_real(x[0], x[1]);
+inline dd_real to_dd_real(const qd_real &a) {
+  return dd_real(a[0], a[1]);
 }
 
-inline qd_real::operator double() const {
-  return x[0];
+inline double to_double(const qd_real &a) {
+  return a[0];
 }
 
-inline qd_real::operator int() const {
-  return (int) x[0];
+inline int to_int(const qd_real &a) {
+  return static_cast<int>(a[0]);
 }
 
 inline qd_real inv(const qd_real &qd) {
@@ -964,7 +1008,7 @@ inline qd_real max(const qd_real &a, const qd_real &b) {
   return (a > b) ? a : b;
 }
 
-inline qd_real max(const qd_real &a, const qd_real &b,
+inline qd_real max(const qd_real &a, const qd_real &b, 
                    const qd_real &c) {
   return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
 }
@@ -973,7 +1017,7 @@ inline qd_real min(const qd_real &a, const qd_real &b) {
   return (a < b) ? a : b;
 }
 
-inline qd_real min(const qd_real &a, const qd_real &b,
+inline qd_real min(const qd_real &a, const qd_real &b, 
                    const qd_real &c) {
   return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
 }
@@ -984,8 +1028,8 @@ inline qd_real qd_real::rand() {
 }
 
 inline qd_real ldexp(const qd_real &a, int n) {
-  return qd_real(_QD_STD_LDEXP(a[0], n), _QD_STD_LDEXP(a[1], n),
-                 _QD_STD_LDEXP(a[2], n), _QD_STD_LDEXP(a[3], n));
+  return qd_real(std::ldexp(a[0], n), std::ldexp(a[1], n), 
+                 std::ldexp(a[2], n), std::ldexp(a[3], n));
 }
 
 #endif /* _QD_QD_INLINE_H */

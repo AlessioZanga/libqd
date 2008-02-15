@@ -1,3 +1,33 @@
+qd (2.3.4-1) unstable; urgency=low
+
+  * New upstream release
+  * Bug fix: "qd: please package new upstream", thanks to Tim Abbott
+    (Closes: #464783).
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Fri, 15 Feb 2008 09:11:01 +0100
+
+qd (2.1.213.1-2) unstable; urgency=low
+
+  [ Rafael Laboissiere ]
+  * debian/control: Added Vcs-Svn and Vcs-Browser fields to the Source
+    section
+      
+  [Christophe Prud'homme]
+  * Bug fix: "FTBFS with GCC 4.3: missing #includes", thanks to Martin
+    Michlmayr (Closes: #417502).
+  * Bug fix: "ldbl128 transition for alpha, powerpc, sparc, s390", thanks
+    to Matthias Klose (Closes: #430295).
+  * debian/control: updated g++ and gfortran build-depends version
+  * debian/control: updated Standards-Version 
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Fri, 15 Feb 2008 08:59:13 +0100
+
+qd (2.1.213.1-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Mon, 16 Oct 2006 15:17:07 +0200
+
 qd (2.1.200-1) unstable; urgency=low
 
   * New upstream release

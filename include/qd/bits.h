@@ -14,6 +14,7 @@
 #ifndef _QD_BITS_H
 #define _QD_BITS_H
 
+#include <iostream>
 #include <qd/qd_config.h>
 
 /* Returns the exponent of the double precision number.
@@ -24,7 +25,7 @@ int get_double_expn(double x);
      SIGN  EXPN  MANTISSA
    of the given double.  If x is NaN, INF, or Zero, this
    prints out the strings NaN, +/- INF, and 0.             */
-void print_double_info(double x);
+void print_double_info(std::ostream &os, double x);
 
 
 #endif  /* _QD_BITS_H */

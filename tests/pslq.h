@@ -21,15 +21,11 @@
 #include <cmath>
 #include <cstdio>
 
-#include <qd/dd.h>
-#include <qd/qd.h>
+#include <qd/dd_real.h>
+#include <qd/qd_real.h>
 
-#if !defined(_MSC_VER) || (_MSC_VER > 1200)
 using std::sqrt;
 using std::abs;
-#else
-inline double abs(double x) { return fabs(x); }
-#endif
 
 using namespace qd;
 
@@ -155,6 +151,11 @@ int pslq(const T *x, int n, T *r, double eps, int max_itr) {
       }
     }
 
+    if (m < 0) { 
+      /* This shouldn't happen. */
+      err = 1;
+      break;
+    }
 
     /* Exchange entries m and m+1 of y, 
                    rows m and m+1 of A and H, 

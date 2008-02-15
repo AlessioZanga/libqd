@@ -6,6 +6,10 @@
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/autotools.mk
+include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 
-DEB_CONFIGURE_EXTRA_FLAGS := --enable-shared
+DEB_CONFIGURE_EXTRA_FLAGS := --enable-maintainer-mode --enable-shared
 
+CXXFLAGS="-O3"
+
+#CXX=g++-4.3

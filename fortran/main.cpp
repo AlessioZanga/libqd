@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <cstdlib>
 #include <qd/fpu.h>
 #include "config.h"
 

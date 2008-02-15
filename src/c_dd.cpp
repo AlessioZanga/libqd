@@ -13,10 +13,10 @@
 #include <cstring>
 
 #include "config.h"
-#include <qd/dd.h>
+#include <qd/dd_real.h>
 #include <qd/c_dd.h>
 
-#define TO_DOUBLE_PTR(x, ptr) ptr[0] = x.hi; ptr[1] = x.lo;
+#define TO_DOUBLE_PTR(a, ptr) ptr[0] = a.x[0]; ptr[1] = a.x[1];
 
 extern "C" {
 
@@ -258,12 +258,12 @@ void c_dd_read(const char *s, double *a) {
   TO_DOUBLE_PTR(aa, a);
 }
 
-void c_dd_swrite(const double *a, char *s) {
-  dd_real(a).write(s);
+void c_dd_swrite(const double *a, int precision, char *s, int len) {
+  dd_real(a).write(s, len, precision);
 }
 
 void c_dd_write(const double *a) {
-  std::cout << dd_real(a) << std::endl;
+  std::cout << dd_real(a).to_string(dd_real::_ndigits) << std::endl;
 }
 
 void c_dd_neg(const double *a, double *b) {

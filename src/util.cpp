@@ -1,10 +1,11 @@
+#include <cstdlib>
 #include "util.h"
 
 void append_expn(std::string &str, int expn) {
   int k;
 
   str += (expn < 0 ? '-' : '+');
-  expn = abs(expn);
+  expn = std::abs(expn);
 
   if (expn >= 100) {
     k = (expn / 100);
