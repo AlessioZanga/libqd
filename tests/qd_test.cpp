@@ -13,6 +13,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <cstring>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>

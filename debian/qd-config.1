@@ -1,0 +1,72 @@
+.TH "QD\-CONFIGG" "1" "2008-05-11" "User Commands" ""
+
+.SH NAME
+qd-config \- determine flags for compilation and linking
+
+.SH SYNOPSIS
+.B qd\-config
+.BI [ options ]
+
+.SH DESCRIPTION
+.PP
+To link a Fortran-90 program with the C++ qd library, it is 
+recommended to link with the C++ compiler used to generate the library.  
+The Fortran 90 interface (along with a C-style main function calling 
+\fIf_main\fR) is found in the qdmod library.  The \fBqd\-config\fR script
+can be used to determine which flags to pass to compile and link your
+programs.
+
+.SH OPTIONS
+.PP
+.TP
+.B  \-\-src
+Switch between source and system location.
+.TP
+.B  \-\-prefix
+Output configured \fIprefix\fR value.
+.TP
+.B  \-\-exec\-prefix
+Output configured \fIexec_prefix\fR value.
+.TP
+.B  \-\-build\-flags
+Compiler options used during build.
+.TP
+.B  \-\-build\-libs
+Linker options used during build.
+.TP
+.B  \-\-configure\-args
+Configure arguments used for build.
+.TP
+.B  \-\-cxx
+C++ compiler.
+.TP
+.B  \-\-cflags
+C++ preprocessor and compiler options.
+.TP
+.B  \-\-cxxflags
+C++ compiler options.
+.TP
+.B  \-\-libs\-la
+C++ linker options and libtool archive location.
+.TP
+.B  \-\-libs
+C++ linker options.
+.TP
+.B \-\-fc
+Fortran compiler.
+.TP
+.B  \-\-fcflags
+Fortran compiler options.
+.TP
+.B  \-\-fclibs
+Fortran linker options.
+.TP
+.B  \-\-fmainlib
+C++ linker options for main program written in Fortran.
+.TP
+.B  \-\-version
+Output version.
+
+.SH AUTHOR
+This manual page was written by \fBDaniel Leidert\fR <\&daniel.leidert@wgdd.de\&>
+for the Debian project (but may be used by others).

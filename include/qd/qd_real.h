@@ -281,6 +281,8 @@ QD_API qd_real max(const qd_real &a, const qd_real &b, const qd_real &c);
 QD_API qd_real min(const qd_real &a, const qd_real &b);
 QD_API qd_real min(const qd_real &a, const qd_real &b, const qd_real &c);
 
+QD_API qd_real fmod(const qd_real &a, const qd_real &b);
+
 QD_API std::ostream &operator<<(std::ostream &s, const qd_real &a);
 QD_API std::istream &operator>>(std::istream &s, qd_real &a);
 #ifdef QD_INLINE

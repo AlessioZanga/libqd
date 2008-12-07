@@ -14,6 +14,7 @@
 #include <cmath>
 #include <iostream>
 #include <ctime>
+#include <cstring>
 #include <limits>
 #include <iomanip>
 #include <qd/fpu.h>

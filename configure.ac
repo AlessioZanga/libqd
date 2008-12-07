@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-define([QD_PATCH_VERSION], 4)
+define([QD_PATCH_VERSION], 7)
 AC_PREREQ(2.60)
 AC_INIT(qd, 2.3.QD_PATCH_VERSION, yozo@cs.berkeley.edu)
 AC_CONFIG_SRCDIR([src/qd_real.cpp])

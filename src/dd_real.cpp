@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
+#include <cstring>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -768,6 +769,11 @@ dd_real atanh(const dd_real &a) {
   return mul_pwr2(log((1.0 + a) / (1.0 - a)), 0.5);
 }
 
+QD_API dd_real fmod(const dd_real &a, const dd_real &b) {
+  dd_real n = aint(a / b);
+  return (a - b * n);
+}
+
 QD_API dd_real ddrand() {
   static const double m_const = 4.6566128730773926e-10;  /* = 2^{-31} */
   double m = m_const;
@@ -931,11 +937,14 @@ void dd_real::to_digits(char *s, int &expn, int precision) const {
     s[i] = static_cast<char>(d + '0');
   }
 
-  /* Fix negative digits. */
+  /* Fix out of range digits. */
   for (i = D-1; i > 0; i--) {
     if (s[i] < '0') {
       s[i-1]--;
       s[i] += 10;
+    } else if (s[i] > '9') {
+      s[i-1]++;
+      s[i] -= 10;
     }
   }
 
