@@ -1,3 +1,19 @@
+Changes for 2.3.7
+  - Fixed bug in to_digits where digits larger than 10
+    where output occasionally.
+
+Changes for 2.3.6
+  - Added fmod (C++) and mod (Fortran) functions.
+
+Changes for 2.3.5
+  - Fixed bug in division of qd_real by dd_real.
+  - Fixed bug in ddoutc (Fortran ddmod.f).
+  - Now compiles with g++ 4.3.
+  - Distribute tests/coeff.dat.
+
+Changes for 2.3.4
+  - Fixed bug in Makefile for cygwin / mingw systems.
+
 Changes for 2.3.3
   - Fixed bug in atan2.
 

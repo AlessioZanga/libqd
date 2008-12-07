@@ -98,9 +98,7 @@ declarations
     qd_real qd;
 
 all of the expressions d + dd, dd * qd, qd / d, etc, are legal, and
-call routines optimized for speed in each case.  Mixed-mode operations
-are not allowed with integer types; these must first be converted to
-double.
+call routines optimized for speed in each case.
 
 In all C++ files that use double-double precision, include the header
 file <qd/dd_real.h>.  In all C++ files that use quad-double precision, 

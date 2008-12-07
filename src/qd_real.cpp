@@ -318,11 +318,14 @@ void qd_real::to_digits(char *s, int &expn, int precision) const {
     s[i] = static_cast<char>(d + '0');
   }
 
-  /* Fix negative digits. */
+  /* Fix out of range digits. */
   for (i = D-1; i > 0; i--) {
     if (s[i] < '0') {
       s[i-1]--;
       s[i] += 10;
+    } else if (s[i] > '9') {
+      s[i-1]++;
+      s[i] -= 10;
     }
   }
 
@@ -551,15 +554,16 @@ void qd_real::dump(const string &name, std::ostream &os) const {
 qd_real qd_real::sloppy_div(const qd_real &a, const dd_real &b) {
   double q0, q1, q2, q3;
   qd_real r;
+  qd_real qd_b(b);
 
   q0 = a[0] / b._hi();
-  r = a - q0 * b;
+  r = a - q0 * qd_b;
 
   q1 = r[0] / b._hi();
-  r -= (q1 * b);
+  r -= (q1 * qd_b);
 
   q2 = r[0] / b._hi();
-  r -= (q2 * b);
+  r -= (q2 * qd_b);
 
   q3 = r[0] / b._hi();
 
@@ -568,22 +572,23 @@ qd_real qd_real::sloppy_div(const qd_real &a, const dd_real &b) {
 }
 
 qd_real qd_real::accurate_div(const qd_real &a, const dd_real &b) {
-  double q0, q1, q2, q3;
+  double q0, q1, q2, q3, q4;
   qd_real r;
+  qd_real qd_b(b);
 
   q0 = a[0] / b._hi();
-  r = a - q0 * b;
+  r = a - q0 * qd_b;
 
   q1 = r[0] / b._hi();
-  r -= (q1 * b);
+  r -= (q1 * qd_b);
 
   q2 = r[0] / b._hi();
-  r -= (q2 * b);
+  r -= (q2 * qd_b);
 
   q3 = r[0] / b._hi();
+  r -= (q3 * qd_b);
 
-  r -= (q3 * b);
-  double q4 = r[0] / b._hi();
+  q4 = r[0] / b._hi();
 
   ::renorm(q0, q1, q2, q3, q4);
   return qd_real(q0, q1, q2, q3);
@@ -2405,6 +2410,10 @@ qd_real atanh(const qd_real &a) {
   return mul_pwr2(log((1.0 + a) / (1.0 - a)), 0.5);
 }
 
+QD_API qd_real fmod(const qd_real &a, const qd_real &b) {
+  qd_real n = aint(a / b);
+  return (a - b * n);
+}
 
 QD_API qd_real qdrand() {
   static const double m_const = 4.6566128730773926e-10;  /* = 2^{-31} */

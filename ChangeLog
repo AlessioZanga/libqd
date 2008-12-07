@@ -1,3 +1,98 @@
+commit e917e3183008443b60b3c883e4f160bc7eb5e9ae
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Mon Jul 21 17:18:27 2008 -0700
+
+    Update NEWS for 2.3.7 release.
+
+commit 15797144220aa874e9f9c35f54a2e268447ec006
+Author: François-R Boyer <Francois-R.Boyer@polymtl.ca>
+Date:   Tue Apr 1 13:28:46 2008 -0700
+
+    Fixed to_digits function where digits > 10 were not fixed.
+
+commit bfe6685c0318c333a88284b07b3feedc891f3e13
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Sun Mar 16 09:54:59 2008 -0700
+
+    Prepare NEWS for 2.3.6 release.
+
+commit 697177c023f32cd8fe5eb5662ead1d8cbdd89106
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Sat Mar 15 15:22:38 2008 -0700
+
+    Added fmod function.
+
+commit f0b5253516d4ce875d2aebc460ff9b609e835edc
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Sat Mar 15 15:07:41 2008 -0700
+
+    Added fortran mod interface.
+
+commit cc309f05792d2d53ad17e436601caad76ec9db4f
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Mon Mar 3 08:23:12 2008 +0900
+
+    Fix example in qd.tex to actually work with the current version.
+    
+    The header file qd.h had been renamed to qd_real.h.
+    Automatic conversion from quad-double to double-double is not done.
+
+commit 49437387deb3521ad60fcf45025a8976678c8163
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Thu Feb 14 12:15:12 2008 -0800
+
+    Update NEWS.
+
+commit 591d750e6bd96dae1795a4142c3a7dc81c13290f
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Tue Feb 5 00:02:46 2008 -0800
+
+    Removed blurb in README about not supporting integer in fortran.
+
+commit 7ee1692c66181f47ac57fc53b538978f95da0326
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Tue Feb 5 10:24:13 2008 -0800
+
+    Updated NEWS for v2.3.5.
+
+commit f5f93a24031527917872617374a815ad6fab3c69
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Mon Feb 4 23:50:11 2008 -0800
+
+    Fix division between qd_real and dd_real.
+    
+    We needed to compute the product between approximate
+    quotient (double) and divisor (dd_real) in qd_real precision.
+    
+    Future optimization may be possible here by only computing
+    this product to td_real (triple-double precision).
+
+commit 9f3b39c6a0e60535435aaec1eeb6dbefec681166
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Tue Feb 5 10:15:38 2008 -0800
+
+    Include <cstring> for strncpy and strcmp.
+
+commit e17dbffdaa488749291b22953c2d80f2638184a2
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Fri Feb 1 18:36:18 2008 -0800
+
+    Pass 38 as maxlen to f_dd_swrite in ddoutc (ddmod.f).
+    
+    Since we only have 40 characters, and 2 is already taken
+    at the front.  Hence there is only 38 characters left to fill.
+    
+    This was causing segfault in fortran/dd_timer.
+
+commit ccd3c085a427a3e58ddd4c1b657a78a03d16846d
+Author: Yozo Hida <yozo@cs.berkeley.edu>
+Date:   Thu Jan 31 14:52:35 2008 -0800
+
+    Distribute tests/coeff.dat.
+    
+    This was omitted from distribution; it is now fixed by
+    adding coeff.dat to dist_noinst_DATA in tests/Makefile.am.
+
 commit a49c5bf6b3b80e070df640765c80b3b21d1b75d8
 Author: Yozo Hida <yozo@cs.berkeley.edu>
 Date:   Thu Jan 17 13:33:22 2008 -0800

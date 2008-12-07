@@ -3,16 +3,17 @@ Section: libs
 Priority: optional
 Maintainer: Debian Scientific Computing Team <pkg-scicomp-devel@lists.alioth.debian.org>
 Uploaders: Christophe Prud'homme <prudhomm@debian.org>
-Build-Depends: cdbs (>= 0.4.23-1.1), quilt, autotools-dev, debhelper (>= 4.1.0), g++ (>= s4.1), gfortran (>= 4.1), automake, autoconf, libtool
-Standards-Version: 3.7.3
-Vcs-Svn: svn://svn.debian.org/svn/pkg-scicomp/qd/
+Build-Depends: cdbs (>= 0.4.23-1.1), debhelper (>= 4.1.0), quilt,
+ autotools-dev, g++ (>= s4.1), gfortran (>= 4.1), automake, autoconf, libtool
+Standards-Version: 3.8.0
+Homepage: http://crd.lbl.gov/~dhbailey/mpdist/
+Vcs-Svn: svn://svn.debian.org/svn/pkg-scicomp/qd/trunk/
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-scicomp/qd/
-
 
 Package: libqd-dev
 Section: libdevel
 Architecture: any
-Depends: libqd2c2a
+Depends: libqd2c2a, ${misc:Depends}
 Description: Double-double and quad double types in C++ and F90
  This package supports both a double-double datatype (approx. 32
  decimal digits) and a quad-double datatype (approx. 64 decimal

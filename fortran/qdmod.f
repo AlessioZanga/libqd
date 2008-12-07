@@ -4,12 +4,12 @@
 !  of Mathematical, Information, and Computational Sciences of the
 !  U.S. Department of Energy under contract number DE-AC03-76SF00098.
 !
-!  Copyright (c) 2000-2007
+!  Copyright (c) 2000-2008
 !
 !  Fortran-90 module file to use with quad-double numbers.
 !
 !  Yozo Hida
-!  David H Bailey    2007-03-15
+!  David H Bailey    2008-02-20
 
 module qdmodule
   use ddmodule
@@ -348,6 +348,9 @@ module qdmodule
   interface max
     module procedure qdmax
     module procedure qdmax2
+  end interface
+  interface mod
+     module procedure qdmod
   end interface
 
   interface qdpi
@@ -1796,6 +1799,15 @@ contains
     if (present(a8)) qdmax = qdmax2(qdmax, a8)
     if (present(a9)) qdmax = qdmax2(qdmax, a9)
   end function qdmax
+
+  elemental type (qd_real) function qdmod (a, b)
+    type (qd_real), intent(in) :: a, b
+    type (qd_real) :: s1, s2
+    call f_qd_div (a%re, b%re, s1%re)
+    call f_qd_aint(s1%re, s2%re)
+    call f_qd_mul (s2%re, b%re, s1%re)
+    call f_qd_sub (a%re, s1%re, qdmod%re)
+  end function qdmod
 
   pure type (qd_real) function qd_pi()
     call f_qd_pi(qd_pi%re)

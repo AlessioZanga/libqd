@@ -4,12 +4,12 @@
 !  of Mathematical, Information, and Computational Sciences of the
 !  U.S. Department of Energy under contract number DE-AC03-76SF00098.
 !
-!  Copyright (c) 2000-2007
+!  Copyright (c) 2000-2008
 !
 !  Fortran-90 module file to use with double-double numbers.
 !
 !  Yozo Hida
-!  David H Bailey    2007-03-15
+!  David H Bailey    2008-03-20
 
 module ddmodule
   use ddext
@@ -339,6 +339,9 @@ module ddmodule
   interface max
     module procedure ddmax
     module procedure ddmax2
+  end interface
+  interface mod
+    module procedure ddmod
   end interface
 
   interface ddpi
@@ -1760,6 +1763,15 @@ contains
     if (present(a9)) ddmax = ddmax2(ddmax, a9)
   end function ddmax
 
+  elemental type (dd_real) function ddmod (a, b)
+    type (dd_real), intent(in) :: a, b
+    type (dd_real) :: s1, s2
+    call f_dd_div (a%re, b%re, s1%re)
+    call f_dd_aint(s1%re, s2%re)
+    call f_dd_mul (s2%re, b%re, s1%re)
+    call f_dd_sub (a%re, s1%re, ddmod%re)
+  end function ddmod
+
   pure type (dd_real) function dd_pi()
     call f_dd_pi(dd_pi%re)
   end function dd_pi
@@ -1938,7 +1950,7 @@ subroutine ddoutc (a, b)
 
   b(1) = ' '
   b(2) = ' '
-  call f_dd_swrite(a, 31, b(3), 70)
+  call f_dd_swrite(a, 31, b(3), 38)
 end subroutine
 
   real*8 function dddigin (ca, n)

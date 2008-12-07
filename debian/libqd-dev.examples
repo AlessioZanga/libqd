@@ -1,2 +1,3 @@
 tests/*.cpp
 tests/*.h
+fortran/Makefile.sample

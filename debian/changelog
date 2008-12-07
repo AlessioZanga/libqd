@@ -1,3 +1,21 @@
+qd (2.3.7-1) unstable; urgency=low
+
+  [ Daniel Leidert (dale) ]
+  * debian/control: Added Homepage field.
+    (Vcs-Svn): Fixed.
+  * debian/dirs: Dropped (useless).
+  * debian/libqd-dev.examples: Added sample Makefile.
+  * debian/libqd-dev.manpages: Added for new man-page.
+  * debian/qd-config.1: Added missing man-page.
+  * debian/watch: Added.
+
+  [ Christophe Prud'homme ]
+  * New upstream release
+  * debian/control: set Standards-Version to 3.8.0 (added README.source
+    and associated quilt comment)
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Sun, 07 Dec 2008 19:59:12 +0100
+
 qd (2.3.4-1) unstable; urgency=low
 
   * New upstream release

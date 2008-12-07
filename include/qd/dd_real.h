@@ -278,6 +278,8 @@ QD_API dd_real atanh(const dd_real &a);
 QD_API dd_real fabs(const dd_real &a);
 QD_API dd_real abs(const dd_real &a);   /* same as fabs */
 
+QD_API dd_real fmod(const dd_real &a, const dd_real &b);
+
 QD_API std::ostream& operator<<(std::ostream &s, const dd_real &a);
 QD_API std::istream& operator>>(std::istream &s, dd_real &a);
 #ifdef QD_INLINE

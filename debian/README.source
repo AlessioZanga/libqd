@@ -1,0 +1,6 @@
+# -*- mode: readme-debian -*- 
+
+
+A quilt patch (see debian/patches) is available to fix some compilation issues.
+
+ -- Christophe Prud'homme <prudhomm@debian.org>, Sun,  7 Dec 2008 19:59:54 +0100
