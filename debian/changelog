@@ -1,3 +1,10 @@
+qd (2.3.7-1ubuntu1) jaunty; urgency=low
+
+  * debian/rules: add "DEB_AUTO_UPDATE_LIBTOOL = pre" to update libtool at build
+    time (LP: #337084)
+
+ -- Fabrice Coutadeur <coutadeurf@gmail.com>  Tue, 03 Mar 2009 06:12:13 +0000
+
 qd (2.3.7-1) unstable; urgency=low
 
   [ Daniel Leidert (dale) ]
