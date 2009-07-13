@@ -1,3 +1,20 @@
+qd (2.3.7-2) unstable; urgency=low
+
+  [Christophe Prud'homme]
+  * added libqdmod.a library for fortran support
+  * debian/control: updated Standards-Version to 3.8.2 (no changes)
+  * debian/{compat,contro}: updated debhelper compatibility (>=7)
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Mon, 13 Jul 2009 13:47:46 +0200
+
+qd (2.3.7-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Call libtoolize in order to update the version of libtool (Closes: 
+    #518564)
+
+ -- Sylvestre Ledru <sylvestre.ledru@inria.fr>  Mon, 23 Mar 2009 12:02:18 +0100
+
 qd (2.3.7-1) unstable; urgency=low
 
   [ Daniel Leidert (dale) ]
