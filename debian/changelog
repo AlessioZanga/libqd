@@ -1,3 +1,14 @@
+qd (2.3.7-2ubuntu1) lucid; urgency=low
+
+  [ Hideki Yamane (Debian-JP) ]
+  * debian/rules
+    - run autoreconf (Closes: #560522) 
+
+  [ Scott Kitterman ]
+  * Cherry pick FTBFS fix from Debian BTS
+
+ -- Scott Kitterman <scott@kitterman.com>  Sat, 24 Apr 2010 11:11:18 -0400
+
 qd (2.3.7-2) unstable; urgency=low
 
   [Christophe Prud'homme]
