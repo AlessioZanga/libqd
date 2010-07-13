@@ -1,3 +1,11 @@
+qd (2.3.7-2.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Update debian/rules.
+    - Add run autoreconf. (Closes: #560522)
+
+ -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Tue, 13 Jul 2010 11:26:15 +0900
+
 qd (2.3.7-2) unstable; urgency=low
 
   [Christophe Prud'homme]
