@@ -1,3 +1,21 @@
+qd (2.3.11.dfsg-1) unstable; urgency=low
+
+  [Christophe Prud'homme]
+  * New upstream release
+  * debian/control: update Standards-Version to 3.9.1
+  * debian/libqd-dev.install: do not ship .la file anymore
+  * Bug fix: "error: Cannot link C++ and Fortran.", thanks to Nobuhiro
+    Iwamatsu (Closes: #590335).
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Fri, 13 Aug 2010 13:30:28 +0200
+
+qd (2.3.8-1) unstable; urgency=low
+
+  [Christophe Prud'homme]
+  * New upstream release
+
+ -- Christophe Prud'homme <prudhomm@debian.org>  Mon, 13 Jul 2009 15:31:46 +0200
+
 qd (2.3.7-2) unstable; urgency=low
 
   [Christophe Prud'homme]
@@ -10,7 +28,7 @@ qd (2.3.7-2) unstable; urgency=low
 qd (2.3.7-1.1) unstable; urgency=low
 
   * Non-maintainer upload.
-  * Call libtoolize in order to update the version of libtool (Closes: 
+  * Call libtoolize in order to update the version of libtool (Closes:
     #518564)
 
  -- Sylvestre Ledru <sylvestre.ledru@inria.fr>  Mon, 23 Mar 2009 12:02:18 +0100
@@ -46,14 +64,14 @@ qd (2.1.213.1-2) unstable; urgency=low
   [ Rafael Laboissiere ]
   * debian/control: Added Vcs-Svn and Vcs-Browser fields to the Source
     section
-      
+
   [Christophe Prud'homme]
   * Bug fix: "FTBFS with GCC 4.3: missing #includes", thanks to Martin
     Michlmayr (Closes: #417502).
   * Bug fix: "ldbl128 transition for alpha, powerpc, sparc, s390", thanks
     to Matthias Klose (Closes: #430295).
   * debian/control: updated g++ and gfortran build-depends version
-  * debian/control: updated Standards-Version 
+  * debian/control: updated Standards-Version
 
  -- Christophe Prud'homme <prudhomm@debian.org>  Fri, 15 Feb 2008 08:59:13 +0100
 

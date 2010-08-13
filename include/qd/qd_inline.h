@@ -40,7 +40,12 @@ inline qd_real::qd_real(double x0) {
   x[1] = x[2] = x[3] = 0.0;
 }
 
-inline qd_real::qd_real() { }
+inline qd_real::qd_real() {
+	x[0] = 0.0; 
+	x[1] = 0.0; 
+	x[2] = 0.0; 
+	x[3] = 0.0; 
+}
 
 inline qd_real::qd_real(const dd_real &a) {
   x[0] = a._hi();

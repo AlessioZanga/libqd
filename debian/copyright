@@ -1,40 +1,35 @@
-This package was debianized by Christophe Prud'homme <prudhomm@debian.org> on
-Sat, 30 Jul 2005 19:50:28 +0200.
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=REVISION
+Name: Qd
+Maintainer:Yozo Hida        U.C. Berkeley               yozo@cs.berkeley.edu
+	   Xiaoye S. Li     Lawrence Berkeley Natl Lab  xiaoye@nersc.gov
+	   David H. Bailey  Lawrence Berkeley Natl Lab  dhbailey@lbl.gov
 
-It was downloaded from http://crd.lbl.gov/~dhbailey/mpdist/
 
-Copyright Holder: 
-Yozo Hida        U.C. Berkeley               yozo@cs.berkeley.edu    
-Xiaoye S. Li     Lawrence Berkeley Natl Lab  xiaoye@nersc.gov        
-David H. Bailey  Lawrence Berkeley Natl Lab  dhbailey@lbl.gov
+Source: http://crd.lbl.gov/~dhbailey/mpdist/
 
-License:
+Copyright: The Regents of the University of California,
 
-This work was supported by the Director, Office of Science, Division
-of Mathematical, Information, and Computational Sciences of the
-U.S. Department of Energy under contract number DE-AC03-76SF00098.
+License: BSD
 
-Copyright (c) 2003, The Regents of the University of California,
-through Lawrence Berkeley National Laboratory (subject to receipt of
-any required approvals from U.S. Dept. of Energy) 
+The parties now agree as follows:
 
-All rights reserved. 
+1. Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are 
-met: 
+(1) Redistributions of source code must retain the copyright notice,
+this list of conditions and the following disclaimer.
 
-(1) Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer. 
-(2) Redistributions in binary form must reproduce the above copyright
+(2) Redistributions in binary form must reproduce the copyright
 notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution. 
-(3) Neither the name of Lawrence Berkeley National Laboratory,
-U.S. Dept. of Energy nor the names of its contributors may be used to
-endorse or promote products derived from this software without
-specific prior written permission. 
+documentation and/or other materials provided with the distribution.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+(3) Neither the name of the University of California, Lawrence
+Berkeley National Laboratory, U.S. Dept. of Energy nor the names of
+its contributors may be used to endorse or promote products derived
+from this software without specific prior written permission.
+
+2. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
@@ -44,5 +39,15 @@ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+3. You are under no obligation whatsoever to provide any bug fixes,
+patches, or upgrades to the features, functionality or performance of
+the source code ("Enhancements") to anyone; however, if you choose to
+make your Enhancements available either publicly, or directly to
+Lawrence Berkeley National Laboratory, without imposing a separate
+written license agreement for such Enhancements, then you hereby grant
+the following license: a non-exclusive, royalty-free perpetual license
+to install, use, modify, prepare derivative works, incorporate into
+other computer software, distribute, and sublicense such enhancements
+or derivative works thereof, in binary and source code form.

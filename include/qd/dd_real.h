@@ -63,7 +63,7 @@ struct QD_API dd_real {
   double x[2];
 
   dd_real(double hi, double lo) { x[0] = hi; x[1] = lo; }
-  dd_real() {}
+  dd_real() {x[0] = 0.0; x[1] = 0.0; }
   dd_real(double h) { x[0] = h; x[1] = 0.0; }
   dd_real(int h) {
     x[0] = (static_cast<double>(h));
