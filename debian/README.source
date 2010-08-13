@@ -1,6 +1,13 @@
-# -*- mode: readme-debian -*- 
+# -*- mode: readme-debian -*-
 
-
+Quilt
+-----
 A quilt patch (see debian/patches) is available to fix some compilation issues.
 
- -- Christophe Prud'homme <prudhomm@debian.org>, Sun,  7 Dec 2008 19:59:54 +0100
+Removing .[a-zA-Z_]* files
+--------------------------
+
+the source package have been cleaned up and all files .[a-zA-Z_]* have
+been removed from the archive.
+
+ -- Christophe Prud'homme <prudhomm@debian.org>, Fri, 13 Aug 2010 13:10:31 +0200
