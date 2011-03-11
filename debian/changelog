@@ -1,3 +1,11 @@
+qd (2.3.11.dfsg-2) unstable; urgency=low
+
+  * Team upload.
+  * Fix build on sh4 (Closes: #590335).
+    - Add patches/sh4.patch.
+
+ -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Fri, 11 Mar 2011 22:22:58 +0900
+
 qd (2.3.11.dfsg-1) unstable; urgency=low
 
   [Christophe Prud'homme]

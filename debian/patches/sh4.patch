@@ -1,0 +1,11 @@
+--- a/configure	2010-07-26 03:24:03.000000000 +0000
++++ b/configure	2010-07-26 03:24:32.000000000 +0000
+@@ -8040,7 +8040,7 @@
+ 
+           ;;
+           # Ignore these flags.
+-        -lang* | -lcrt*.o | -lc | -lgcc* | -lSystem | -libmil | -LANG:=* | -LIST:* | -LNO:*)
++        -lang* | -lcrt*.o | -lc | -lgcc* | -lSystem | -libmil | -little | -LANG:=* | -LIST:* | -LNO:*)
+           ;;
+         -lkernel32)
+           test x"$CYGWIN" != xyes && ac_cv_fc_libs="$ac_cv_fc_libs $ac_arg"
