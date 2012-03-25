@@ -1,3 +1,11 @@
+qd (2.3.11.dfsg-2.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix "FTBFS": add pkglibdir.patch to fix fortran/Makefile.am.
+    (Closes: #662585)
+
+ -- gregor herrmann <gregoa@debian.org>  Sun, 25 Mar 2012 18:59:19 +0200
+
 qd (2.3.11.dfsg-2) unstable; urgency=low
 
   * Team upload.

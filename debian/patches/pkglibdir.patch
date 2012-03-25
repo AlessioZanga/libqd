@@ -1,0 +1,12 @@
+--- a/fortran/Makefile.am
++++ b/fortran/Makefile.am
+@@ -24,7 +24,8 @@
+ $(DDEXT): ddext.o
+ $(QDEXT): qdext.o
+ 
+-pkglib_DATA = $(QDMOD) $(QDEXT) $(DDMOD) $(DDEXT)
++qd_pkglibdir = $(pkglibdir)
++qd_pkglib_DATA = $(QDMOD) $(QDEXT) $(DDMOD) $(DDEXT)
+ 
+ DEMO=quaderq$(EXEEXT) quadgsq2d$(EXEEXT) quadgsq$(EXEEXT) \
+      quadtsq$(EXEEXT) quadtsq2d$(EXEEXT)
