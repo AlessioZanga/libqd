@@ -3,7 +3,7 @@ Section: libs
 Priority: optional
 Maintainer: Debian Science Maintainers <debian-science-maintainers@lists.alioth.debian.org>
 Uploaders: Christophe Prud'homme <prudhomm@debian.org>
-Build-Depends: cdbs, debhelper (>= 7), quilt, autotools-dev, g++ (>= 4.1), gfortran (>= 4.1), automake, autoconf, libtool
+Build-Depends: cdbs, debhelper (>= 7), quilt, dh-autoreconf, g++ (>= 4.1), gfortran (>= 4.1)
 Standards-Version: 3.9.1
 Homepage: http://crd.lbl.gov/~dhbailey/mpdist/
 Vcs-Svn: svn://svn.debian.org/svn/debian-science/packages/qd/trunk

@@ -1,3 +1,12 @@
+qd (2.3.11.dfsg-2.2) unstable; urgency=low
+
+  * Convert to dh-autoreconf, which is more robust than CDBS
+    DEB_AUTO_UPDATE_* (closes: #713207).
+  * Adjust pkglibdir.patch to work with current Autotools.
+  * Remove sh4.patch, automatically applied by autoreconf.
+
+ -- Colin Watson <cjwatson@debian.org>  Wed, 18 Sep 2013 09:31:53 +0100
+
 qd (2.3.11.dfsg-2.1) unstable; urgency=low
 
   * Non-maintainer upload.

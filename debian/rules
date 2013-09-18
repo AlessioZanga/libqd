@@ -3,12 +3,10 @@
 
 ## control update does not seem t be a good practice
 ## DEB_AUTO_UPDATE_DEBIAN_CONTROL := yes
-DEB_AUTO_UPDATE_LIBTOOL :=
-DEB_AUTO_UPDATE_AUTOCONF:=
-DEB_AUTO_UPDATE_AUTOMAKE:= 1.11
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/autotools.mk
+include /usr/share/cdbs/1/rules/autoreconf.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 
 
