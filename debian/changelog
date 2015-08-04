@@ -1,3 +1,9 @@
+qd (2.3.11.dfsg-2.2ubuntu1) wily; urgency=medium
+
+  * Rename library packages for g++5 ABI transition.
+
+ -- Iain Lane <iain@orangesquash.org.uk>  Tue, 04 Aug 2015 11:37:46 +0100
+
 qd (2.3.11.dfsg-2.2) unstable; urgency=low
 
   * Convert to dh-autoreconf, which is more robust than CDBS
