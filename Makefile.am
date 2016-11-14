@@ -1,7 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = config src include tests fortran
 
-docdir=${datadir}/doc/${PACKAGE}
 BUILT_SOURCES = docs/qd.pdf
 dist_doc_DATA = README docs/qd.pdf
 dist_noinst_DATA = docs/Makefile \
@@ -24,7 +23,7 @@ dist_noinst_DATA = docs/Makefile \
 doc: docs/qd.pdf
 
 docs/qd.pdf:
-	cd docs && $(MAKE) qd.pdf
+	$(MAKE) -C docsqd.pdf
 
 changelog:
 	git log >ChangeLog
@@ -33,12 +32,12 @@ dist-hook:
 	rm -f ${distdir}/ChangeLog && git log >${distdir}/ChangeLog
 
 cpp-demo:
-	cd tests && make demo
+	$(MAKE) -C tests demo
 
 if HAVE_FORTRAN
 
 fortran-demo:
-	cd fortran && make demo
+	$(MAKE) -C fortran demo
 
 demo: cpp-demo fortran-demo
 
@@ -52,7 +51,7 @@ demo: cpp-demo
 endif
 
 time:
-	cd tests && make time
+	$(MAKE) -C tests time
 
 bin_SCRIPTS=qd-config
 

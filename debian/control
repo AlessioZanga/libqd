@@ -1,10 +1,10 @@
 Source: qd
-Section: libs
 Priority: optional
+Section: libs
 Maintainer: Debian Science Maintainers <debian-science-maintainers@lists.alioth.debian.org>
-Uploaders: Christophe Prud'homme <prudhomm@debian.org>
-Build-Depends: cdbs, debhelper (>= 7), quilt, dh-autoreconf, g++ (>= 4.1), gfortran (>= 4.1)
-Standards-Version: 3.9.1
+Uploaders: Alastair McKinstry <mckinstry@debian.org>
+Build-Depends: cdbs, debhelper (>= 10), quilt, dh-autoreconf, g++ (>= 4.1), gfortran (>= 4.1)
+Standards-Version: 3.9.8
 Homepage: http://crd.lbl.gov/~dhbailey/mpdist/
 Vcs-Svn: svn://svn.debian.org/svn/debian-science/packages/qd/trunk
 Vcs-Browser: http://svn.debian.org/wsvn/debian-science/packages/qd/trunk
@@ -12,7 +12,7 @@ Vcs-Browser: http://svn.debian.org/wsvn/debian-science/packages/qd/trunk
 Package: libqd-dev
 Section: libdevel
 Architecture: any
-Depends: libqd0 (= ${binary:Version}), ${misc:Depends}
+Depends: libqd0v5 (= ${binary:Version}), ${misc:Depends}
 Description: Double-double and quad double types in C++ and F90
  This package supports both a double-double datatype (approx. 32
  decimal digits) and a quad-double datatype (approx. 64 decimal
@@ -21,12 +21,11 @@ Description: Double-double and quad double types in C++ and F90
  to convert an existing C++ or Fortran-90 program to use the library
  with only minor changes to the source code.
 
-Package: libqd0
-Section: libs
+Package: libqd0v5
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Replaces: libqd2c2a
-Conflicts: libqd2c2a
+Replaces: libqd2c2a, libqd0
+Conflicts: libqd2c2a, libqd0
 Description: Double-double and quad double types in C++ and F90
  This package supports both a double-double datatype (approx. 32
  decimal digits) and a quad-double datatype (approx. 64 decimal

@@ -1,3 +1,22 @@
+qd (2.3.17.dfsg-1) unstable; urgency=medium
+
+  * New upstream release
+   - libtool patch merged upstream
+   - gxx43 patch no longer needed
+  * Remove prelibtool stage, which caused FTBFS. Closes: #818542
+  * Remove Christophe Prud'homme from Uploaders. Closes: #835012.
+  * Add myself as Uploader.
+  * Move to DH_COMPAT=10, with debhelper dep, >= 10
+  * Standards-Version: 3.9.8
+  * source format: quilt (3.0)
+  * Use xz compression
+  * Rename library packages for g++5 ABI transition. (Match Ubuntu name)
+    Closes: #819339.
+  * Tidy up copyright; fix machine-readble format
+  * Add demangle to debian/watch file (dfsg component)
+
+ -- Alastair McKinstry <mckinstry@debian.org>  Mon, 14 Nov 2016 18:22:01 +0000
+
 qd (2.3.11.dfsg-2.3) unstable; urgency=medium
 
   * Non-maintainer upload.

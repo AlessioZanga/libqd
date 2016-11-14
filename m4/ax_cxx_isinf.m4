@@ -6,19 +6,19 @@ AC_DEFUN([AX_CXX_ISINF], [
 AC_MSG_CHECKING([for isinf])
 AC_LANG_PUSH(C++)
 ax_cxx_isinf=
-AC_COMPILE_IFELSE([#include <cmath>
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <cmath>
                    int main() {
                      std::isinf(1.0);
                      return 0;
-                   }], 
+                   }])], 
                    [AC_MSG_RESULT(std::isinf)
                     ax_cxx_isinf="std::isinf(x)"])
 if test "x$ax_cxx_isinf" = "x"; then
-  AC_COMPILE_IFELSE([#include <cmath>
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <cmath>
                      int main() {
                        ::isinf(1.0);
                        return 0;
-                     }], 
+                     }])], 
                      [AC_MSG_RESULT(::isinf)
                       ax_cxx_isinf="::isinf(x)"], 
                      [AC_MSG_RESULT(none)

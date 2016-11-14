@@ -21,7 +21,7 @@ dnl @license AllPermissive
 
 AC_DEFUN([AX_F90_MODULE_STYLE],[
 AC_CACHE_CHECK([fortran 90 modules naming style],
-ax_f90_module_style, 
+ax_cv_f90_module_style, 
 [AC_LANG_PUSH(Fortran)
 i=0
 while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
@@ -29,13 +29,13 @@ while test \( -f tmpdir_$i \) -o \( -d tmpdir_$i \) ; do
 done
 mkdir tmpdir_$i
 cd tmpdir_$i
-AC_COMPILE_IFELSE([module conftest_module
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([module conftest_module
    contains
    subroutine conftest_routine
    write(*,'(a)') 'gotcha!'
    end subroutine conftest_routine
    end module conftest_module
-  ],
+  ])],
   [ax_f90_modext=`ls | sed -n 's,conftest_module\.,,p'`
    if test x$ax_f90_modext = x ; then
 dnl Some F90 compilers put module filename in uppercase letters
