@@ -19,14 +19,14 @@ for name in $ax_cxx_fma_list; do
     case $name in
       ibm)
         # IBM VisualAge C++ __fmadd / __fmsub.
-        AC_RUN_IFELSE([#include <cmath>
+        AC_RUN_IFELSE([AC_LANG_SOURCE([#include <cmath>
                        #include <builtins.h>
                        int main() {
                          double d = std::ldexp(1.0, -52);
                          double x = __fmadd(1.0 + d, 1.0 - d, -1.0);
                          double y = __fmsub(1.0 + d, 1.0 - d, 1.0);
                          return (x == -d*d && y == -d*d) ? 0 : 1;
-                       }], 
+                       }])], 
                       [ax_cxx_fma="__fmadd(x,y,z)"
                        ax_cxx_fms="__fmsub(x,y,z)"
                        AC_DEFINE([QD_VACPP_BUILTINS_H], [1], 
@@ -34,11 +34,11 @@ for name in $ax_cxx_fma_list; do
       ;;
       gnu)
         # Later gcc (3.4 and later) have __builtin_fma that seems to work.
-        AC_RUN_IFELSE([#include <cmath>
+        AC_RUN_IFELSE([AC_LANG_SOURCE([#include <cmath>
                        int main() {
                          double d = std::ldexp(1.0, -52);
                          return (__builtin_fma(1.0 + d, 1.0 - d, -1.0) == -d*d ? 0 : 1);
-                       }], 
+                       }])], 
                       [ax_cxx_fma="__builtin_fma(x,y,z)"
                        ax_cxx_fms="__builtin_fma(x,y,-z)"])
       ;;
@@ -46,22 +46,22 @@ for name in $ax_cxx_fma_list; do
         # Intel and HP compilers for IA 64 architecture seems to have 
         # _Asm_fma/fms macros.  Not much documentation is available for 
         # these...
-        AC_RUN_IFELSE([#include <cmath>
+        AC_RUN_IFELSE([AC_LANG_SOURCE([#include <cmath>
                        int main() {
                          double d = std::ldexp(1.0, -52);
                          return (_Asm_fma(2, 1.0 + d, 1.0 - d, -1.0) == -d*d ? 0 : 1);
-                       }], 
+                       }])], 
                       [ax_cxx_fma="_Asm_fma(2, x,y,z)"
                        ax_cxx_fms="_Asm_fms(2, x,y,z)"])
       ;;
       c99)
         # Try C99 fma() function.  Some platforms doesn't seem to implement this
         # correctly (Apple gcc-3.3 for example).
-        AC_RUN_IFELSE([#include <cmath>
+        AC_RUN_IFELSE([AC_LANG_SOURCE([#include <cmath>
                        int main() {
                          double d = std::ldexp(1.0, -52);
                          return (fma(1.0 + d, 1.0 - d, -1.0) == -d*d ? 0 : 1);
-                       }], 
+                       }])], 
                       [ax_cxx_fma="fma(x,y,z)"
                        ax_cxx_fms="fma(x,y,-z)"])
       ;;
@@ -69,11 +69,11 @@ for name in $ax_cxx_fma_list; do
         # Try relying on the compiler to optimize x * y + z into an fma.
         # This method is not recommended since if it is inlined it does not
         # always produce the same correct code.
-        AC_RUN_IFELSE([#include <cmath>
+        AC_RUN_IFELSE([AC_LANG_SOURCE([#include <cmath>
                        int main() {
                          double d = std::ldexp(1.0, -52);
                          return ( (1.0 + d) * (1.0 - d) - 1.0 == -d*d ? 0 : 1);
-                       }],
+                       }])],
                        [ax_cxx_fma="((x)*(y) + (z))"
                         ax_cxx_fms="((x)*(y) - (z))"])
       ;;

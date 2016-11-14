@@ -1,81 +1,111 @@
-Revised 13 May 2009
+Quad-Double computation package
+Copyright (C) 2003-2012
+================================================
 
-Note on Compiler Optimizations
-==============================
+Revised 13 Mar 2012
 
-This library is quite sensitive to the various optimization flags
-passed to the C++ compiler, both in terms of speed and correctness.
-In general, you should not turn on optimization that weakens the
-floating point numerics.  For the more recent GNU C++ compiler (4.x
-series), I use '-O3 -funroll-all-loops', along with some architecture
-specifier, such as '-march=nocona'.  By default the configure script
-will choose something fairly benign, such as '-O2', along with
-certain flags known to the author to disable optimzation that changes
-the floating point semantics (such as -mp on Intel compilers).
+To build this library, follow the steps below.
+Some system specific notes are at the end of this file.
 
-When tinkering with optimization flags, it is advised to 
+Build Instructions
+==================
 
-  - check the correctness of the library by running 
-    "make check", and 
-  - do "make time" to perform some timings to see that the 
-    optimization is actually helpful.
+  1. Run the configure script by typing
 
-Note that since many functions are implemented as inline functions
-in the header files, same optimization precautions apply to any 
-program that uses the QD library headers.
+        ./configure
 
-Installation Instructions
-=========================
+     The script will attempt to automatically detect various system-dependent
+     variables used during compilation (such as the C++/fortran compiler, 
+     compiler flags, and linker flags).
 
-To build the qd library, follow the following steps.
+     If you want to specify a particular C++ / F90 compiler and their flags, 
+     you can set them as environmental variables.  For example:
 
-  1. You need to figure out which C++, C, (and optionally Fortran 95) 
-     compiler you will be using.  Run the configure script by typing
+       FC=ifc FCFLAGS="-O2 -FR" ./configure
 
-       ./configure CXX=<your C++ compiler> CC=<your C compiler> FC=<your Fortran 95 compiler>
-
-     The script will attempt to automatically detect various 
-     system-dependent features used during compilation (such as 
-     C++ / C / Fortran compiler characteristics and availability of 
-     certain system headers).
-
-     If you want to specify a particular C++ / Fortran-90 compiler 
-     flags, you can set them using CXXFLAGS and FCFLAGS.  For example:
-
-       CXX=icpc CXXFLAGS='-O2 -mp' FC=ifort FCFLAGS='-O2 -mp' ./configure
-
-     Some variable of interests are
+     Important variables are
 
        CXX       C++ compiler to use
        CXXFLAGS  C++ compiler flags to use
-       CC        C compiler to use
+       CC        C compiler to use (for C demo program)
+       CFLAGS    C compiler flags to use (for C demo program)
        FC        Fortran 90 compiler
        FCFLAGS   Fortran 90 compiler flags to use
-       FCLIBS    Fortran 90 libraries needed to to link with C++ code
-       LDFLAGS   Linker flags
+       FCLIBS    Fortran 90 libraries needed to to link with C++ code.
 
-     For more build options, type "./configure --help".  In particular, 
-     if you want to install to a custom path, do something like
+     See ./configure --help to see other options. 
 
-       ./configure --prefix=/custom/path
+  3. The configure script should also have created the files 'config.h' and
+     'include/qd/qd_config.h', which will contain the compile time 
+     defines.  Examine these and edit them if necessary.  In most cases 
+     no edits are necessary, since the options are detected when configure
+     was run.
 
-  3. Type "make".  This will build the qd library.
+  4. Type "make".  This will build the library, and necessary Fortran
+     wrappers.
 
-  4. Optionally, one can build and run some simple test programs.
+  5. Optionally, one can build and run some simple test programs.
      To do this, type "make check".  Some programs run during this
-     phase (especially qd_test and pslq_test in tests directory) is
-     a good demonstration of how to use the qd library in C++.
+     phase is a good demonstration of how to use the qd library in C++.
 
-     There are two other programs qd_timer and quadt_test that can be
-     built inside tests directory using "make qd_timer" and "make 
-     quadt_test".  The program qd_timer times the basic operations in 
-     double-double and quad-double.  The program quadt_test is another
-     demo program that computes quadratures of various functions.
+  6. You can now install the QD library by issuing "make install".
 
-  5. If you want to build some sample programs written in Fortran 90, 
+  7. If you want to build some sample programs written in C++
+     you can type "make cpp-demo".
+
+  8. If you want to build some sample programs written in Fortran 90, 
      you can type "make fortran-demo".
 
-  6. Type "make install" to install the quad-double library to
-     the location specified (through --prefix option) to the configure 
-     script (default is "/usr/local").
+  9. If you want to compile the Experimental Mathematician's Toolkit,
+     type "make toolkit".  This will compile the Fortran-90 codes in
+     the toolkit cirectory, including the "mathinit" and "mathtool"
+     Read the "README" file in the toolkit directory for additional details.
+
+
+System-Specific Notes
+=====================
+
+Linux x86 / Itanium
+-------------------
+You can use g++ to compile the C++ code.  The Fortran 90 codes
+can be compiled using Intel Fortran 95 compiler
+
+  http://www.intel.com/software/products/compilers/flin/
+
+available freely for non-commercial uses.  There is also a C++
+compiler available (for non-commercial use) at
+
+  http://www.intel.com/software/products/compilers/clin/
+
+which can be used to compile the C++ portion.  By default the 
+configure script will use the Intel compiler if found.
+
+Apple (OS X)
+------------
+
+For Apple OS X Intel-badsed systems, it is recommended that you use
+the g++-4.0 (or higher) compiler and the gfortran compiler.  The
+g++-4.0 (or higher) compiler and related command-line tools are now
+available via this URL (see command-line tools):
+https://developer.apple.com/downloads/index.action
+
+The gfortran compiler can be downloaded from:
+http://www.macresearch.org/files/gfortran/gfortran-4.3-Nov.mpkg.zip
+
+After installing these compilers, in the main qd directory type
+
+   ./configure CXX=g++ FC=gfortran FCFLAGS=-m64
+
+then type "make" to construct the library.  See the "README" file on
+how to construct a compile-link script for your own codes.
+
+IBM (Power)
+-----------
+
+With IBM's xlC/xlf90 compilers, you may want to experiment with
+--enable-fma option which uses a faster code but relies on the
+compiler to generate a fused multiply-accumulate instruction.
+WARNING: since the compiler is not required to produce such
+instructions, this is not guaranteed to work.  Please test before
+using.
 

@@ -1,12 +1,14 @@
---- a/fortran/Makefile.am
-+++ b/fortran/Makefile.am
-@@ -24,7 +24,8 @@
- $(DDEXT): ddext.o
- $(QDEXT): qdext.o
+Index: qd-2.3.17/fortran/Makefile.am
+===================================================================
+--- qd-2.3.17.orig/fortran/Makefile.am
++++ qd-2.3.17/fortran/Makefile.am
+@@ -2,6 +2,9 @@ if HAVE_FORTRAN
+ AM_CPPFLAGS = -I$(top_builddir) -I$(top_builddir)/include -I$(top_srcdir)/include
+ LDADD=libqdmod.la libqd_f_main.la $(top_builddir)/src/libqd.la $(FCLIBS)
  
--pkglib_DATA = $(QDMOD) $(QDEXT) $(DDMOD) $(DDEXT)
 +qdpkglibdir = $(pkglibdir)
 +qdpkglib_DATA = $(QDMOD) $(QDEXT) $(DDMOD) $(DDEXT)
- 
- DEMO=quaderq$(EXEEXT) quadgsq2d$(EXEEXT) quadgsq$(EXEEXT) \
-      quadtsq$(EXEEXT) quadtsq2d$(EXEEXT)
++
+ if UPCASE_MODULE
+ DDEXT=DDEXT.$(module_ext)
+ QDEXT=QDEXT.$(module_ext)

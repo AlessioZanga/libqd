@@ -6,19 +6,19 @@ AC_DEFUN([AX_CXX_ISFINITE], [
 AC_MSG_CHECKING([for isfinite])
 AC_LANG_PUSH(C++)
 ax_cxx_isfinite=
-AC_COMPILE_IFELSE([#include <cmath>
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <cmath>
                    int main() {
                      std::isfinite(1.0);
                      return 0;
-                   }], 
+                   }])], 
                    [AC_MSG_RESULT(std::isfinite)
                     ax_cxx_isfinite="std::isfinite(x)"])
 if test "x$ax_cxx_isfinite" = "x"; then
-  AC_COMPILE_IFELSE([#include <cmath>
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <cmath>
                      int main() {
                        ::isfinite(1.0);
                        return 0;
-                     }], 
+                     }])], 
                      [AC_MSG_RESULT(::isfinite)
                       ax_cxx_isfinite="::isfinite(x)"], 
                      [AC_MSG_RESULT(none)

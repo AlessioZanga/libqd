@@ -1,4 +1,4 @@
-LDADD = $(top_builddir)/src/libqd.a
+LDADD = $(top_builddir)/src/libqd.la
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_builddir)/include -I$(top_srcdir)/include
 
 TESTS = qd_test pslq_test c_test
@@ -15,9 +15,9 @@ AM_FFLAGS = $(AM_FCFLAGS)
 
 f_test_SOURCES = f_test.f
 f_test_LINK=$(CXXLINK)
-f_test_LDADD = $(top_builddir)/fortran/libqdmod.a \
-               $(top_builddir)/fortran/libqd_f_main.a \
-               $(LDADD) $(top_builddir)/src/libqd.a $(FCLIBS)
+f_test_LDADD = $(top_builddir)/fortran/libqdmod.la \
+               $(top_builddir)/fortran/libqd_f_main.la \
+               $(LDADD) $(top_builddir)/src/libqd.la $(FCLIBS)
 endif
 
 CLEANFILES=qd_timer quadt_test huge

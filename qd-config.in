@@ -30,7 +30,7 @@ SRC_CFLAGS="-I$srcdir/src -I$builddir/src @CPPFLAGS@"
 FCLIBS="-L$libdir -lqdmod -lqd @LIBS@ @FCLIBS@"
 FMAINLIB="-L$libdir -lqd_f_main"
 FCFLAGS="@REQ_FCFLAGS@"
-MODFLAG="@ax_f90_modflag@$libdir/qd"
+MODFLAG="@ax_f90_modflag@$includedir/qd"
 
 build="@BUILDER@-@BUILDDATE@"
 configure_args="@CONFIGURE_ARGS@"

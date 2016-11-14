@@ -1,6 +1,6 @@
 if HAVE_FORTRAN
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_builddir)/include -I$(top_srcdir)/include
-LDADD=libqdmod.a libqd_f_main.a $(top_builddir)/src/libqd.a $(FCLIBS)
+LDADD=libqdmod.la libqd_f_main.la $(top_builddir)/src/libqd.la $(FCLIBS)
 
 if UPCASE_MODULE
 DDEXT=DDEXT.$(module_ext)
@@ -14,17 +14,18 @@ QDMOD=qdmodule.$(module_ext)
 DDMOD=ddmodule.$(module_ext)
 endif
 
-lib_LIBRARIES = libqdmod.a libqd_f_main.a
-libqdmod_a_SOURCES = ddext.f ddmod.f qdext.f qdmod.f f_dd.cpp f_qd.cpp
-libqd_f_main_a_SOURCES = main.cpp
-ddmod.o: ddext.o
-qdmod.o: ddmod.o qdext.o
-$(QDMOD): qdmod.o
-$(DDMOD): ddmod.o
-$(DDEXT): ddext.o
-$(QDEXT): qdext.o
+lib_LTLIBRARIES = libqdmod.la libqd_f_main.la
+libqdmod_la_SOURCES = ddext.f ddmod.f qdext.f qdmod.f f_dd.cpp f_qd.cpp
+libqd_f_main_la_SOURCES = main.cpp
+ddmod.lo: $(DDEXT) ddext.lo
+qdmod.lo: ddmod.lo $(DDMOD) qdext.lo
+$(QDMOD): qdmod.lo $(DDMOD)
+$(DDMOD): ddmod.lo
+$(DDEXT): ddext.lo
+$(QDEXT): qdext.lo $(DDEXT) 
 
-pkglib_DATA = $(QDMOD) $(QDEXT) $(DDMOD) $(DDEXT)
+qdmoddir = $(includedir)/$(PACKAGE)
+qdmod_HEADERS = $(QDMOD) $(QDEXT) $(DDMOD) $(DDEXT)
 
 DEMO=quaderq$(EXEEXT) quadgsq2d$(EXEEXT) quadgsq$(EXEEXT) \
      quadtsq$(EXEEXT) quadtsq2d$(EXEEXT)

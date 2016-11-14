@@ -309,11 +309,12 @@ AC_SUBST(F77, $FC)
 AC_SUBST(FFLAGS, $FCFLAGS)
 
 # Add libraries
-AC_CHECK_LIB(m,sqrt)
+LIBS="$LIBS -lm"
 
 # libtool stuff
-AC_DISABLE_SHARED
-AC_PROG_LIBTOOL
+# AC_DISABLE_SHARED
+# AC_PROG_LIBTOOL
+AC_PROG_RANLIB
 
 # Output
 AC_CONFIG_FILES([Makefile config/Makefile src/Makefile include/Makefile 

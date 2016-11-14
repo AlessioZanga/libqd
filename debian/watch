@@ -1,2 +1,2 @@
 version=3
-http://crd.lbl.gov/~dhbailey/mpdist/qd-([\d.]+)\.tar\.gz
+opts=dversionmangle=s/\+(debian|dfsg|ds|deb)(\.\d+)?$// http://crd.lbl.gov/~dhbailey/mpdist/qd-([\d.]+)\.tar\.gz
