@@ -1,7 +1,6 @@
 qd-config                       /usr/bin
 include/qd/*.h                  /usr/include/qd
-debian/tmp/usr/lib/libqd.a      /usr/lib
-debian/tmp/usr/lib/libqd.so     /usr/lib
-debian/tmp/usr/lib/libqdmod.a   /usr/lib
+debian/tmp/usr/lib/lib*.a      /usr/lib
+debian/tmp/usr/lib/lib*.so     /usr/lib
 debian/tmp/usr/lib/qd           /usr/lib
 
