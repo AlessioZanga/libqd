@@ -141,12 +141,12 @@ DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/Owner/hipreclibs/QD/qd-2.3.20/config/missing --run aclocal-1.11
-AMTAR = ${SHELL} /home/Owner/hipreclibs/QD/qd-2.3.20/config/missing --run tar
+ACLOCAL = ${SHELL} ./config/missing --run aclocal-1.11
+AMTAR = ${SHELL}   ./config/missing --run tar
 AR = ar
-AUTOCONF = ${SHELL} /home/Owner/hipreclibs/QD/qd-2.3.20/config/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/Owner/hipreclibs/QD/qd-2.3.20/config/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/Owner/hipreclibs/QD/qd-2.3.20/config/missing --run automake-1.11
+AUTOCONF = ${SHELL} ./config/missing --run autoconf
+AUTOHEADER = ${SHELL} ./config/missing --run autoheader
+AUTOMAKE = ${SHELL} ./config/missing --run automake-1.11
 AWK = gawk
 CC = c++
 CCDEPMODE = depmode=gcc3
