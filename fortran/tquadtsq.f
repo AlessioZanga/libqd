@@ -1,7 +1,7 @@
 module quadglobal
-use qdmodule
-implicit none
-integer ndebug, ndigits, nerror, nquadl
+      use qdmodule
+      implicit none
+      integer ndebug, ndigits, nerror, nquadl
 end module
 
 ! program tquadtsq

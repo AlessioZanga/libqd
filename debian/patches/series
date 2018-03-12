@@ -1,2 +1,4 @@
 pkglibdir.patch
 missing-changelog.patch
+fix-pdf-build.patch
+autoconf.patch

@@ -1,3 +1,13 @@
+qd (2.3.20+dfsg.1-1) unstable; urgency=medium
+
+  * New upstream release
+  * Point VCS to salsa.debian.org
+  * Set libqd0v5 M-A: same. Ship libs in M-A directory.
+  * Use simple debhelper; no longer need cdbs, quilt
+  * Build-dep on gawk, texlive-latex-base, texlive-latex-recommended
+
+ -- Alastair McKinstry <mckinstry@debian.org>  Mon, 12 Mar 2018 12:29:36 +0000
+
 qd (2.3.18+dfsg-1) unstable; urgency=medium
 
   * New upstream release
