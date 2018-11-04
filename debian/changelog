@@ -1,3 +1,12 @@
+qd (2.3.22+dfsg.1-2) unstable; urgency=medium
+
+  * New upstream release
+  * Standards-Version: 4.2.1
+  *  autoconf patch obsolete
+  * Undo hard-coded xz compression
+
+ -- Alastair McKinstry <mckinstry@debian.org>  Sun, 04 Nov 2018 15:02:35 +0000
+
 qd (2.3.20+dfsg.1-1) unstable; urgency=medium
 
   * New upstream release

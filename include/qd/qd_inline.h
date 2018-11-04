@@ -138,7 +138,6 @@ inline void renorm(double &c0, double &c1,
   s0 = c0;
   s1 = c1;
 
-  s0 = qd::quick_two_sum(c0, c1, s1);
   if (s1 != 0.0) {
     s1 = qd::quick_two_sum(s1, c2, s2);
     if (s2 != 0.0) {
@@ -146,7 +145,7 @@ inline void renorm(double &c0, double &c1,
       if (s3 != 0.0)
         s3 += c4;
       else
-        s2 += c4;
+        s2 = qd::quick_two_sum(s2, c4, s3);
     } else {
       s1 = qd::quick_two_sum(s1, c3, s2);
       if (s2 != 0.0)
