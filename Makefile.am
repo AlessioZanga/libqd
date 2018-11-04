@@ -1,6 +1,9 @@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = config src include tests fortran
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = qd.pc
+
 BUILT_SOURCES = docs/qd.pdf
 dist_doc_DATA = README docs/qd.pdf
 dist_noinst_DATA = docs/Makefile \

@@ -1,11 +1,11 @@
 Quad Double computation package
-Copyright (C) 2003-2012
+Copyright (C) 2003-2018
 ================================================
 
-Revision date:  13 Mar 2012
+Revision date:  30 Oct 2018
 
 Authors:
-Yozo Hida		U.C. Berkeley   			yozo@cs.berkeley.edu
+Yozo Hida		U.C. Berkeley   		yozo@cs.berkeley.edu
 Xiaoye S. Li 		Lawrence Berkeley Natl Lab  	xiaoye@nersc.gov
 David H. Bailey  	Lawrence Berkeley Natl Lab  	dhbailey@lbl.gov
 

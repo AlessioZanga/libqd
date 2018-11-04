@@ -1,3 +1,9 @@
+Changes for 2.3.22
+    Made changes suggested by Vasiliy Sotnikov
+
+Changes for 2.3.21
+    Changed renorm in include/qd/qd_inline.h
+
 Changes for 2.3.20
     added #include <string.h> to quadt_test.cpp
     changed references to 2.3.20 from 2.3.18

@@ -1,8 +1,8 @@
 Quad-Double computation package
-Copyright (C) 2003-2012
+Copyright (C) 2003-2018
 ================================================
 
-Revised 13 Mar 2012
+Revised 30 Oct 2018
 
 To build this library, follow the steps below.
 Some system specific notes are at the end of this file.
@@ -65,32 +65,38 @@ Build Instructions
 System-Specific Notes
 =====================
 
-Linux x86 / Itanium
+Linux with Intel processors
 -------------------
-You can use g++ to compile the C++ code.  The Fortran 90 codes
-can be compiled using Intel Fortran 95 compiler
+You can use g++ to compile the C++ code, which is a part of all
+Linux or other Unix distributions. The Fortran 90 codes
+can be compiled using the gfortran compiler available at 
 
-  http://www.intel.com/software/products/compilers/flin/
+   https://gcc.gnu.org/wiki/GFortranBinaries
 
-available freely for non-commercial uses.  There is also a C++
-compiler available (for non-commercial use) at
+Alternatively, one can use the Intel compilers, available at:
 
-  http://www.intel.com/software/products/compilers/clin/
+   http://www.intel.com/software/products/compilers/clin/
+   http://www.intel.com/software/products/compilers/flin/
 
-which can be used to compile the C++ portion.  By default the 
-configure script will use the Intel compiler if found.
+One can specify specific compilers for the configure script, as in:
+
+   ./configure CXX=g++ FC=gfortran
+
 
 Apple (OS X)
 ------------
 
-For Apple OS X Intel-badsed systems, it is recommended that you use
-the g++-4.0 (or higher) compiler and the gfortran compiler.  The
-g++-4.0 (or higher) compiler and related command-line tools are now
-available via this URL (see command-line tools):
-https://developer.apple.com/downloads/index.action
+For Apple OS X Intel-based systems, it is recommended that you use
+the g++ compiler and related command-line tools, available via this URL:
 
-The gfortran compiler can be downloaded from:
-http://www.macresearch.org/files/gfortran/gfortran-4.3-Nov.mpkg.zip
+   https://developer.apple.com/downloads/index.action
+
+See "Command-line tools" for your version of OS X. The above URL requires
+a registered Apple ID. It may be necessary to install Apple's Xcode
+package first.
+
+The gfortran compiler for Mac OS X can be downloaded from:
+   https://gcc.gnu.org/wiki/GFortranBinaries
 
 After installing these compilers, in the main qd directory type
 
