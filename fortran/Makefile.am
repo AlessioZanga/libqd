@@ -2,6 +2,9 @@ if HAVE_FORTRAN
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_builddir)/include -I$(top_srcdir)/include
 LDADD=libqdmod.la libqd_f_main.la $(top_builddir)/src/libqd.la $(FCLIBS)
 
+qdpkglibdir = $(pkglibdir)
+qdpkglib_DATA = $(QDMOD) $(QDEXT) $(DDMOD) $(DDEXT)
+
 if UPCASE_MODULE
 DDEXT=DDEXT.$(module_ext)
 QDEXT=QDEXT.$(module_ext)
