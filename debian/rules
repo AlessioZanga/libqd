@@ -5,7 +5,17 @@ export DH_VERBOSE=1
 %:
 	dh $@ 
 
-CXXFLAGS=-O3
+CXXFLAGS=$(shell dpkg-buildflags --get CXXFLAGS)
+FCFLAGS=$(shell dpkg-buildflags --get FCFLAGS)
+
+CXXFLAGS+=-O3
+
+FC ?= $(shell basename $(shell readlink /etc/alternatives/f95))
+ifneq ($(filter flang,$(FC)),)
+FCFLAGS += -fPIC
+endif
+
+
 
 override_dh_auto_configure:
 	dh_auto_configure -- --enable-shared

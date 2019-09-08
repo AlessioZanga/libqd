@@ -1,0 +1,25 @@
+From: Frédéric Bonnard <frediz@debian.org>
+Date: Wed, 4 Sep 2019 12:56:35 +0200
+X-Dgit-Generated: 2.3.22+dfsg.1-2 323dfc305d9e830b36b4fbbc1c5f5091c55182d4
+Subject: Workaround on ppc64el to fix qd_test (Closes: #935289)
+
+As reported in the bug, disabling that flag on ppc64el let
+tests/qd_test.cpp work.
+Let's disable it in qd-config so that other binaries compiled can
+benefit from it.
+
+---
+
+--- qd-2.3.22+dfsg.1.orig/configure.ac
++++ qd-2.3.22+dfsg.1/configure.ac
+@@ -111,6 +111,9 @@ CXX_PROG_NAME=`basename $CXX`
+ case $host in
+   powerpc*-*-*)
+     case "$CXX_PROG_NAME" in
++      c++)
++        REQ_CXXFLAGS="$REQ_CXXFLAGS -fno-tree-pre"
++      ;;
+       xlC*) 
+         REQ_CXXFLAGS="$REQ_CXXFLAGS -qstrict"
+       ;;
+

@@ -1,3 +1,5 @@
 pkglibdir.patch
 missing-changelog.patch
 fix-pdf-build.patch
+workaround-on-ppc64el-to-fix-qd_test-clo.patch
+
