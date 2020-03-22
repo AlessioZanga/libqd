@@ -26,7 +26,7 @@ dist_noinst_DATA = docs/Makefile \
 doc: docs/qd.pdf
 
 docs/qd.pdf:
-	$(MAKE) -C docsqd.pdf
+	$(MAKE) -C docs qd.pdf
 
 changelog:
 	git log >ChangeLog
