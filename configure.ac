@@ -111,6 +111,9 @@ CXX_PROG_NAME=`basename $CXX`
 case $host in
   powerpc*-*-*)
     case "$CXX_PROG_NAME" in
+      c++)
+        REQ_CXXFLAGS="$REQ_CXXFLAGS -fno-tree-pre"
+      ;;
       xlC*) 
         REQ_CXXFLAGS="$REQ_CXXFLAGS -qstrict"
       ;;
