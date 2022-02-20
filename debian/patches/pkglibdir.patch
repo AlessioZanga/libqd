@@ -1,7 +1,7 @@
-Index: qd-2.3.17/fortran/Makefile.am
+Index: qd-2.3.22+dfsg.1/fortran/Makefile.am
 ===================================================================
---- qd-2.3.17.orig/fortran/Makefile.am
-+++ qd-2.3.17/fortran/Makefile.am
+--- qd-2.3.22+dfsg.1.orig/fortran/Makefile.am
++++ qd-2.3.22+dfsg.1/fortran/Makefile.am
 @@ -2,6 +2,9 @@ if HAVE_FORTRAN
  AM_CPPFLAGS = -I$(top_builddir) -I$(top_builddir)/include -I$(top_srcdir)/include
  LDADD=libqdmod.la libqd_f_main.la $(top_builddir)/src/libqd.la $(FCLIBS)
@@ -12,3 +12,21 @@ Index: qd-2.3.17/fortran/Makefile.am
  if UPCASE_MODULE
  DDEXT=DDEXT.$(module_ext)
  QDEXT=QDEXT.$(module_ext)
+Index: qd-2.3.22+dfsg.1/qd.pc.in
+===================================================================
+--- qd-2.3.22+dfsg.1.orig/qd.pc.in
++++ qd-2.3.22+dfsg.1/qd.pc.in
+@@ -1,5 +1,6 @@
+ /------------------ qd.pc ------------------------
+ prefix=@prefix@
++fortran=gfortran-mod-15
+ exec_prefix=@prefix@
+ libdir=@prefix@/lib
+ includedir=@prefix@/include
+@@ -10,5 +11,5 @@ URL: http://crd-legacy.lbl.gov/~dhbailey
+ Version: @VERSION@
+ Requires:
+ Libs: -L@libdir@ -lqd
+-Cflags: -I@includedir@
++Cflags: -I@includedir@ -I@libdir@/fortran/$fortran
+ \-------------------------------------------------------

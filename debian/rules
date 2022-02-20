@@ -5,20 +5,50 @@ export DH_VERBOSE=1
 %:
 	dh $@ 
 
+
+# We do potentially two builds: one the default Fortran (typically gfortran,
+# but potentially another, eg FC=ifort ) and one the flang compiler
+BUILDDIR=debian/build
+BUILDDIR_FLANG=debian/build-flang
+
 CXXFLAGS=$(shell dpkg-buildflags --get CXXFLAGS)
 FCFLAGS=$(shell dpkg-buildflags --get FCFLAGS)
 
 CXXFLAGS+=-O3
 
-FC ?= $(shell basename $(shell readlink /etc/alternatives/f95))
+ifeq ($(FC),f77)
+  FC:=$(shell basename $(shell readlink /etc/alternatives/f95))
+endif
+
 ifneq ($(filter flang,$(FC)),)
 FCFLAGS += -fPIC
 endif
 
+DO_FLANG:=$(if $(wildcard /usr/bin/flang),true, false)
 
+# Drop '-g' flag with flang. Known failure with 2018122 version
+ifneq ($(filter flang,$(FC)),)
+FCFLAGS=$(shell dpkg-buildflags --get FCLAGS |  sed -e 's/-g //')
+endif
+
+override_dh_auto_clean:
+	rm -rf debian/build*
+	dh_auto_clean
 
 override_dh_auto_configure:
-	dh_auto_configure -- --enable-shared
+	dh_auto_configure --builddirectory=$(BUILDDIR) - -- --enable-shared   
+	$(DO_FLANG) && ( dh_auto_configure --builddirectory=$(BUILDDIR_FLANG) \
+		-- --enable-shared  F77=flang FC=flang ) || true
+
+override_dh_auto_build:
+	dh_auto_build --builddirectory=$(BUILDDIR)
+	$(DO_FLANG) && ( dh_auto_build --builddirectory=$(BUILDDIR_FLANG) ) || true
+
+override_dh_auto_install:
+	dh_auto_install --builddirectory=$(BUILDDIR)
+	$(DO_FLANG) && ( dh_auto_build --builddirectory=$(BUILDDIR_FLANG) ) || true
+	rm -rf debian/tmp/usr/lib/*/*.la debian/tmp/usr/lib/*/qd
+
 
 get-orig-source:
 	uscan --force-download

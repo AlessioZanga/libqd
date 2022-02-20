@@ -1,11 +1,11 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = config src include tests fortran
+SUBDIRS = src include tests fortran 
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = qd.pc
 
-BUILT_SOURCES = docs/qd.pdf
-dist_doc_DATA = README docs/qd.pdf
+BUILT_SOURCES = 
+dist_doc_DATA = README 
 dist_noinst_DATA = docs/Makefile \
   docs/qd.tex docs/qd.bib \
   docs/nine-two-sum.eps docs/nine-two-sum.fig \
@@ -23,16 +23,10 @@ dist_noinst_DATA = docs/Makefile \
   docs/two-prod.eps docs/two-prod.fig \
   docs/two-sum.eps docs/two-sum.fig
 
-doc: docs/qd.pdf
+# doc: docs/qd.pdf
 
-docs/qd.pdf:
-	$(MAKE) -C docs qd.pdf
-
-changelog:
-	git log >ChangeLog
-
-dist-hook:
-	rm -f ${distdir}/ChangeLog && git log >${distdir}/ChangeLog
+#docs/qd.pdf:
+#	$(MAKE) -C docs qd.pdf
 
 cpp-demo:
 	$(MAKE) -C tests demo
@@ -58,4 +52,4 @@ time:
 
 bin_SCRIPTS=qd-config
 
-.PHONY: changelog cpp-demo fortran-demo demo time doc
+.PHONY: cpp-demo fortran-demo demo time doc

@@ -1,5 +1,6 @@
 /------------------ qd.pc ------------------------
 prefix=@prefix@
+fortran=gfortran-mod-15
 exec_prefix=@prefix@
 libdir=@prefix@/lib
 includedir=@prefix@/include
@@ -10,5 +11,5 @@ URL: http://crd-legacy.lbl.gov/~dhbailey/mpdist/
 Version: @VERSION@
 Requires:
 Libs: -L@libdir@ -lqd
-Cflags: -I@includedir@
+Cflags: -I@includedir@ -I@libdir@/fortran/$fortran
 \-------------------------------------------------------
