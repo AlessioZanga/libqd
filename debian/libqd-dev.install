@@ -1,6 +1,6 @@
-qd-config                       /usr/bin
-include/qd/*.h                  /usr/include/qd
+usr/bin/qd-config                      
+usr/include/qd/*.h                  /usr/include/qd
 usr/lib/*/lib*.a 
 usr/lib/*/lib*.so 
-usr/lib/*/qd  
-
+usr/share/doc/qd/*
+usr/lib/*/pkgconfig/*

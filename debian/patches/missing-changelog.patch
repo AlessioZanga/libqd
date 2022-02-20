@@ -4,10 +4,8 @@ Author: Alastair McKinstry <mckinstry@debian.org>
 Forwarded: no
 Last-Updated: 2018-01-22
 
-Index: qd-2.3.18.dfsg/ChangeLog
-===================================================================
 --- /dev/null
-+++ qd-2.3.18.dfsg/ChangeLog
++++ b/ChangeLog
 @@ -0,0 +1,5938 @@
 +commit e917e3183008443b60b3c883e4f160bc7eb5e9ae
 +Author: Yozo Hida <yozo@cs.berkeley.edu>
