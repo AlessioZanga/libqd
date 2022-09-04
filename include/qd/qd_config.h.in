@@ -1,0 +1,58 @@
+#ifndef _QD_QD_CONFIG_H
+#define _QD_QD_CONFIG_H  1
+
+/* Set the following to 1 if the processor has a fused 
+   multiply-accumulate instruction, and the compiler correctly 
+   emits it.  Otherwise (or if unsure), make it 0. */
+#ifndef QD_HAS_FMA
+#undef QD_HAS_FMA 
+#endif
+
+/* Set the following to 1 to define commonly used function
+   to be inlined.  This should be set to 1 unless the compiler 
+   does not support the "inline" keyword, or if building for 
+   debugging purposes. */
+#ifndef QD_INLINE
+#undef QD_INLINE
+#endif
+
+/* Set the following to 1 to use ANSI C++ standard header files
+   such as cmath, iostream, etc.  If set to zero, it will try to 
+   include math.h, iostream.h, etc, instead. */
+#ifndef QD_HAVE_STD
+#undef QD_HAVE_STD 
+#endif
+
+/* Set the following to 1 to make the addition and subtraction
+   to satisfy the IEEE-style error bound 
+
+      fl(a + b) = (1 + d) * (a + b)
+
+   where |d| <= eps.  If set to 0, the addition and subtraction
+   will satisfy the weaker Cray-style error bound
+
+      fl(a + b) = (1 + d1) * a + (1 + d2) * b
+
+   where |d1| <= eps and |d2| eps.           */
+#ifndef QD_IEEE_ADD
+#undef QD_IEEE_ADD
+#endif
+
+/* Set the following to 1 to use slightly inaccurate but faster
+   version of multiplication. */
+#ifndef QD_SLOPPY_MUL
+#undef QD_SLOPPY_MUL
+#endif
+
+/* Set the following to 1 to use slightly inaccurate but faster
+   version of division. */
+#ifndef QD_SLOPPY_DIV
+#undef QD_SLOPPY_DIV
+#endif
+
+/* Set the following to 1 to enable debugging code. */
+#ifndef QD_DEBUG
+#undef QD_DEBUG
+#endif
+
+#endif /* _QD_QD_CONFIG_H */

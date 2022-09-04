@@ -1,0 +1,37 @@
+Changes for 2.1  (2003-12-30)
+  - added automake scripts.
+  - use libtool to compile / link and build libraries.
+  - supports standard installation targets (make install).
+  - support for Intel C++ compilers (icc / ecc).
+  - Fortran programs are now linked by C++ compiler.
+  - support for building shared library.
+  - minor bug fixes.
+
+Changes for 2.0  (2003-12-08)
+  - all header files are in "include/qd" directory.
+  - added autoconf scripts.
+  - added config.h and qd_config.h to store configuration information.
+  - renamed x86_* routines to fpu_* routines.
+  - added separate Fortran interface (f_* routines).
+  - options for sloppy multiply and sloppy divison separated.
+  - fixed C interface to be actually in C syntax.
+  - updated / added README, AUTHORS, NEWS, and LICENSE files.
+  - minor bug fixes.
+
+Changes for 1.2  (2003-12-04)
+  - added "dist-clean" target in Makefile
+  - initialize dd and qd variables to zero
+  - increases tolerance for qd / dd tests
+  - changed .cc extension to .cpp
+  - updated README, COPYING, and NEWS files
+  - added ChangeLog file
+  - fixed bug in '-all' flag in qd_test
+  - minor bug fixes
+
+Changes for 1.1  (2002-10-22)
+  - added "Changes" file (this file)
+  - fixed <strings.h> to <string.h>
+  - fixed constant (3/4) * pi
+  - fixed exp(x) to return zero if x is a large negative number
+  - removed "docs" target in Makefile
+
