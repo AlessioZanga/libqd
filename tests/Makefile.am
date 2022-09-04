@@ -5,6 +5,8 @@ TESTS = qd_test pslq_test c_test
 check_PROGRAMS = qd_test pslq_test c_test
 EXTRA_PROGRAMS = qd_timer quadt_test huge
 
+dist_noinst_DATA = coeff.dat
+
 if HAVE_FORTRAN
 TESTS += f_test
 check_PROGRAMS += f_test

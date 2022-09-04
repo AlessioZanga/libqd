@@ -841,30 +841,34 @@ variables are declared as {\tt dd\_real}.
 
 A sample C++ program is given below.
 
+\bigskip
+
+\begin{minipage}{0.8\textwidth}
 \begin{tt}\begin{verbatim}
   #include <iostream>
-  #include <qd/qd.h>
+  #include <qd/qd_real.h>
 
   using std::cout;
   using std::endl;
 
   int main() {
-    int oldcw;
+    unsigned int oldcw;
     fpu_fix_start(&oldcw);     // see notes on x86 machines below.
 
     qd_real a = "3.141592653589793238462643383279502884197169399375105820";
     dd_real b = "2.249775724709369995957";
-    dd_real r;
+    qd_real r;
     
-    r = a + b;
-    cout << "pi + e = " << r << endl;
-
-    r = sqrt(r + 1.0);
+    r = sqrt(a * b + 1.0);
+    cout << " sqrt(a * b + 1) = " << r << endl;
 
     fpu_fix_end(&oldcw);       // see notes on x86 machines below.
     return 0;
   }
 \end{verbatim}\end{tt}
+\end{minipage}
+
+\bigskip
 
 Note that strings must be used to assign to a quad-double (or double-double)
 numbers; otherwise the double precision approximation is assigned.
