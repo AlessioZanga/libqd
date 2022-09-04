@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-define([QD_PATCH_VERSION], 142)
+define([QD_PATCH_VERSION], 200)
 AC_PREREQ(2.59)
 AC_INIT(qd, 2.1.QD_PATCH_VERSION, yozo@cs.berkeley.edu)
 AC_CONFIG_SRCDIR([src/qd.cpp])
@@ -80,6 +80,15 @@ else
 fi
 AC_MSG_RESULT($enable_debug)
 
+# --enable-warnings
+AC_ARG_ENABLE(enable_warnings, AC_HELP_STRING(--enable-warnings, [enable compiler warnings. [[default=no]]]))
+AC_MSG_CHECKING([if compiler warnings is to be enabled])
+if test "$enable_warnings" != "yes"; then
+  enable_warnings="no"
+fi
+AC_MSG_RESULT($enable_warnings)
+
+
 # Checks for programs.
 AC_LANG(C++)
 if test "$CXXFLAGS" = ""; then
@@ -89,30 +98,39 @@ if test "$CXXFLAGS" = ""; then
     CXXFLAGS="-O2"
   fi
 fi
-AC_PROG_CXX([xlC_r xlC icpc icc ecc cxx aCC CC cc++ cl FCC KCC RCC c++ g++ gpp])
+AC_PROG_CXX([xlC_r xlC icpc icc ecc cxx aCC cc++ cl FCC KCC RCC c++ g++ gpp CC])
 if test "$CC" = ""; then
   CC="$CXX";
 fi
 AC_PROG_CC
 
+
 CXX_PROG_NAME=`basename $CXX`
 case $host in
   *-*-aix*)
     case "$CXX_PROG_NAME" in
-      xlC*) CXXFLAGS="$CXXFLAGS -qstrict" ;;
+      xlC*) 
+        REQ_CXXFLAGS="$REQ_CXXFLAGS -qstrict"
+      ;;
     esac
   ;;
   i?86-*-* | k?*-*-* | athlon-*-*)
     case "$CXX_PROG_NAME" in
       icc|icpc) 
-        CXXFLAGS="$CXXFLAGS -mp -wd1572 -wd981 -wd1418 -wd1419"
+        REQ_CXXFLAGS="$REQ_CXXFLAGS -mp"
+        if test "$enable_warnings" = "yes"; then
+          CXXFLAGS="$CXXFLAGS -wd1572 -wd981 -wd1418 -wd1419"
+        fi
       ;;
     esac
   ;;
   ia64-*-*)
     case "$CXX_PROG_NAME" in
       icc|icpc|ecc) 
-        CXXFLAGS="$CXXFLAGS -mp -wd1572 -wd981 -wd1418 -wd1419"
+        REQ_CXXFLAGS="$REQ_CXXFLAGS -mp"
+        if test "$enable_warnings" = "yes"; then
+          CXXFLAGS="$CXXFLAGS -wd1572 -wd981 -wd1418 -wd1419"
+        fi
       ;;
     esac
   ;;
@@ -124,9 +142,16 @@ case $host in
     esac
   ;;
 esac
-if test "$GCC" = "yes"; then
-  CXXFLAGS="$CXXFLAGS -Wall"
+
+AC_SUBST(REQ_CXXFLAGS)
+CXXFLAGS="$CXXFLAGS $REQ_CXXFLAGS"
+
+if test "$enable_warnings" = "yes"; then
+  if test "$GCC" = "yes"; then
+    CXXFLAGS="$CXXFLAGS -Wall"
+  fi
 fi
+
 if test "$enable_debug" = "yes"; then
   CXXFLAGS="$CXXFLAGS -g"
 fi
@@ -192,39 +217,53 @@ if test "$enable_fortran" != "no"; then
 
     FC_PROG_NAME=`basename $FC`
 
-    ACX_FC_ETIME
-    AC_SUBST(ETIME, $acx_fc_etime)
-    ACX_CXX_FC_LIB
-
-    MODINC="-I"
     case $host in
       i?86-*-* | k?*-*-* | athlon-*-*)
         case "$FC_PROG_NAME" in
-          ifc|ifort) FCFLAGS="$FCFLAGS -mp" ;;
+          ifc|ifort) 
+            REQ_FCFLAGS="$REQ_FCFLAGS -mp -Vaxlib"
+          ;;
+        esac
+      ;;
+      ia64-*-*)
+        case "$FC_PROG_NAME" in
+          ifc|ifort|efc) 
+            REQ_FCFLAGS="$REQ_FCFLAGS -mp -Vaxlib"
+          ;;
         esac
       ;;
       *-*-aix*)
         case "$FC_PROG_NAME" in
-          xlf*) FCFLAGS="$FCFLAGS -qstrict" ;;
+          xlf*) 
+            REQ_FCFLAGS="$REQ_FCFLAGS -qstrict" 
+          ;;
         esac
       ;;
-      *-sun-solaris*)
-        case "$FC_PROG_NAME" in
-          f90|f95) MODINC="-moddir=" ;;
-        esac
     esac
-    AC_SUBST(MODINC, $MODINC)
+
+    ACX_FC_ETIME
+    AC_SUBST(ETIME, $acx_fc_etime)
+    ACX_CXX_FC_LIB
 
     AC_FC_WRAPPERS
     AC_FC_MAIN
+    AX_F90_MODULE_FLAG
+    AC_SUBST(ax_f90_modflag)
+    AX_F90_MODULE_STYLE
+    module_case=`echo "$ax_f90_module_style" | sed 's/,.*$//'`
+    module_ext=`echo "$ax_f90_module_style" | sed 's/^.*, //'`
+    AC_SUBST(module_ext)
   else
     enable_fortran="no"
   fi
+  AC_SUBST(REQ_FCFLAGS)
+  FCFLAGS="$FCFLAGS $REQ_FCFLAGS"
   if test "$enable_debug" = "yes"; then
     FCFLAGS="$FCFLAGS -g"
   fi
   AC_LANG_POP(Fortran)
 fi
+AM_CONDITIONAL(UPCASE_MODULE, [test "$module_case" = "uppercase"])
 AM_CONDITIONAL(HAVE_FORTRAN, [test "$enable_fortran" = "yes"])
 AM_CONDITIONAL(QD_DEBUG, [test "$enable_debug" = "yes"])
 

@@ -333,11 +333,11 @@ inline qd_real operator+(const qd_real &a, const qd_real &b) {
   double x[4] = {0.0, 0.0, 0.0, 0.0};
   
   i = j = k = 0;
-  if (std::abs(a[i]) > std::abs(b[j]))
+  if (_QD_STD_ABS(a[i]) > _QD_STD_ABS(b[j]))
     u = a[i++];
   else
     u = b[j++];
-  if (std::abs(a[i]) > std::abs(b[j]))
+  if (_QD_STD_ABS(a[i]) > _QD_STD_ABS(b[j]))
     v = a[i++];
   else
     v = b[j++];
@@ -356,7 +356,7 @@ inline qd_real operator+(const qd_real &a, const qd_real &b) {
       t = b[j++];
     else if (j >= 4)
       t = a[i++];
-    else if (std::abs(a[i]) > std::abs(b[j])) {
+    else if (_QD_STD_ABS(a[i]) > _QD_STD_ABS(b[j])) {
       t = a[i++];
     } else
       t = b[j++];
@@ -949,8 +949,8 @@ inline qd_real qd_real::rand() {
 }
 
 inline qd_real ldexp(const qd_real &a, int n) {
-  return qd_real(std::ldexp(a[0], n), std::ldexp(a[1], n), 
-                 std::ldexp(a[2], n), std::ldexp(a[3], n));
+  return qd_real(_QD_STD_LDEXP(a[0], n), _QD_STD_LDEXP(a[1], n), 
+                 _QD_STD_LDEXP(a[2], n), _QD_STD_LDEXP(a[3], n));
 }
 
 #endif /* _QD_QD_INLINE_H */

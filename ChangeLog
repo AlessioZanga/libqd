@@ -2,6 +2,888 @@
 # arch-tag: automatic-ChangeLog--yozo@cs.berkeley.edu--qd/qd--mainline--2.1
 #
 
+2006-02-22 00:07:26 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-200
+
+    Summary:
+      Added qd-to-qd copying to qdreal interface (and similar for dd).
+    Revision:
+      qd--mainline--2.1--patch-200
+
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-02-18 05:01:57 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-199
+
+    Summary:
+      Change name of constant qd::qd_nan to qd::_d_nan.
+    Revision:
+      qd--mainline--2.1--patch-199
+
+
+    modified files:
+     include/qd/inline.h src/dd.cpp src/qd_const.cpp
+
+
+2006-02-18 04:15:44 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-198
+
+    Summary:
+      Fix routine names in error messages.
+    Revision:
+      qd--mainline--2.1--patch-198
+
+    * dd_real::polyroot routine should use dd_real instead of 
+      qd_real as class name.
+    * qd_real::sqrt should use qd_real as class name.
+    
+
+    modified files:
+     src/dd.cpp src/qd.cpp
+
+
+2006-02-18 04:09:49 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-197
+
+    Summary:
+      Emit error message for qd_real square root of negative numbers.
+    Revision:
+      qd--mainline--2.1--patch-197
+
+
+    modified files:
+     src/qd.cpp
+
+
+2006-02-18 03:54:00 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-196
+
+    Summary:
+      Added dd_real::_nan and qd_real::_nan.
+    Revision:
+      qd--mainline--2.1--patch-196
+
+    * Currently a rather naive way of just assigning 0.0 / 0.0.
+    
+
+    modified files:
+     include/qd/dd.h include/qd/inline.h include/qd/qd.h src/dd.cpp
+     src/qd_const.cpp
+
+
+2006-02-18 03:37:14 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-195
+
+    Summary:
+      Make abort() do something more sensible than calling exit().
+    Revision:
+      qd--mainline--2.1--patch-195
+
+    * abort() now prints out the error message but does not
+      call exit.
+    
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h src/dd.cpp src/qd.cpp
+
+
+2006-02-18 03:02:49 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-194
+
+    Summary:
+      Use ax_f90_module_flag macro to figure out the flag to specify module directories.
+    Revision:
+      qd--mainline--2.1--patch-194
+
+    * Instead of relying on $host, actually test what flags
+      to use to specify module directories.
+    
+
+    new files:
+     m4/.arch-ids/ax_f90_module_flag.m4.id m4/ax_f90_module_flag.m4
+
+    modified files:
+     configure.ac qd-config.in
+
+
+2006-02-18 02:27:56 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-193
+
+    Summary:
+      configure now supports differing module file names.
+    Revision:
+      qd--mainline--2.1--patch-193
+
+    * Added m4/ax_f90_module_style.m4, which detects module file
+      naming style (currently upper/lower case and the extension).
+      The macro is based on ax_f90_module_extension.m4 found in
+      autoconf-archives.
+    * configure.ac modified to use this macro, extract out the 
+      upper/lower case and the extension.
+    * fortran/Makefile.am modified to name DDMOD and QDMOD variables 
+      accordingly.
+    
+
+    new files:
+     m4/.arch-ids/ax_f90_module_style.m4.id
+     m4/ax_f90_module_style.m4
+
+    modified files:
+     configure.ac fortran/Makefile.am
+
+
+2006-02-10 11:01:21 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-192
+
+    Summary:
+      Make qdread and ddread ignore extra characters at the end.
+    Revision:
+      qd--mainline--2.1--patch-192
+
+    * This is more consistent with read statements in fortran.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-02-02 08:17:38 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-191
+
+    Summary:
+      Added sign(dd, d) and sign(qd, d) fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-191
+
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-02-02 08:13:33 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-190
+
+    Summary:
+      [fix] Fix ddsign and qdsign in fortran module.
+    Revision:
+      qd--mainline--2.1--patch-190
+
+    * In call to sign(a, b), it was comparing b to a, instead
+      it needs to compare b to zero.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-25 18:52:17 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-189
+
+    Summary:
+      Added epsilon, huge, and tiny function to fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-189
+
+    * fortran/ddmod.f90, fortran/qdmod.f90: Added epsilon, huge, and tiny
+      interface.  Renamed qdeps to d_qd_eps, the double precision version
+      of epsilon.  Added constants qd_huge, qd_tiny, and qd_eps.  Similar
+      changes to ddmod.f90.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-24 21:09:07 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-188
+
+    Summary:
+      Include call to fpu_fix_start in fortran/main.cpp.
+    Revision:
+      qd--mainline--2.1--patch-188
+
+    * Call fpu_fix_start in fortran/main.cpp so that the fortrain
+      main subroutine (f_main) does not need to explicit call it.
+      This can be overridden by providing one's own main function
+      if desired.
+    
+
+    modified files:
+     fortran/Makefile.am fortran/main.cpp
+
+
+2006-01-21 05:34:54 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-187
+
+    Summary:
+      Added nint function fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-187
+
+    * fortran/ddmod.f90, fortran/qdmod.f90: Added nint function.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-21 05:20:25 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-186
+
+    Summary:
+      Added comparison to integers to fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-186
+
+    * fortran/ddmod.f90, fortran/qdmod.f90: Added comparison to integers.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-20 20:36:13 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-185
+
+    Summary:
+      Added more general min / max to fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-185
+
+    * fortran/ddmod.f90: Added more general min and max function.
+      qdmin2 computes the min of two dd numbers, while qdmin now
+      accepts up to 9 arguments.
+    
+    * fortran/qdmod.f90: Similar change as above.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-20 20:24:26 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-184
+
+    Summary:
+      Added conversion to integer in fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-184
+
+    * fortran/ddmod.f90: Added conversion to integer to_int_dd.
+    * fortran/qdmod.f90: Added conversion to integer to_int_qd.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-20 20:20:11 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-183
+
+    Summary:
+      Added log10 interface to fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-183
+
+    * fortran/ddmod.f90: Added log10 interface to call ddlog10.
+    * fortran/qdmod.f90: Added log10 interface to call qdlog10.
+      
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-20 20:16:05 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-182
+
+    Summary:
+      Added integer-dd and integer-qd division in fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-182
+
+    * fortran/ddmod.f90: Added integer-dd division div_i_dd and div_dd_i.
+    * fortran/qdmod.f90: Added integer-qd division div_i_qd and div_qd_i.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-20 20:09:55 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-181
+
+    Summary:
+      Added integer-qd and integer-dd addition for fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-181
+
+    * fortran/ddmod.f90: Added integer-dd additions add_dd_i and add_i_dd.
+    * fortran/qdmod.f90: Aqded integer-qd aqditions aqd_qd_i and aqd_i_qd.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-20 20:04:05 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-180
+
+    Summary:
+      Make case in fortan/qdmod.f90 and ddmod.f90 consistent.
+    Revision:
+      qd--mainline--2.1--patch-180
+
+    * fortran/qdmod.f90, fortran/ddmod.f90: Use lowercase consistently.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-20 19:53:17 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-179
+
+    Summary:
+      Added assignment to and from integers in fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-179
+
+    * fortran/ddmod.f90: added assign_dd_i, assign_i_dd (assignment to
+      and from integers).
+    * fortran/qdmod.f90: aqded assign_qd_i, assign_i_qd (assignment to
+      and from integers).
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2006-01-17 08:28:32 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-178
+
+    Summary:
+      Remove confusion of abs(int) and abs(double).
+    Revision:
+      qd--mainline--2.1--patch-178
+
+    * Some compilers (such as MSVC++ 6.0) do not provide abs(double).
+      Work around this by providing abs(double), or using fabs(double).
+    
+
+    modified files:
+     include/qd/inline.h tests/pslq.h tests/pslq_test.cpp
+     tests/qd_test.cpp
+
+
+2006-01-17 08:14:55 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-177
+
+    Summary:
+      Make bits.cpp use _QD_STD_ABS and similar.
+    Revision:
+      qd--mainline--2.1--patch-177
+
+    * src/bits.cpp: Instead of std::abs, use _QD_STD_ABS
+      (and similar).
+    
+
+    modified files:
+     src/bits.cpp
+
+
+2006-01-17 07:50:50 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-176
+
+    Summary:
+      Add int-to-bool cast in dd.cpp and qd.cpp.
+    Revision:
+      qd--mainline--2.1--patch-176
+
+    * src/dd.cpp and src/qd.cpp: Added int-to-bool cast
+      where necessary.  MSVC++ compiler gave warning about this.
+    
+
+    modified files:
+     src/dd.cpp src/qd.cpp
+
+
+2006-01-17 07:30:20 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-175
+
+    Summary:
+      Various changes to make it compatible with MSVC++ 6.0.
+    Revision:
+      qd--mainline--2.1--patch-175
+
+    * MSVC++ 6.0 does not have various C functions in std namespace.
+      (e.g., std::abs, std::exit, std::printf, etc.).  These are now
+      declared as macros _QD_STD_ABS, etc., and are conditionally
+      defined to be either abs() or std::abs().
+    
+    * Need to explicitly cast constant 0 to (int).
+    
+    * MSVC++ 8.0 does not seem to have this problem.
+    
+
+    modified files:
+     include/qd/dd_inline.h include/qd/inline.h
+     include/qd/qd_inline.h src/bits.cpp src/dd.cpp src/qd.cpp
+     tests/pslq.h tests/pslq_test.cpp tests/qd_test.cpp
+
+
+2006-01-17 07:08:35 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-174
+
+    Summary:
+      Don't use inline constant initalizer in tests/qd_test.cpp.
+    Revision:
+      qd--mainline--2.1--patch-174
+
+    * tests/qd_test.cpp: some compilers (e.g., VC++ 6.0) does not
+      allow static initializers for class constants.
+    
+
+    modified files:
+     tests/qd_test.cpp
+
+
+2006-01-17 06:48:21 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-173
+
+    Summary:
+      Use slightly more efficient ldexp at the end of dd_real::exp.
+    Revision:
+      qd--mainline--2.1--patch-173
+
+    * src/dd.cpp: Use mul_pwr2 to multiply by power of two at the end of
+      dd_real::exp().
+    
+
+    modified files:
+     src/dd.cpp
+
+
+2006-01-17 00:30:20 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-172
+
+    Summary:
+      Don't use inline constant initializer.
+    Revision:
+      qd--mainline--2.1--patch-172
+
+    * include/qd/dd.h and qd.h: some compilers (e.g., VC++ 6.0) does not
+      allow static initializers for class constants.
+    
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h src/dd.cpp src/qd_const.cpp
+
+
+2006-01-17 00:06:48 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-171
+
+    Summary:
+      Added src/util.h as source for libqd.a.
+    Revision:
+      qd--mainline--2.1--patch-171
+
+    src/Makefile.am: list util.h as a source for libqd.a library.
+    
+
+    modified files:
+     src/Makefile.am
+
+
+2006-01-16 23:42:36 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-170
+
+    Summary:
+      Implement fixed format and aligned output.
+    Revision:
+      qd--mainline--2.1--patch-170
+
+    * src/qd.cpp and src/dd.cpp: Added write() routine to C++ routine, 
+      now used in operator>>.  This now handles fixed format and 
+      aligned outputs.
+    
+
+    modified files:
+     src/dd.cpp src/qd.cpp
+
+
+2006-01-15 02:15:20 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-169
+
+    Summary:
+      Type cast 0 in default parameter.
+    Revision:
+      qd--mainline--2.1--patch-169
+
+    * include/qd/dd.h and include/qd/qd.h: cast 0 into appropriate
+      type in the default parameter.
+    
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h
+
+
+2006-01-14 10:14:57 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-168
+
+    Summary:
+      Added field adjustment to string output.
+    Revision:
+      qd--mainline--2.1--patch-168
+
+    * include/qd/qd.h, include/qd/dd.h, src/qd.cpp src/dd.cpp: 
+      write to string routine now correctly aligns the output.
+    
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h src/dd.cpp src/qd.cpp
+
+
+2006-01-14 09:32:05 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-167
+
+    Summary:
+      Added write to C++ string routines.
+    Revision:
+      qd--mainline--2.1--patch-167
+
+    * include/qd/dd.h, include/qd/qd.h, src/dd.cpp, src/qd.cpp: added
+      write() to C++ string.
+    * Added src/util.cpp and src/util.h that includes append_expn function
+      to add the exponent field in output.
+    
+
+    new files:
+     src/.arch-ids/util.cpp.id src/.arch-ids/util.h.id src/util.cpp
+     src/util.h
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h src/Makefile.am src/dd.cpp
+     src/qd.cpp
+
+
+2006-01-14 08:55:22 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-166
+
+    Summary:
+      Stop using variable sized arrays (non ISO feature).
+    Revision:
+      qd--mainline--2.1--patch-166
+
+    * src/qd.cpp and src/dd.cpp: explicitly allocate and free 
+      arrays (instead of variable sized arrays).
+    
+
+    modified files:
+     src/dd.cpp src/qd.cpp
+
+
+2006-01-14 06:53:35 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-165
+
+    Summary:
+      Use _ndigits constant instead of 32 or 64.
+    Revision:
+      qd--mainline--2.1--patch-165
+
+    * include/qd/qd.h and include/dd/dd.h: use _ndigits constant
+      instead of hardwiring 32 or 64 in default parameter in output
+      functions.
+    
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h
+
+
+2006-01-14 05:44:27 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-164
+
+    Summary:
+      Added ::to_digits(), restructure ::write().
+    Revision:
+      qd--mainline--2.1--patch-164
+
+    * Added qd_real::to_digits, dd_real::to_digits.  These now return
+      a sequence of digits.
+    * Restructured qd_real::write and dd_real::write to call to_digits, 
+      above.
+    
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h src/dd.cpp src/qd.cpp
+
+
+2006-01-14 03:28:31 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-163
+
+    Summary:
+      Update qd_test and pslq_test to output different number of digits.
+    Revision:
+      qd--mainline--2.1--patch-163
+
+    * qd_test and pslq_test updated to output different number of digits
+      depending on the precision of the variable.
+    
+
+    modified files:
+     tests/pslq_test.cpp tests/qd_test.cpp
+
+
+2006-01-14 03:13:38 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-162
+
+    Summary:
+      Added ::_ndigits integer constant.
+    Revision:
+      qd--mainline--2.1--patch-162
+
+    * dd::_ndigits and qd::_digits added.  These roughly represent the 
+      number of digits of accuracy.
+    
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h
+
+
+2006-01-14 02:58:29 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-161
+
+    Summary:
+      Added showpos and uppercase options to write().
+    Revision:
+      qd--mainline--2.1--patch-161
+
+    * Added showpos (show positive sign +) and uppercase (use E instead of e)
+      options to dd::write and qd::write.
+    * cout::operator<< now uses cout format flags (including precision).
+    
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h src/dd.cpp src/qd.cpp
+
+
+2006-01-13 20:17:15 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-160
+
+    Summary:
+      Output only required flags for qd-config --cxxflags and --fcflags.
+    Revision:
+      qd--mainline--2.1--patch-160
+
+    * configure.ac: set variable REQ_CXXFLAGS and REQ_FCFLAGS to contain
+      compiler flags required to use the qd package.  Don't include 
+      optimization flags.
+    * qd-config.in: return only required flags when called with --cxxflags
+      or --fcflags.
+    
+
+    modified files:
+     configure.ac qd-config.in
+
+
+2006-01-12 21:13:00 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-159
+
+    Summary:
+      Added consistent pow interface.
+    Revision:
+      qd--mainline--2.1--patch-159
+
+    * Added pow(a, b) interface, where a and b are both
+      reals (qd_real or dd_real).
+    
+
+    modified files:
+     include/qd/dd.h include/qd/qd.h src/dd.cpp src/qd.cpp
+
+
+2006-01-06 20:48:53 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-158
+
+    Summary:
+      Updated libtool to version 1.5.22.
+    Revision:
+      qd--mainline--2.1--patch-158
+
+
+    modified files:
+     config/config.guess config/config.sub config/ltmain.sh
+
+
+2006-01-06 20:41:28 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-157
+
+    Summary:
+      Fix discrepancy in license.
+    Revision:
+      qd--mainline--2.1--patch-157
+
+    * The license is a modified BSD license, but some source had
+      the "commercial use requires a license" blurb.  Removed.
+    
+
+    modified files:
+     fortran/tquaderq.f90 fortran/tquaderq2d.f90
+     fortran/tquadgsq.f90 fortran/tquadtsq.f90
+     fortran/tquadtsq2d.f90
+
+
+2005-12-15 18:46:31 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-156
+
+    Summary:
+      Added integer multiplication for fortran interface.
+    Revision:
+      qd--mainline--2.1--patch-156
+
+    * Now integer * qd_real and integer * dd_real are overloaded
+      and should work correctly.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2005-12-11 09:00:20 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-155
+
+    Summary:
+      Added sign function to fortran modules.
+    Revision:
+      qd--mainline--2.1--patch-155
+
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2005-12-11 08:26:47 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-154
+
+    Summary:
+      Added qd_one and qd_zero constants (and dd equivalents) to fortran modules.
+    Revision:
+      qd--mainline--2.1--patch-154
+
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
+2005-12-02 05:04:14 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-153
+
+    Summary:
+      Bug fixes in configure.ac to work on older intel compilers.
+    Revision:
+      qd--mainline--2.1--patch-153
+
+    * Added -Vaxlib if intel fortran compiler is detected.
+    * Check for etime after FCFLAGS has been set.
+    
+
+    modified files:
+     configure.ac
+
+
+2005-12-01 21:43:40 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-152
+
+    Summary:
+      Added enable-warnings flag to configure.
+    Revision:
+      qd--mainline--2.1--patch-152
+
+    * Adds -Wall to CXXFLAGS if specified (if using gcc or icc).
+    * Disables several warnings on icc.
+    
+
+    modified files:
+     configure.ac
+
+
+2005-12-01 19:42:37 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-151
+
+    Summary:
+      Removed -wd options from intel compiler.
+    Revision:
+      qd--mainline--2.1--patch-151
+
+    * Older intel compilers does not seem to have these.
+      Ideally we should check whether the compiler accepts
+      them or not.
+    
+
+    modified files:
+     configure.ac
+
+
+2005-12-01 06:26:31 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-150
+
+    Summary:
+      Updated to libtool 1.5.20.
+    Revision:
+      qd--mainline--2.1--patch-150
+
+
+    modified files:
+     config/ltmain.sh
+
+
+2005-09-20 05:54:14 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-149
+
+    Summary:
+      Updated libtool scripts to version 1.5.20.
+    Revision:
+      qd--mainline--2.1--patch-149
+
+
+    modified files:
+     config/ltmain.sh
+
+
+2005-09-18 21:56:10 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-148
+
+    Summary:
+      Fix abstract in docs/qd.tex.
+    Revision:
+      qd--mainline--2.1--patch-148
+
+
+    modified files:
+     docs/qd.tex
+
+
+2005-08-25 02:57:28 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-147
+
+    Summary:
+      Move CC back in compiler search order.
+    Revision:
+      qd--mainline--2.1--patch-147
+
+    * Moved CC towards the end in compiler search order so that
+      on case-insensitive systems it does not pick the C compiler cc
+      (instead of C++ compiler CC).  On Sun's this can choose g++ 
+      before CC.
+    
+
+    modified files:
+     configure.ac
+
+
+2005-08-24 21:13:44 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-146
+
+    Summary:
+      Restore line accidentally deleted in patch 143.
+    Revision:
+      qd--mainline--2.1--patch-146
+
+    * fortran/ddmod.f90: Restore line 819 that was somehow deleted in 
+      patch 143.
+
+    modified files:
+     fortran/ddmod.f90
+
+
+2005-08-24 21:03:28 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-145
+
+    Summary:
+      Updated to latest autotool files (libtool 1.5.18).
+    Revision:
+      qd--mainline--2.1--patch-145
+
+
+    modified files:
+     config/config.guess config/config.sub config/ltmain.sh
+
+
+2005-08-24 20:59:16 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-144
+
+    Summary:
+      Fix bug in qdinp in fortran/qdmod.f90.
+    Revision:
+      qd--mainline--2.1--patch-144
+
+    * fortran/qdmod.f90: Fixed small bug in qdinp (merge of DHB's fix.)
+    
+
+    modified files:
+     fortran/qdmod.f90
+
+
+2005-08-24 20:55:17 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-143
+
+    Summary:
+      Added fortran integer-to-qd convertion interface.
+    Revision:
+      qd--mainline--2.1--patch-143
+
+    * fortran/qdmod.f90 fortran/ddmod.f90: added integer-to-qd 
+      convertion interface.
+    
+
+    modified files:
+     fortran/ddmod.f90 fortran/qdmod.f90
+
+
 2005-05-16 04:59:40 GMT	Yozo Hida <yozo@cs.berkeley.edu>	patch-142
 
     Summary:

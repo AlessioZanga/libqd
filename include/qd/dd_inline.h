@@ -197,7 +197,7 @@ inline dd_real dd_real::mul(double a, double b) {
 
 /* double-double * (2.0 ^ exp) */
 inline dd_real ldexp(const dd_real &a, int exp) {
-  return dd_real(std::ldexp(a.hi, exp), std::ldexp(a.lo, exp));
+  return dd_real(_QD_STD_LDEXP(a.hi, exp), _QD_STD_LDEXP(a.lo, exp));
 }
 
 /* double-double * double,  where double is a power of 2. */
@@ -540,7 +540,7 @@ inline dd_real nint(const dd_real &a) {
   } else {
     /* High word is not an integer. */
     lo = 0.0;
-    if (std::abs(hi-a.hi) == 0.5 && a.lo < 0.0) {
+    if (_QD_STD_ABS(hi-a.hi) == 0.5 && a.lo < 0.0) {
       /* There is a tie in the high word, consult the low word 
          to break the tie. */
       hi -= 1.0;      /* NOTE: This does not cause INEXACT. */

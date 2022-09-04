@@ -53,8 +53,11 @@ const qd_real qd_real::_pi1024 = qd_real(3.067961575771282340e-03,
                                          1.195944139792337116e-19,
                                          -2.924579892303066080e-36,
                                          1.086381075061880158e-52);
+const qd_real qd_real::_nan = qd_real(qd::_d_nan, qd::_d_nan, 
+                                      qd::_d_nan, qd::_d_nan);
 
 const double qd_real::_eps = 1.51929083932157e-64; /* = 2^-212 */
+const int qd_real::_ndigits = 64;
 
 /* Table of sin(k * pi/1024) and cos(k * pi/1024). */
 const qd_real qd_real::sin_table [] = {

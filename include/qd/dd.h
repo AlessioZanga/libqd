@@ -30,6 +30,7 @@
 #define _QD_DD_H
 
 #include <iostream>
+#include <string>
 #include <qd/qd_config.h>
 
 class dd_real {
@@ -55,7 +56,7 @@ public:
   dd_real (const double *d) : hi(d[0]), lo(d[1]) {}
 
   /* Function to be called is a fatal error occurs. */
-  static void abort();
+  static void abort(const char *msg);
 
   /* Accessors */
   double _hi() const { return hi; }
@@ -71,8 +72,10 @@ public:
   static const dd_real _e;
   static const dd_real _log2;
   static const dd_real _log10;
+  static const dd_real _nan;
 
   static const double _eps;   /* = 2^-106 */
+  static const int _ndigits;  /* = 32     */
 
   /* Addition */
   friend dd_real operator+(const dd_real &a, double b);
@@ -129,6 +132,8 @@ public:
 
   /* N-th power.  NOTE: must be careful about order of precedence. */
   dd_real operator^(int n);
+  friend dd_real pow(const dd_real &a, int n);
+  friend dd_real pow(const dd_real &a, const dd_real &b);
   friend dd_real npwr(const dd_real &a, int n);
   friend dd_real sqr(const dd_real &a);
   static dd_real sqr(double d);
@@ -224,7 +229,14 @@ public:
   friend dd_real abs(const dd_real &a);   /* same as fabs */
 
   /* Input/Output */
-  void write(char *s, int d = 32) const; /* s must hold d+8 chars */
+  void to_digits(char *s, int &expn, int precision = _ndigits) const;
+  void write(char *s, int precision = _ndigits, 
+      bool showpos = false, bool uppercase = false) const; 
+      /* s must hold d+8 chars */
+  std::string write(int precision = _ndigits, int width = 0, 
+      std::ios_base::fmtflags floatfield = (std::ios_base::fmtflags) 0, 
+      std::ios_base::fmtflags adjustfield = (std::ios_base::fmtflags) 0, 
+      bool showpos = false, bool uppercase = false, char fill = ' ') const;
   int read(const char *s, dd_real &a);
 
   friend std::ostream& operator<<(std::ostream &s, const dd_real &a);

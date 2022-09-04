@@ -9,941 +9,1161 @@
 !  Fortran-90 module file to use with quad-double numbers.
 !
 !  Yozo Hida
-!  David H Bailey    2005-01-25
+!  David H Bailey    2005-08-24
 
-MODULE qdmodule
+module qdmodule
 use ddmodule
-  IMPLICIT NONE
+  implicit none
   
-  TYPE qd_real
-     SEQUENCE
-     REAL*8 :: re(4)
-  END TYPE qd_real
+  type qd_real
+     sequence
+     real*8 :: re(4)
+  end type qd_real
 
-  real*8 qdeps
-  parameter (qdeps = 1.51929083932157d-64)
+  real*8 d_qd_eps
+  parameter (d_qd_eps = 1.51929083932157d-64)
 
-  INTERFACE ASSIGNMENT (=)
-     MODULE PROCEDURE assign_qd_str
-     MODULE PROCEDURE assign_qd_d
-     MODULE PROCEDURE assign_d_qd
+  type (qd_real) qd_one, qd_zero, qd_eps, qd_huge, qd_tiny
+  parameter (qd_one = qd_real((/1.0d0, 0.0d0, 0.0d0, 0.0d0/)))
+  parameter (qd_zero = qd_real((/0.0d0, 0.0d0, 0.0d0, 0.0d0/)))
+  parameter (qd_eps = qd_real((/d_qd_eps, 0.0d0, 0.0d0, 0.0d0/)))
+  parameter (qd_huge = qd_real((/ &
+    1.79769313486231570815d+308, 9.97920154767359795037d+291, &
+    5.53956966280111259858d+275, 3.07507889307840487279d+259/)))
+  parameter (qd_tiny = qd_real((/3.25194908739046463067d-260, &
+    0.0d0, 0.0d0, 0.0d0/)))
+
+  interface assignment (=)
+     module procedure assign_qd_str
+     module procedure assign_qd_d
+     module procedure assign_d_qd
      module procedure assign_dd_qd
      module procedure assign_qd_dd
-  END INTERFACE
+     module procedure assign_qd_i
+     module procedure assign_i_qd
+  end interface
 
-  INTERFACE OPERATOR (+)
-     MODULE PROCEDURE add_qd
-     MODULE PROCEDURE add_qd_d
-     MODULE PROCEDURE add_d_qd
-  END INTERFACE
+  interface operator (+)
+     module procedure add_qd
+     module procedure add_qd_d
+     module procedure add_d_qd
+     module procedure add_qd_i
+     module procedure add_i_qd
+  end interface
 
-  INTERFACE OPERATOR (-)
-     MODULE PROCEDURE sub_qd
-     MODULE PROCEDURE sub_qd_d
-     MODULE PROCEDURE sub_d_qd
-     MODULE PROCEDURE neg_qd
-  END INTERFACE
+  interface operator (-)
+     module procedure sub_qd
+     module procedure sub_qd_d
+     module procedure sub_d_qd
+     module procedure neg_qd
+  end interface
 
-  INTERFACE OPERATOR (*)
-     MODULE PROCEDURE mul_qd
-     MODULE PROCEDURE mul_qd_d
-     MODULE PROCEDURE mul_d_qd
-  END INTERFACE
+  interface operator (*)
+     module procedure mul_qd
+     module procedure mul_qd_d
+     module procedure mul_d_qd
+     module procedure mul_qd_i
+     module procedure mul_i_qd
+  end interface
 
-  INTERFACE OPERATOR (/)
-     MODULE PROCEDURE div_qd
-     MODULE PROCEDURE div_qd_d
-     MODULE PROCEDURE div_d_qd
-  END INTERFACE
+  interface operator (/)
+     module procedure div_qd
+     module procedure div_qd_d
+     module procedure div_d_qd
+     module procedure div_qd_i
+     module procedure div_i_qd
+  end interface
 
-  INTERFACE OPERATOR (**)
-     MODULE PROCEDURE pwr_qd
-     MODULE PROCEDURE pwr_qd_i
-     MODULE PROCEDURE pwr_d_qd
-  END INTERFACE
+  interface operator (**)
+     module procedure pwr_qd
+     module procedure pwr_qd_i
+     module procedure pwr_d_qd
+  end interface
 
-  INTERFACE qdreal
-     MODULE PROCEDURE to_qd_d
-     MODULE PROCEDURE to_qd_dd
-     MODULE PROCEDURE to_qd_str
-  END INTERFACE
+  interface qdreal
+     module procedure to_qd_i
+     module procedure to_qd_d
+     module procedure to_qd_dd
+     module procedure to_qd_qd
+     module procedure to_qd_str
+  end interface
 
-  INTERFACE ddreal
-     MODULE PROCEDURE to_dd_qd
-  END INTERFACE
+  interface ddreal
+     module procedure to_dd_qd
+  end interface
 
-  INTERFACE REAL
-     MODULE PROCEDURE to_real_qd
-  END INTERFACE
+  interface real
+     module procedure to_real_qd
+  end interface
 
-  INTERFACE SIN
-     MODULE PROCEDURE qdsin
-  END INTERFACE
-  INTERFACE COS
-     MODULE PROCEDURE qdcos
-  END INTERFACE
-  INTERFACE TAN
-     MODULE PROCEDURE qdtan
-  END INTERFACE
-  INTERFACE SINCOS
-     MODULE PROCEDURE qdsincos
-  END INTERFACE
-  INTERFACE qdcssnf
-     MODULE PROCEDURE qdcossin
-  END INTERFACE
+  interface int
+     module procedure to_int_qd
+  end interface
 
-  INTERFACE ASIN
-     MODULE PROCEDURE qdasin
-  END INTERFACE
-  INTERFACE ACOS
-     MODULE PROCEDURE qdacos
-  END INTERFACE
-  INTERFACE ATAN
-     MODULE PROCEDURE qdatan
-  END INTERFACE
-  INTERFACE ATAN2
-     MODULE PROCEDURE qdatan2
-  END INTERFACE
+  interface sin
+     module procedure qdsin
+  end interface
+  interface cos
+     module procedure qdcos
+  end interface
+  interface tan
+     module procedure qdtan
+  end interface
+  interface sincos
+     module procedure qdsincos
+  end interface
+  interface qdcssnf
+     module procedure qdcossin
+  end interface
 
-  INTERFACE EXP
-     MODULE PROCEDURE qdexp
-  END INTERFACE
-  INTERFACE LOG
-     MODULE PROCEDURE qdlog
-  END INTERFACE
+  interface asin
+     module procedure qdasin
+  end interface
+  interface acos
+     module procedure qdacos
+  end interface
+  interface atan
+     module procedure qdatan
+  end interface
+  interface atan2
+     module procedure qdatan2
+  end interface
 
-  INTERFACE SQRT
-     MODULE PROCEDURE qdsqrt
-  END INTERFACE
-  INTERFACE SQR
-     MODULE PROCEDURE qdsqr
-  END INTERFACE
-  INTERFACE NROOT
-     MODULE PROCEDURE qdnroot
-  END INTERFACE
+  interface exp
+     module procedure qdexp
+  end interface
+  interface log
+     module procedure qdlog
+  end interface
+  interface log10
+     module procedure qdlog10
+  end interface
 
-  INTERFACE SINH
-     MODULE PROCEDURE qdsinh
-  END INTERFACE
-  INTERFACE COSH
-     MODULE PROCEDURE qdcosh
-  END INTERFACE
-  INTERFACE TANH
-     MODULE PROCEDURE qdtanh
-  END INTERFACE
-  INTERFACE SINCOSH
-     MODULE PROCEDURE qdsincosh
-  END INTERFACE
-  INTERFACE qdcsshf
-     MODULE PROCEDURE qdcossinh
-  END INTERFACE
+  interface sqrt
+     module procedure qdsqrt
+  end interface
+  interface sqr
+     module procedure qdsqr
+  end interface
+  interface nroot
+     module procedure qdnroot
+  end interface
 
-  INTERFACE ASINH
-     MODULE PROCEDURE qdasinh
-  END INTERFACE
-  INTERFACE ACOSH
-     MODULE PROCEDURE qdacosh
-  END INTERFACE
-  INTERFACE ATANH
-     MODULE PROCEDURE qdatanh
-  END INTERFACE
+  interface sinh
+     module procedure qdsinh
+  end interface
+  interface cosh
+     module procedure qdcosh
+  end interface
+  interface tanh
+     module procedure qdtanh
+  end interface
+  interface sincosh
+     module procedure qdsincosh
+  end interface
+  interface qdcsshf
+     module procedure qdcossinh
+  end interface
 
-  INTERFACE AINT
-     MODULE PROCEDURE qdaint
-  END INTERFACE
+  interface asinh
+     module procedure qdasinh
+  end interface
+  interface acosh
+     module procedure qdacosh
+  end interface
+  interface atanh
+     module procedure qdatanh
+  end interface
 
-  INTERFACE ANINT
-     MODULE PROCEDURE qdanint
-  END INTERFACE
+  interface aint
+     module procedure qdaint
+  end interface
 
-  INTERFACE ABS
-     MODULE PROCEDURE qdabs
-  END INTERFACE
+  interface nint
+     module procedure qdnint
+  end interface
 
-  INTERFACE QDRAND
-     MODULE PROCEDURE qdrand
-  END INTERFACE
+  interface anint
+     module procedure qdanint
+  end interface
 
-  INTERFACE OPERATOR (==)
-     MODULE PROCEDURE eq_qd
-     MODULE PROCEDURE eq_qd_d
-     MODULE PROCEDURE eq_d_qd
-  END INTERFACE
+  interface abs
+     module procedure qdabs
+  end interface
 
-  INTERFACE OPERATOR (/=)
-     MODULE PROCEDURE ne_qd
-     MODULE PROCEDURE ne_qd_d
-     MODULE PROCEDURE ne_d_qd
-  END INTERFACE
+  interface sign
+     module procedure qdsign
+     module procedure qdsign_dd_d
+  end interface
 
-  INTERFACE OPERATOR (>)
-     MODULE PROCEDURE gt_qd
-     MODULE PROCEDURE gt_qd_d
-     MODULE PROCEDURE gt_d_qd
-  END INTERFACE
+  interface qdrand
+     module procedure qdrand
+  end interface
 
-  INTERFACE OPERATOR (<)
-     MODULE PROCEDURE lt_qd
-     MODULE PROCEDURE lt_qd_d
-     MODULE PROCEDURE lt_d_qd
-  END INTERFACE
+  interface operator (==)
+     module procedure eq_qd
+     module procedure eq_qd_d
+     module procedure eq_d_qd
+     module procedure eq_qd_i
+     module procedure eq_i_qd
+  end interface
 
-  INTERFACE OPERATOR (>=)
-     MODULE PROCEDURE ge_qd
-     MODULE PROCEDURE ge_qd_d
-     MODULE PROCEDURE ge_d_qd
-  END INTERFACE
+  interface operator (/=)
+     module procedure ne_qd
+     module procedure ne_qd_d
+     module procedure ne_d_qd
+     module procedure ne_qd_i
+     module procedure ne_i_qd
+  end interface
 
-  INTERFACE OPERATOR (<=)
-     MODULE PROCEDURE le_qd
-     MODULE PROCEDURE le_qd_d
-     MODULE PROCEDURE le_d_qd
-  END INTERFACE
+  interface operator (>)
+     module procedure gt_qd
+     module procedure gt_qd_d
+     module procedure gt_d_qd
+     module procedure gt_qd_i
+     module procedure gt_i_qd
+  end interface
 
-  INTERFACE qdread
-     MODULE PROCEDURE qdinpq
-  END INTERFACE
+  interface operator (<)
+     module procedure lt_qd
+     module procedure lt_qd_d
+     module procedure lt_d_qd
+     module procedure lt_qd_i
+     module procedure lt_i_qd
+  end interface
 
-  INTERFACE qdwrite
-     MODULE PROCEDURE qdoutq
-  END INTERFACE
+  interface operator (>=)
+     module procedure ge_qd
+     module procedure ge_qd_d
+     module procedure ge_d_qd
+     module procedure ge_qd_i
+     module procedure ge_i_qd
+  end interface
 
-  INTERFACE dble
-     MODULE PROCEDURE qd_to_d
-  END INTERFACE
+  interface operator (<=)
+     module procedure le_qd
+     module procedure le_qd_d
+     module procedure le_d_qd
+     module procedure le_qd_i
+     module procedure le_i_qd
+  end interface
 
-  INTERFACE min
-     MODULE PROCEDURE qdmin
-     MODULE PROCEDURE qdmin3
-  END INTERFACE
-  INTERFACE max
-     MODULE PROCEDURE qdmax
-     MODULE PROCEDURE qdmax3
-  END INTERFACE
+  interface qdread
+     module procedure qdinpq
+  end interface
 
-  INTERFACE qdpi
-     MODULE PROCEDURE qd_pi
-  END INTERFACE
+  interface qdwrite
+     module procedure qdoutq
+  end interface
 
-CONTAINS
+  interface dble
+     module procedure qd_to_d
+  end interface
+
+  interface min
+     module procedure qdmin
+     module procedure qdmin2
+  end interface
+  interface max
+     module procedure qdmax
+     module procedure qdmax2
+  end interface
+
+  interface qdpi
+     module procedure qd_pi
+  end interface
+
+  interface huge
+     module procedure qdhuge
+  end interface
+
+  interface tiny
+     module procedure qdtiny
+  end interface
+
+  interface epsilon
+     module procedure qdepsilon
+  end interface
+
+contains
 
 ! Assignments
-  SUBROUTINE assign_qd_str(a, s)
-    TYPE (qd_real), INTENT(INOUT) :: a
-    CHARACTER (LEN=*), INTENT(IN) :: s
+  subroutine assign_qd_str(a, s)
+    type (qd_real), intent(inout) :: a
+    character (len=*), intent(in) :: s
     character*80 t
     t = s
     call qdinpc (t, a%re(1))
-  END SUBROUTINE assign_qd_str
+  end subroutine assign_qd_str
 
-  SUBROUTINE assign_qd_d(a, d)
-    TYPE (qd_real), INTENT(INOUT) :: a
-    REAL*8, INTENT(IN) :: d
+  subroutine assign_qd_d(a, d)
+    type (qd_real), intent(inout) :: a
+    real*8, intent(in) :: d
     a%re(1) = d
     a%re(2) = 0.0d0
     a%re(3) = 0.0d0
     a%re(4) = 0.0d0
-  END SUBROUTINE assign_qd_d
+  end subroutine assign_qd_d
 
-  SUBROUTINE assign_d_qd(d, a)
-    REAL*8, INTENT(INOUT) :: d
-    TYPE (qd_real), INTENT(IN) :: a
+  subroutine assign_d_qd(d, a)
+    real*8, intent(inout) :: d
+    type (qd_real), intent(in) :: a
     d = a%re(1)
-  END SUBROUTINE assign_d_qd
+  end subroutine assign_d_qd
 
-  SUBROUTINE assign_dd_qd(dd, a)
-    TYPE (dd_real), INTENT(INOUT) :: dd
-    TYPE (qd_real), INTENT(IN) :: a
+  subroutine assign_qd_i(a, i)
+    type (qd_real), intent(inout) :: a
+    integer, intent(in) :: i
+    a%re(1) = i
+    a%re(2) = 0.0d0
+    a%re(3) = 0.0d0
+    a%re(4) = 0.0d0
+  end subroutine assign_qd_i
+
+  subroutine assign_i_qd(i, a)
+    integer, intent(inout) :: i
+    type (qd_real), intent(in) :: a
+    i = a%re(1)
+  end subroutine assign_i_qd
+
+
+  subroutine assign_dd_qd(dd, a)
+    type (dd_real), intent(inout) :: dd
+    type (qd_real), intent(in) :: a
     dd%re(1) = a%re(1)
     dd%re(2) = a%re(2)
-  END SUBROUTINE assign_dd_qd
+  end subroutine assign_dd_qd
 
-  SUBROUTINE assign_qd_dd(a, dd)
-    TYPE (qd_real), INTENT(INOUT) :: a
-    TYPE (dd_real), INTENT(IN) :: dd
+  subroutine assign_qd_dd(a, dd)
+    type (qd_real), intent(inout) :: a
+    type (dd_real), intent(in) :: dd
     a%re(1) = dd%re(1)
     a%re(2) = dd%re(2)
     a%re(3) = 0.d0
     a%re(4) = 0.d0
-  END SUBROUTINE assign_qd_dd
+  end subroutine assign_qd_dd
 
 ! Conversions
-  TYPE (qd_real) FUNCTION to_qd_d(a)
-    REAL*8, INTENT(IN) :: a
+
+  type (qd_real) function to_qd_i(ia)
+    integer, intent(in) :: ia
+    to_qd_i%re(1) = ia
+    to_qd_i%re(2) = 0.d0
+    to_qd_i%re(3) = 0.d0
+    to_qd_i%re(4) = 0.d0
+  end function to_qd_i
+
+  type (qd_real) function to_qd_d(a)
+    real*8, intent(in) :: a
     to_qd_d%re(1) = a
     to_qd_d%re(2) = 0.0d0
     to_qd_d%re(3) = 0.0d0
     to_qd_d%re(4) = 0.0d0
-  END FUNCTION to_qd_d
+  end function to_qd_d
 
-  REAL*8 FUNCTION to_real_qd(a) 
-    TYPE (qd_real), INTENT(IN) :: a
+  real*8 function to_real_qd(a) 
+    type (qd_real), intent(in) :: a
     to_real_qd = a%re(1)
-  END FUNCTION to_real_qd
+  end function to_real_qd
 
-  TYPE (qd_real) FUNCTION to_qd_dd (dd)
-     TYPE (dd_real), INTENT(IN) :: dd
+  integer function to_int_qd(a) 
+    type (qd_real), intent(in) :: a
+    to_int_qd = a%re(1)
+  end function to_int_qd
+
+  type (qd_real) function to_qd_dd (dd)
+     type (dd_real), intent(in) :: dd
      to_qd_dd%re(1) = dd%re(1)
      to_qd_dd%re(2) = dd%re(2)
      to_qd_dd%re(3) = 0.d0
      to_qd_dd%re(4) = 0.d0
-  END FUNCTION to_qd_dd
+  end function to_qd_dd
 
-  TYPE (dd_real) FUNCTION to_dd_qd (qd)
-     TYPE (qd_real), INTENT(IN) :: qd
+  type (qd_real) function to_qd_qd (qd)
+     type (qd_real), intent(in) :: qd
+     to_qd_qd%re(1) = qd%re(1)
+     to_qd_qd%re(2) = qd%re(2)
+     to_qd_qd%re(3) = qd%re(3)
+     to_qd_qd%re(4) = qd%re(4)
+  end function to_qd_qd
+
+  type (dd_real) function to_dd_qd (qd)
+     type (qd_real), intent(in) :: qd
      to_dd_qd%re(1) = qd%re(1)
      to_dd_qd%re(2) = qd%re(2)
-  END FUNCTION to_dd_qd
+  end function to_dd_qd
 
-  TYPE (qd_real) FUNCTION to_qd_str(s)
-    CHARACTER (LEN=*), INTENT(IN) :: s
+  type (qd_real) function to_qd_str(s)
+    character (len=*), intent(in) :: s
     character*80 t
     t = s
     call qdinpc (t, to_qd_str%re(1))
-  END FUNCTION to_qd_str
+  end function to_qd_str
 
 ! Additions
-  TYPE (qd_real) FUNCTION add_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    CALL f_qd_add(a, b, add_qd)
-  END FUNCTION add_qd
+  type (qd_real) function add_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    call f_qd_add(a, b, add_qd)
+  end function add_qd
 
-  TYPE (qd_real) FUNCTION add_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    CALL f_qd_add_qd_d(a, b, add_qd_d)
-  END FUNCTION add_qd_d
+  type (qd_real) function add_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    call f_qd_add_qd_d(a, b, add_qd_d)
+  end function add_qd_d
 
-  TYPE (qd_real) FUNCTION add_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    CALL f_qd_add_d_qd(a, b, add_d_qd)
-  END FUNCTION add_d_qd
+  type (qd_real) function add_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    call f_qd_add_d_qd(a, b, add_d_qd)
+  end function add_d_qd
+
+  type (qd_real) function add_i_qd(a, b)
+    integer, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    call f_qd_add_d_qd(dble(a), b, add_i_qd)
+  end function add_i_qd
+
+  type (qd_real) function add_qd_i(a, b)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: b
+    call f_qd_add_qd_d(a, dble(b), add_qd_i)
+  end function add_qd_i
 
 ! Subtractions
-  TYPE (qd_real) FUNCTION sub_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    CALL f_qd_sub(a, b, sub_qd)
-  END FUNCTION sub_qd
+  type (qd_real) function sub_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    call f_qd_sub(a, b, sub_qd)
+  end function sub_qd
 
-  TYPE (qd_real) FUNCTION sub_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    CALL f_qd_sub_qd_d(a, b, sub_qd_d)
-  END FUNCTION sub_qd_d
+  type (qd_real) function sub_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    call f_qd_sub_qd_d(a, b, sub_qd_d)
+  end function sub_qd_d
 
-  TYPE (qd_real) FUNCTION sub_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    CALL f_qd_sub_d_qd(a, b, sub_d_qd)
-  END FUNCTION sub_d_qd
+  type (qd_real) function sub_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    call f_qd_sub_d_qd(a, b, sub_d_qd)
+  end function sub_d_qd
 
 ! Unary Minus
-  TYPE (qd_real) FUNCTION neg_qd(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_neg(a, neg_qd)
-  END FUNCTION neg_qd
+  type (qd_real) function neg_qd(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_neg(a, neg_qd)
+  end function neg_qd
 
 
 ! Multiplications
-  TYPE (qd_real) FUNCTION mul_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    CALL f_qd_mul(a, b, mul_qd)
-  END FUNCTION mul_qd
+  type (qd_real) function mul_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    call f_qd_mul(a, b, mul_qd)
+  end function mul_qd
 
-  TYPE (qd_real) FUNCTION mul_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    CALL f_qd_mul_qd_d(a, b, mul_qd_d)
-  END FUNCTION mul_qd_d
+  type (qd_real) function mul_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    call f_qd_mul_qd_d(a, b, mul_qd_d)
+  end function mul_qd_d
 
-  TYPE (qd_real) FUNCTION mul_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    CALL f_qd_mul_d_qd(a, b, mul_d_qd)
-  END FUNCTION mul_d_qd
+  type (qd_real) function mul_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    call f_qd_mul_d_qd(a, b, mul_d_qd)
+  end function mul_d_qd
 
+  type (qd_real) function mul_qd_i(a, b)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: b
+    call f_qd_mul_qd_d(a, dble(b), mul_qd_i)
+  end function mul_qd_i
+
+  type (qd_real) function mul_i_qd(a, b)
+    integer, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    call f_qd_mul_d_qd(dble(a), b, mul_i_qd)
+  end function mul_i_qd
 
 ! Divisions
-  TYPE (qd_real) FUNCTION div_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    CALL f_qd_div(a, b, div_qd)
-  END FUNCTION div_qd
+  type (qd_real) function div_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    call f_qd_div(a, b, div_qd)
+  end function div_qd
 
-  TYPE (qd_real) FUNCTION div_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    CALL f_qd_div_qd_d(a, b, div_qd_d)
-  END FUNCTION div_qd_d
+  type (qd_real) function div_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    call f_qd_div_qd_d(a, b, div_qd_d)
+  end function div_qd_d
 
-  TYPE (qd_real) FUNCTION div_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    CALL f_qd_div_d_qd(a, b, div_d_qd)
-  END FUNCTION div_d_qd
+  type (qd_real) function div_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    call f_qd_div_d_qd(a, b, div_d_qd)
+  end function div_d_qd
+
+  type (qd_real) function div_qd_i(a, b)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: b
+    call f_qd_div_qd_d(a, dble(b), div_qd_i)
+  end function div_qd_i
+
+  type (qd_real) function div_i_qd(a, b)
+    integer, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    call f_qd_div_d_qd(dble(a), b, div_i_qd)
+  end function div_i_qd
 
 
 ! Power
-  TYPE (qd_real) FUNCTION pwr_qd (a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    TYPE (qd_real) q1, q2
-    CALL f_qd_log(a, q1)
-    CALL f_qd_mul(q1, b, q2)
-    CALL f_qd_exp(q2, pwr_qd)
-  END FUNCTION pwr_qd
+  type (qd_real) function pwr_qd (a, b)
+    type (qd_real), intent(in) :: a, b
+    type (qd_real) q1, q2
+    call f_qd_log(a, q1)
+    call f_qd_mul(q1, b, q2)
+    call f_qd_exp(q2, pwr_qd)
+  end function pwr_qd
 
-  TYPE (qd_real) FUNCTION pwr_qd_i(a, n)
-    TYPE (qd_real), INTENT(IN) :: a
-    INTEGER, INTENT(IN) :: n
-    CALL f_qd_npwr(a, n, pwr_qd_i)
-  END FUNCTION pwr_qd_i
+  type (qd_real) function pwr_qd_i(a, n)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: n
+    call f_qd_npwr(a, n, pwr_qd_i)
+  end function pwr_qd_i
 
-  TYPE (qd_real) FUNCTION pwr_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    TYPE (qd_real) q1, q2, q3
+  type (qd_real) function pwr_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    type (qd_real) q1, q2, q3
     q1%re(1) = a
     q1%re(2) = 0.d0
     q1%re(3) = 0.d0
     q1%re(4) = 0.d0
-    CALL f_qd_log(q1, q2)
-    CALL f_qd_mul(q2, b, q3)
-    CALL f_qd_exp(q3, pwr_d_qd)
-  END FUNCTION pwr_d_qd
+    call f_qd_log(q1, q2)
+    call f_qd_mul(q2, b, q3)
+    call f_qd_exp(q3, pwr_d_qd)
+  end function pwr_d_qd
 
 ! Trigonometric Functions
-  TYPE (qd_real) FUNCTION qdsin(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_sin(a, qdsin)
-  END FUNCTION qdsin
+  type (qd_real) function qdsin(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_sin(a, qdsin)
+  end function qdsin
 
-  TYPE (qd_real) FUNCTION qdcos(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_cos(a, qdcos)
-  END FUNCTION qdcos
+  type (qd_real) function qdcos(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_cos(a, qdcos)
+  end function qdcos
 
-  TYPE (qd_real) FUNCTION qdtan(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_tan(a, qdtan)
-  END FUNCTION qdtan
+  type (qd_real) function qdtan(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_tan(a, qdtan)
+  end function qdtan
 
-  SUBROUTINE qdsincos(a, s, c)
-    TYPE (qd_real), INTENT(IN) :: a
-    TYPE (qd_real), INTENT(OUT) :: s, c
-    CALL f_qd_sincos(a, s, c)
-  END SUBROUTINE qdsincos
+  subroutine qdsincos(a, s, c)
+    type (qd_real), intent(in) :: a
+    type (qd_real), intent(out) :: s, c
+    call f_qd_sincos(a, s, c)
+  end subroutine qdsincos
 
-  SUBROUTINE qdcossin(a, c, s)
-    TYPE (qd_real), INTENT(IN) :: a
-    TYPE (qd_real), INTENT(OUT) :: s, c
-    CALL f_qd_sincos(a, s, c)
-  END SUBROUTINE qdcossin
+  subroutine qdcossin(a, c, s)
+    type (qd_real), intent(in) :: a
+    type (qd_real), intent(out) :: s, c
+    call f_qd_sincos(a, s, c)
+  end subroutine qdcossin
 
 
 ! Inverse Trigonometric Functions
-  TYPE (qd_real) FUNCTION qdasin(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_asin(a, qdasin)
-  END FUNCTION qdasin
+  type (qd_real) function qdasin(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_asin(a, qdasin)
+  end function qdasin
 
-  TYPE (qd_real) FUNCTION qdacos(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_acos(a, qdacos)
-  END FUNCTION qdacos
+  type (qd_real) function qdacos(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_acos(a, qdacos)
+  end function qdacos
 
-  TYPE (qd_real) FUNCTION qdatan(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_atan(a, qdatan)
-  END FUNCTION qdatan
+  type (qd_real) function qdatan(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_atan(a, qdatan)
+  end function qdatan
 
-  TYPE (qd_real) FUNCTION qdatan2(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    CALL f_qd_atan2(a, b, qdatan2)
-  END FUNCTION qdatan2
+  type (qd_real) function qdatan2(a, b)
+    type (qd_real), intent(in) :: a, b
+    call f_qd_atan2(a, b, qdatan2)
+  end function qdatan2
 
 ! Exponential and Logarithms
-  TYPE (qd_real) FUNCTION qdexp(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_exp(a, qdexp)
-  END FUNCTION qdexp
+  type (qd_real) function qdexp(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_exp(a, qdexp)
+  end function qdexp
 
-  TYPE (qd_real) FUNCTION qdlog(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_log(a, qdlog)
-  END FUNCTION qdlog
+  type (qd_real) function qdlog(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_log(a, qdlog)
+  end function qdlog
 
-  TYPE (qd_real) FUNCTION qdlog10(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_log10(a, qdlog10)
-  END FUNCTION qdlog10
+  type (qd_real) function qdlog10(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_log10(a, qdlog10)
+  end function qdlog10
 
 
 ! SQRT, etc.
-  TYPE (qd_real) FUNCTION qdsqrt(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_sqrt(a, qdsqrt)
-  END FUNCTION qdsqrt
+  type (qd_real) function qdsqrt(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_sqrt(a, qdsqrt)
+  end function qdsqrt
 
-  TYPE (qd_real) FUNCTION qdsqr(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_sqr(a, qdsqr)
-  END FUNCTION qdsqr
+  type (qd_real) function qdsqr(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_sqr(a, qdsqr)
+  end function qdsqr
 
-  TYPE (qd_real) FUNCTION qdnroot(a, n)
-    TYPE (qd_real), INTENT(IN) :: a
-    INTEGER, INTENT(IN) :: n
-    CALL f_qd_nroot(a, n, qdnroot)
-  END FUNCTION qdnroot
+  type (qd_real) function qdnroot(a, n)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: n
+    call f_qd_nroot(a, n, qdnroot)
+  end function qdnroot
 
 
 ! Hyperbolic Functions
-  TYPE (qd_real) FUNCTION qdsinh(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_sinh(a, qdsinh)
-  END FUNCTION qdsinh
+  type (qd_real) function qdsinh(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_sinh(a, qdsinh)
+  end function qdsinh
 
-  TYPE (qd_real) FUNCTION qdcosh(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_cosh(a, qdcosh)
-  END FUNCTION qdcosh
+  type (qd_real) function qdcosh(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_cosh(a, qdcosh)
+  end function qdcosh
 
-  TYPE (qd_real) FUNCTION qdtanh(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_tanh(a, qdtanh)
-  END FUNCTION qdtanh
+  type (qd_real) function qdtanh(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_tanh(a, qdtanh)
+  end function qdtanh
 
-  SUBROUTINE qdsincosh(a, s, c)
-    TYPE (qd_real), INTENT(IN) :: a
-    TYPE (qd_real), INTENT(OUT) :: s, c
-    CALL f_qd_sincosh(a, s, c)
-  END SUBROUTINE qdsincosh
+  subroutine qdsincosh(a, s, c)
+    type (qd_real), intent(in) :: a
+    type (qd_real), intent(out) :: s, c
+    call f_qd_sincosh(a, s, c)
+  end subroutine qdsincosh
 
-  SUBROUTINE qdcossinh(a, c, s)
-    TYPE (qd_real), INTENT(IN) :: a
-    TYPE (qd_real), INTENT(OUT) :: s, c
-    CALL f_qd_sincosh(a, s, c)
-  END SUBROUTINE qdcossinh
+  subroutine qdcossinh(a, c, s)
+    type (qd_real), intent(in) :: a
+    type (qd_real), intent(out) :: s, c
+    call f_qd_sincosh(a, s, c)
+  end subroutine qdcossinh
 
 ! Inverse Hyperbolic Functions
-  TYPE (qd_real) FUNCTION qdasinh(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_asinh(a, qdasinh)
-  END FUNCTION qdasinh
+  type (qd_real) function qdasinh(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_asinh(a, qdasinh)
+  end function qdasinh
 
-  TYPE (qd_real) FUNCTION qdacosh(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_acosh(a, qdacosh)
-  END FUNCTION qdacosh
+  type (qd_real) function qdacosh(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_acosh(a, qdacosh)
+  end function qdacosh
 
-  TYPE (qd_real) FUNCTION qdatanh(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_atanh(a, qdatanh)
-  END FUNCTION qdatanh
+  type (qd_real) function qdatanh(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_atanh(a, qdatanh)
+  end function qdatanh
 
 
 ! Rounding
-  TYPE (qd_real) FUNCTION qdaint(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_aint(a, qdaint)
-  END FUNCTION qdaint
+  type (qd_real) function qdaint(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_aint(a, qdaint)
+  end function qdaint
 
-  TYPE (qd_real) FUNCTION qdanint(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_nint(a, qdanint)
-  END FUNCTION qdanint
+  type (qd_real) function qdanint(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_nint(a, qdanint)
+  end function qdanint
+
+  integer function qdnint(a)
+    type (qd_real), intent(in) :: a
+    qdnint = to_int_qd(qdaint(a));
+  end function qdnint
 
 
 ! Random Number Generator
-  TYPE (qd_real) FUNCTION qdrand()
-    CALL f_qd_rand(qdrand)
-  END FUNCTION qdrand
+  type (qd_real) function qdrand()
+    call f_qd_rand(qdrand)
+  end function qdrand
 
 
 ! Equality
-  LOGICAL FUNCTION eq_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_qd_comp(a, b, r)
-    IF (r == 0) THEN
-       eq_qd = .TRUE.
-    ELSE
-       eq_qd = .FALSE.
-    END IF
-  END FUNCTION eq_qd
+  logical function eq_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    integer :: r
+    call f_qd_comp(a, b, r)
+    if (r == 0) then
+       eq_qd = .true.
+    else
+       eq_qd = .false.
+    end if
+  end function eq_qd
 
-  LOGICAL FUNCTION eq_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_qd_d(a, b, r)
-    IF (r == 0) THEN
-       eq_qd_d = .TRUE.
-    ELSE
-       eq_qd_d = .FALSE.
-    END IF
-  END FUNCTION eq_qd_d
+  logical function eq_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_qd_comp_qd_d(a, b, r)
+    if (r == 0) then
+       eq_qd_d = .true.
+    else
+       eq_qd_d = .false.
+    end if
+  end function eq_qd_d
 
-  LOGICAL FUNCTION eq_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_d_qd(a, b, r)
-    IF (r == 0) THEN
-       eq_d_qd = .TRUE.
-    ELSE
-       eq_d_qd = .FALSE.
-    END IF
-  END FUNCTION eq_d_qd
+  logical function eq_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    integer :: r
+    call f_qd_comp_d_qd(a, b, r)
+    if (r == 0) then
+       eq_d_qd = .true.
+    else
+       eq_d_qd = .false.
+    end if
+  end function eq_d_qd
 
+  logical function eq_qd_i(a, b)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: b
+    eq_qd_i = eq_qd_d(a, dble(b))
+  end function eq_qd_i
+
+  logical function eq_i_qd(a, b)
+    integer, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    eq_i_qd = eq_d_qd(dble(a), b)
+  end function eq_i_qd
 
 ! Non-Equality
-  LOGICAL FUNCTION ne_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_qd_comp(a, b, r)
-    IF (r == 0) THEN
-       ne_qd = .FALSE.
-    ELSE
-       ne_qd = .TRUE.
-    END IF
-  END FUNCTION ne_qd
+  logical function ne_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    integer :: r
+    call f_qd_comp(a, b, r)
+    if (r == 0) then
+       ne_qd = .false.
+    else
+       ne_qd = .true.
+    end if
+  end function ne_qd
 
-  LOGICAL FUNCTION ne_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_qd_d(a, b, r)
-    IF (r == 0) THEN
-       ne_qd_d = .FALSE.
-    ELSE
-       ne_qd_d = .TRUE.
-    END IF
-  END FUNCTION ne_qd_d
+  logical function ne_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_qd_comp_qd_d(a, b, r)
+    if (r == 0) then
+       ne_qd_d = .false.
+    else
+       ne_qd_d = .true.
+    end if
+  end function ne_qd_d
 
-  LOGICAL FUNCTION ne_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_d_qd(a, b, r)
-    IF (r == 0) THEN
-       ne_d_qd = .FALSE.
-    ELSE
-       ne_d_qd = .TRUE.
-    END IF
-  END FUNCTION ne_d_qd
+  logical function ne_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    integer :: r
+    call f_qd_comp_d_qd(a, b, r)
+    if (r == 0) then
+       ne_d_qd = .false.
+    else
+       ne_d_qd = .true.
+    end if
+  end function ne_d_qd
+
+  logical function ne_qd_i(a, b)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: b
+    ne_qd_i = ne_qd_d(a, dble(b))
+  end function ne_qd_i
+
+  logical function ne_i_qd(a, b)
+    integer, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    ne_i_qd = ne_d_qd(dble(a), b)
+  end function ne_i_qd
 
 ! Greater-Than
-  LOGICAL FUNCTION gt_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_qd_comp(a, b, r)
-    IF (r == 1) THEN
-       gt_qd = .TRUE.
-    ELSE
-       gt_qd = .FALSE.
-    END IF
-  END FUNCTION gt_qd
+  logical function gt_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    integer :: r
+    call f_qd_comp(a, b, r)
+    if (r == 1) then
+       gt_qd = .true.
+    else
+       gt_qd = .false.
+    end if
+  end function gt_qd
 
-  LOGICAL FUNCTION gt_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_qd_d(a, b, r)
-    IF (r == 1) THEN
-       gt_qd_d = .TRUE.
-    ELSE
-       gt_qd_d = .FALSE.
-    END IF
-  END FUNCTION gt_qd_d
+  logical function gt_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_qd_comp_qd_d(a, b, r)
+    if (r == 1) then
+       gt_qd_d = .true.
+    else
+       gt_qd_d = .false.
+    end if
+  end function gt_qd_d
 
-  LOGICAL FUNCTION gt_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_d_qd(a, b, r)
-    IF (r == 1) THEN
-       gt_d_qd = .TRUE.
-    ELSE
-       gt_d_qd = .FALSE.
-    END IF
-  END FUNCTION gt_d_qd
+  logical function gt_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    integer :: r
+    call f_qd_comp_d_qd(a, b, r)
+    if (r == 1) then
+       gt_d_qd = .true.
+    else
+       gt_d_qd = .false.
+    end if
+  end function gt_d_qd
 
+  logical function gt_qd_i(a, b)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: b
+    gt_qd_i = gt_qd_d(a, dble(b))
+  end function gt_qd_i
+
+  logical function gt_i_qd(a, b)
+    integer, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    gt_i_qd = gt_d_qd(dble(a), b)
+  end function gt_i_qd
 
 ! Less-Than
-  LOGICAL FUNCTION lt_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_qd_comp(a, b, r)
-    IF (r == -1) THEN
-       lt_qd = .TRUE.
-    ELSE
-       lt_qd = .FALSE.
-    END IF
-  END FUNCTION lt_qd
+  logical function lt_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    integer :: r
+    call f_qd_comp(a, b, r)
+    if (r == -1) then
+       lt_qd = .true.
+    else
+       lt_qd = .false.
+    end if
+  end function lt_qd
 
-  LOGICAL FUNCTION lt_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_qd_d(a, b, r)
-    IF (r == -1) THEN
-       lt_qd_d = .TRUE.
-    ELSE
-       lt_qd_d = .FALSE.
-    END IF
-  END FUNCTION lt_qd_d
+  logical function lt_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_qd_comp_qd_d(a, b, r)
+    if (r == -1) then
+       lt_qd_d = .true.
+    else
+       lt_qd_d = .false.
+    end if
+  end function lt_qd_d
 
-  LOGICAL FUNCTION lt_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_d_qd(a, b, r)
-    IF (r == -1) THEN
-       lt_d_qd = .TRUE.
-    ELSE
-       lt_d_qd = .FALSE.
-    END IF
-  END FUNCTION lt_d_qd
+  logical function lt_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    integer :: r
+    call f_qd_comp_d_qd(a, b, r)
+    if (r == -1) then
+       lt_d_qd = .true.
+    else
+       lt_d_qd = .false.
+    end if
+  end function lt_d_qd
+
+  logical function lt_qd_i(a, b)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: b
+    lt_qd_i = lt_qd_d(a, dble(b))
+  end function lt_qd_i
+
+  logical function lt_i_qd(a, b)
+    integer, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    lt_i_qd = lt_d_qd(dble(a), b)
+  end function lt_i_qd
 
 ! Greater-Than-Or-Equal-To
-  LOGICAL FUNCTION ge_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_qd_comp(a, b, r)
-    IF (r >= 0) THEN
-       ge_qd = .TRUE.
-    ELSE
-       ge_qd = .FALSE.
-    END IF
-  END FUNCTION ge_qd
+  logical function ge_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    integer :: r
+    call f_qd_comp(a, b, r)
+    if (r >= 0) then
+       ge_qd = .true.
+    else
+       ge_qd = .false.
+    end if
+  end function ge_qd
 
-  LOGICAL FUNCTION ge_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_qd_d(a, b, r)
-    IF (r >= 0) THEN
-       ge_qd_d = .TRUE.
-    ELSE
-       ge_qd_d = .FALSE.
-    END IF
-  END FUNCTION ge_qd_d
+  logical function ge_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_qd_comp_qd_d(a, b, r)
+    if (r >= 0) then
+       ge_qd_d = .true.
+    else
+       ge_qd_d = .false.
+    end if
+  end function ge_qd_d
 
-  LOGICAL FUNCTION ge_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_d_qd(a, b, r)
-    IF (r >= 0) THEN
-       ge_d_qd = .TRUE.
-    ELSE
-       ge_d_qd = .FALSE.
-    END IF
-  END FUNCTION ge_d_qd
+  logical function ge_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    integer :: r
+    call f_qd_comp_d_qd(a, b, r)
+    if (r >= 0) then
+       ge_d_qd = .true.
+    else
+       ge_d_qd = .false.
+    end if
+  end function ge_d_qd
+
+  logical function ge_qd_i(a, b)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: b
+    ge_qd_i = ge_qd_d(a, dble(b))
+  end function ge_qd_i
+
+  logical function ge_i_qd(a, b)
+    integer, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    ge_i_qd = ge_d_qd(dble(a), b)
+  end function ge_i_qd
 
 ! Less-Than-Or-Equal-To
-  LOGICAL FUNCTION le_qd(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_qd_comp(a, b, r)
-    IF (r <= 0) THEN
-       le_qd = .TRUE.
-    ELSE
-       le_qd = .FALSE.
-    END IF
-  END FUNCTION le_qd
+  logical function le_qd(a, b)
+    type (qd_real), intent(in) :: a, b
+    integer :: r
+    call f_qd_comp(a, b, r)
+    if (r <= 0) then
+       le_qd = .true.
+    else
+       le_qd = .false.
+    end if
+  end function le_qd
 
-  LOGICAL FUNCTION le_qd_d(a, b)
-    TYPE (qd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_qd_d(a, b, r)
-    IF (r <= 0) THEN
-       le_qd_d = .TRUE.
-    ELSE
-       le_qd_d = .FALSE.
-    END IF
-  END FUNCTION le_qd_d
+  logical function le_qd_d(a, b)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_qd_comp_qd_d(a, b, r)
+    if (r <= 0) then
+       le_qd_d = .true.
+    else
+       le_qd_d = .false.
+    end if
+  end function le_qd_d
 
-  LOGICAL FUNCTION le_d_qd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (qd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_qd_comp_d_qd(a, b, r)
-    IF (r <= 0) THEN
-       le_d_qd = .TRUE.
-    ELSE
-       le_d_qd = .FALSE.
-    END IF
-  END FUNCTION le_d_qd
+  logical function le_d_qd(a, b)
+    real*8, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    integer :: r
+    call f_qd_comp_d_qd(a, b, r)
+    if (r <= 0) then
+       le_d_qd = .true.
+    else
+       le_d_qd = .false.
+    end if
+  end function le_d_qd
+
+  logical function le_qd_i(a, b)
+    type (qd_real), intent(in) :: a
+    integer, intent(in) :: b
+    le_qd_i = le_qd_d(a, dble(b))
+  end function le_qd_i
+
+  logical function le_i_qd(a, b)
+    integer, intent(in) :: a
+    type (qd_real), intent(in) :: b
+    le_i_qd = le_d_qd(dble(a), b)
+  end function le_i_qd
 
 
 ! Absolute Value
-  TYPE (qd_real) FUNCTION qdabs(a)
-    TYPE (qd_real), INTENT(IN) :: a
-    CALL f_qd_abs(a, qdabs)
-  END FUNCTION qdabs
+  type (qd_real) function qdabs(a)
+    type (qd_real), intent(in) :: a
+    call f_qd_abs(a, qdabs)
+  end function qdabs
+
+! Sign transfer
+  type (qd_real) function qdsign(a, b) result (c)
+    type (qd_real), intent(in) :: a, b
+    integer :: r
+    if (b%re(1) .gt. 0.0d0) then
+      c%re(1) = abs(a%re(1))
+      c%re(2) = abs(a%re(2))
+      c%re(3) = abs(a%re(3))
+      c%re(4) = abs(a%re(4))
+    else
+      c%re(1) = -abs(a%re(1))
+      c%re(2) = -abs(a%re(2))
+      c%re(3) = -abs(a%re(3))
+      c%re(4) = -abs(a%re(4))
+    endif
+  end function qdsign
+
+  type (qd_real) function qdsign_dd_d(a, b) result (c)
+    type (qd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    if (b .gt. 0.0d0) then
+      c%re(1) = abs(a%re(1))
+      c%re(2) = abs(a%re(2))
+      c%re(3) = abs(a%re(3))
+      c%re(4) = abs(a%re(4))
+    else
+      c%re(1) = -abs(a%re(1))
+      c%re(2) = -abs(a%re(2))
+      c%re(3) = -abs(a%re(3))
+      c%re(4) = -abs(a%re(4))
+    endif
+  end function qdsign_dd_d
 
 ! Input
-  SUBROUTINE qdinpq(u, q1, q2, q3, q4, q5, q6, q7, q8, q9)
-    INTEGER, INTENT(IN) :: u
-    TYPE (qd_real), INTENT(IN) :: q1
-    TYPE (qd_real), INTENT(IN), OPTIONAL :: q2, q3, q4, q5, q6, q7, q8, q9
+  subroutine qdinpq(u, q1, q2, q3, q4, q5, q6, q7, q8, q9)
+    integer, intent(in) :: u
+    type (qd_real), intent(in) :: q1
+    type (qd_real), intent(in), optional :: q2, q3, q4, q5, q6, q7, q8, q9
 
     call qdinp (u, q1%re(1))
 
-    IF (PRESENT(q2)) THEN
+    if (present(q2)) then
       call qdinp (u, q2%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q3)) THEN
+    if (present(q3)) then
       call qdinp (u, q3%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q4)) THEN
+    if (present(q4)) then
       call qdinp (u, q4%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q5)) THEN
+    if (present(q5)) then
       call qdinp (u, q5%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q6)) THEN
+    if (present(q6)) then
       call qdinp (u, q6%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q7)) THEN
+    if (present(q7)) then
       call qdinp (u, q7%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q8)) THEN
+    if (present(q8)) then
       call qdinp (u, q8%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q9)) THEN
+    if (present(q9)) then
       call qdinp (u, q9%re(1))
-    END IF
+    end if
 
-  END SUBROUTINE qdinpq
+  end subroutine qdinpq
 
 ! Output
-  SUBROUTINE qdoutq(u, q1, q2, q3, q4, q5, q6, q7, q8, q9)
-    INTEGER, INTENT(IN) :: u
-    TYPE (qd_real), INTENT(IN) :: q1
-    TYPE (qd_real), INTENT(IN), OPTIONAL :: q2, q3, q4, q5, q6, q7, q8, q9
+  subroutine qdoutq(u, q1, q2, q3, q4, q5, q6, q7, q8, q9)
+    integer, intent(in) :: u
+    type (qd_real), intent(in) :: q1
+    type (qd_real), intent(in), optional :: q2, q3, q4, q5, q6, q7, q8, q9
 
     call qdout (u, q1%re(1))
 
-    IF (PRESENT(q2)) THEN
+    if (present(q2)) then
       call qdout (u, q2%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q3)) THEN
+    if (present(q3)) then
       call qdout (u, q3%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q4)) THEN
+    if (present(q4)) then
       call qdout (u, q4%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q5)) THEN
+    if (present(q5)) then
       call qdout (u, q5%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q6)) THEN
+    if (present(q6)) then
       call qdout (u, q6%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q7)) THEN
+    if (present(q7)) then
       call qdout (u, q7%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q8)) THEN
+    if (present(q8)) then
       call qdout (u, q8%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q9)) THEN
+    if (present(q9)) then
       call qdout (u, q9%re(1))
-    END IF
+    end if
 
-  END SUBROUTINE qdoutq
+  end subroutine qdoutq
 
-  REAL*8 FUNCTION qd_to_d(a)
-    TYPE (qd_real), INTENT(IN) :: a
+  real*8 function qd_to_d(a)
+    type (qd_real), intent(in) :: a
     qd_to_d = a%re(1)
-  END FUNCTION qd_to_d
+  end function qd_to_d
 
-  TYPE (qd_real) FUNCTION qdmin(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_qd_comp(a, b, r)
-    IF (r == 1) THEN
-       qdmin = b
-    ELSE
-       qdmin = a
-    END IF
-  END FUNCTION qdmin
+  type (qd_real) function qdmin2(a, b)
+    type (qd_real), intent(in) :: a, b
+    integer :: r
+    call f_qd_comp(a, b, r)
+    if (r == 1) then
+       qdmin2 = b
+    else
+       qdmin2 = a
+    end if
+  end function qdmin2
 
-  TYPE (qd_real) FUNCTION qdmin3(a, b, c)
-    TYPE (qd_real), INTENT(IN) :: a, b, c
-    INTEGER r
-    CALL f_qd_comp(a, b, r)
-    IF (r == 1) THEN
-       ! b < a.  
-       CALL f_qd_comp(b, c, r)
-       IF (r == 1) THEN
-          qdmin3 = c
-       ELSE
-          qdmin3 = b
-       END IF
-    ELSE
-       ! b > a
-       CALL f_qd_comp(a, c, r)
-       IF (r == 1) THEN 
-          qdmin3 = c
-       ELSE
-          qdmin3 = a
-       END IF
-    END IF
-  END FUNCTION qdmin3
+  type (qd_real) function qdmin(a1, a2, a3, a4, a5, a6, a7, a8, a9)
+    type (qd_real), intent(in) :: a1, a2, a3
+    type (qd_real), intent(in), optional :: a4, a5, a6, a7, a8, a9
+    qdmin = qdmin2(qdmin2(a1, a2), a3)
+    if (present(a4)) qdmin = qdmin2(qdmin, a4)
+    if (present(a5)) qdmin = qdmin2(qdmin, a5)
+    if (present(a6)) qdmin = qdmin2(qdmin, a6)
+    if (present(a7)) qdmin = qdmin2(qdmin, a7)
+    if (present(a8)) qdmin = qdmin2(qdmin, a8)
+    if (present(a9)) qdmin = qdmin2(qdmin, a9)
+  end function qdmin
 
-  TYPE (qd_real) FUNCTION qdmax(a, b)
-    TYPE (qd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_qd_comp(a, b, r)
-    IF (r == -1) THEN
-       qdmax = b
-    ELSE
-       qdmax = a
-    END IF
-  END FUNCTION qdmax
+  type (qd_real) function qdmax2(a, b)
+    type (qd_real), intent(in) :: a, b
+    integer :: r
+    call f_qd_comp(a, b, r)
+    if (r == -1) then
+       qdmax2 = b
+    else
+       qdmax2 = a
+    end if
+  end function qdmax2
 
-  TYPE (qd_real) FUNCTION qdmax3(a, b, c)
-    TYPE (qd_real), INTENT(IN) :: a, b, c
-    INTEGER r
-    CALL f_qd_comp(a, b, r)
-    IF (r == -1) THEN
-       ! b > a.  
-       CALL f_qd_comp(b, c, r)
-       IF (r == -1) THEN
-          qdmax3 = c
-       ELSE
-          qdmax3 = b
-       END IF
-    ELSE
-       ! b < a
-       CALL f_qd_comp(a, c, r)
-       IF (r == -1) THEN 
-          qdmax3 = c
-       ELSE
-          qdmax3 = a
-       END IF
-    END IF
-  END FUNCTION qdmax3
+  type (qd_real) function qdmax(a1, a2, a3, a4, a5, a6, a7, a8, a9)
+    type (qd_real), intent(in) :: a1, a2, a3
+    type (qd_real), intent(in), optional :: a4, a5, a6, a7, a8, a9
+    qdmax = qdmax2(qdmax2(a1, a2), a3)
+    if (present(a4)) qdmax = qdmax2(qdmax, a4)
+    if (present(a5)) qdmax = qdmax2(qdmax, a5)
+    if (present(a6)) qdmax = qdmax2(qdmax, a6)
+    if (present(a7)) qdmax = qdmax2(qdmax, a7)
+    if (present(a8)) qdmax = qdmax2(qdmax, a8)
+    if (present(a9)) qdmax = qdmax2(qdmax, a9)
+  end function qdmax
 
-  TYPE (qd_real) FUNCTION qd_pi()
-    CALL f_qd_pi(qd_pi)
-  END FUNCTION qd_pi
+  type (qd_real) function qd_pi()
+    call f_qd_pi(qd_pi)
+  end function qd_pi
 
 subroutine qdinp (iu, a)
 
@@ -956,16 +1176,17 @@ parameter (ln = 80)
 character*80 cs
 real*8 a(4)
 
-read (iu, '(80a1)', end = 100) cs
+read (iu, '(a)', end = 100) cs
 call qdinpc (cs, a)
 goto 110
 
 100 write (6, 1)
-1  format ('*** QDINP: End-of-file encountered.')
+1  format ('*** qdinp: End-of-file encountered.')
 ! call qdabrt
 stop
 
 110 return
+
 end subroutine
 
 subroutine qdinpc (a, b)
@@ -973,7 +1194,7 @@ subroutine qdinpc (a, b)
 !   Converts the CHARACTER*80 array A into the DD number B.
 
 implicit none
-integer i, ib, id, ie, inz, ip, is, ix, k, ln, lnn
+integer i, ib, id, ie, inz, ip, is, ix, k, ln, lnn, beg
 parameter (ln = 80)
 real*8 bi
 character*80 a
@@ -992,20 +1213,29 @@ s1(2) = 0.d0
 s1(3) = 0.d0
 s1(4) = 0.d0
 
-do i = 80, 1, -1
-  if (a(i:i) /= ' ') goto 90
+do i = 1, 80
+  if (a(i:i) /= ' ') then
+    beg = i
+    goto 80
+  end if
+end do
+80 continue
+
+do i = beg, 80
+  if (a(i:i) == ' ') then
+    lnn = i-1
+    goto 90
+  end if
 enddo
 
+lnn = 80
 90 continue
-
-lnn = i
 
 !   Scan for digits, looking for the period also.
 
-do i = 1, lnn
+do i = beg, lnn
   ai = a(i:i)
-  if (ai .eq. ' ' .and. id == 0) then
-  elseif (ai .eq. '.') then
+  if (ai .eq. '.') then
     if (ip >= 0) goto 210
     ip = id
     inz = 1
@@ -1084,11 +1314,12 @@ call f_qd_mul (s1, s2, b)
 goto 220
 
 210  write (6, 1)
-1 format ('*** DDINPC: Syntax error in literal string.')
+1 format ('*** qdinpc: Syntax error in literal string.')
 ! call qdabrt
 stop
 
 220  return
+
 end subroutine
 
 subroutine qdout (iu, a)
@@ -1279,6 +1510,21 @@ enddo
 return
 end subroutine
 
-END MODULE qdmodule
+type (qd_real) function qdhuge(a) 
+  type (qd_real), intent(in) :: a
+  qdhuge = qd_huge
+end function qdhuge
+
+type (qd_real) function qdtiny(a) 
+  type (qd_real), intent(in) :: a
+  qdtiny = qd_tiny
+end function qdtiny
+
+type (qd_real) function qdepsilon(a) 
+  type (qd_real), intent(in) :: a
+  qdepsilon = qd_eps
+end function qdepsilon
+
+end module qdmodule
 
 

@@ -1,9 +1,14 @@
 if HAVE_FORTRAN
-AM_CPPFLAGS=-I$(top_builddir)
+AM_CPPFLAGS = -I$(top_builddir) -I$(top_builddir)/include -I$(top_srcdir)/include
 LDADD=-L. -lqdmod -L$(top_builddir)/src -lqd $(FCLIBS)
 
-QDMOD=qdmodule.mod
-DDMOD=ddmodule.mod
+if UPCASE_MODULE
+QDMOD=QDMODULE.$(module_ext)
+DDMOD=DDMODULE.$(module_ext)
+else
+QDMOD=qdmodule.$(module_ext)
+DDMOD=ddmodule.$(module_ext)
+endif
 
 lib_LIBRARIES = libqdmod.a
 libqdmod_a_SOURCES = ddmod.f90 qdmod.f90 main.cpp

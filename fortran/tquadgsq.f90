@@ -10,9 +10,6 @@ subroutine f_main
 !   David H. Bailey      2004-12-16
 !   This is Quad-Double Fortran-90 version.
 
-!   This software is provided for research purposes only.  
-!   Commercial usage requires license agreement.
-
 !   This work was supported by the Director, Office of Science, Division
 !   of Mathematical, Information, and Computational Sciences of the
 !   U.S. Department of Energy under contract number DE-AC03-76SF00098.

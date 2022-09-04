@@ -9,899 +9,1106 @@
 !  Fortran-90 module file to use with double-double numbers.
 !
 !  Yozo Hida
-!  David H Bailey    2005-01-25
+!  David H Bailey    2005-08-24
 
-MODULE ddmodule
-  IMPLICIT NONE
+module ddmodule
+  implicit none
   
-  TYPE dd_real
-     SEQUENCE
-     REAL*8 :: re(2)
-  END TYPE dd_real
+  type dd_real
+     sequence
+     real*8 :: re(2)
+  end type dd_real
 
-  real*8 ddeps
-  parameter (ddeps = 1.23259516440783d-32)
+  real*8 d_dd_eps
+  parameter (d_dd_eps = 1.23259516440783d-32)
 
-  INTERFACE ASSIGNMENT (=)
-     MODULE PROCEDURE assign_dd_str
-     MODULE PROCEDURE assign_dd_d
-     MODULE PROCEDURE assign_d_dd
-  END INTERFACE
+  type (dd_real) dd_one, dd_zero, dd_eps, dd_huge, dd_tiny
+  parameter (dd_one = dd_real((/1.0d0, 0.0d0/)), &
+             dd_zero = dd_real((/0.0d0, 0.0d0/)))
+  parameter (dd_eps = dd_real((/d_dd_eps, 0.0d0/)))
+  parameter (dd_huge = dd_real((/1.79769313486231570815d+308, &
+                                 9.97920154767359795037d+291/)))
+  parameter (dd_tiny = dd_real((/4.00833672001794555599d-292, 0.0d0/)))
 
-  INTERFACE OPERATOR (+)
-     MODULE PROCEDURE add_dd
-     MODULE PROCEDURE add_dd_d
-     MODULE PROCEDURE add_d_dd
-  END INTERFACE
 
-  INTERFACE OPERATOR (-)
-     MODULE PROCEDURE sub_dd
-     MODULE PROCEDURE sub_dd_d
-     MODULE PROCEDURE sub_d_dd
-     MODULE PROCEDURE neg_dd
-  END INTERFACE
+  interface assignment (=)
+     module procedure assign_dd_str
+     module procedure assign_dd_d
+     module procedure assign_d_dd
+     module procedure assign_dd_i
+     module procedure assign_i_dd
+  end interface
 
-  INTERFACE OPERATOR (*)
-     MODULE PROCEDURE mul_dd
-     MODULE PROCEDURE mul_dd_d
-     MODULE PROCEDURE mul_d_dd
-  END INTERFACE
+  interface operator (+)
+     module procedure add_dd
+     module procedure add_dd_d
+     module procedure add_d_dd
+     module procedure add_dd_i
+     module procedure add_i_dd
+  end interface
 
-  INTERFACE OPERATOR (/)
-     MODULE PROCEDURE div_dd
-     MODULE PROCEDURE div_dd_d
-     MODULE PROCEDURE div_d_dd
-  END INTERFACE
+  interface operator (-)
+     module procedure sub_dd
+     module procedure sub_dd_d
+     module procedure sub_d_dd
+     module procedure neg_dd
+  end interface
 
-  INTERFACE OPERATOR (**)
-     MODULE PROCEDURE pwr_dd
-     MODULE PROCEDURE pwr_dd_i
-     MODULE PROCEDURE pwr_d_dd
-  END INTERFACE
+  interface operator (*)
+     module procedure mul_dd
+     module procedure mul_dd_d
+     module procedure mul_d_dd
+     module procedure mul_dd_i
+     module procedure mul_i_dd
+  end interface
 
-  INTERFACE ddreal
-     MODULE PROCEDURE to_dd_d
-     MODULE PROCEDURE to_dd_str
-  END INTERFACE
+  interface operator (/)
+     module procedure div_dd
+     module procedure div_dd_d
+     module procedure div_d_dd
+     module procedure div_dd_i
+     module procedure div_i_dd
+  end interface
 
-  INTERFACE REAL
-     MODULE PROCEDURE to_real_dd
-  END INTERFACE
+  interface operator (**)
+     module procedure pwr_dd
+     module procedure pwr_dd_i
+     module procedure pwr_d_dd
+  end interface
 
-  INTERFACE SIN
-     MODULE PROCEDURE ddsin
-  END INTERFACE
-  INTERFACE COS
-     MODULE PROCEDURE ddcos
-  END INTERFACE
-  INTERFACE TAN
-     MODULE PROCEDURE ddtan
-  END INTERFACE
-  INTERFACE SINCOS
-     MODULE PROCEDURE ddsincos
-  END INTERFACE
-  INTERFACE ddcssnf
-     MODULE PROCEDURE ddcossin
-  END INTERFACE
+  interface ddreal
+     module procedure to_dd_i
+     module procedure to_dd_d
+     module procedure to_dd_dd
+     module procedure to_dd_str
+  end interface
 
-  INTERFACE ASIN
-     MODULE PROCEDURE ddasin
-  END INTERFACE
-  INTERFACE ACOS
-     MODULE PROCEDURE ddacos
-  END INTERFACE
-  INTERFACE ATAN
-     MODULE PROCEDURE ddatan
-  END INTERFACE
-  INTERFACE ATAN2
-     MODULE PROCEDURE ddatan2
-  END INTERFACE
+  interface real
+     module procedure to_real_dd
+  end interface
 
-  INTERFACE EXP
-     MODULE PROCEDURE ddexp
-  END INTERFACE
-  INTERFACE LOG
-     MODULE PROCEDURE ddlog
-  END INTERFACE
+  interface int
+     module procedure to_int_dd
+  end interface
 
-  INTERFACE SQRT
-     MODULE PROCEDURE ddsqrt
-  END INTERFACE
-  INTERFACE SQR
-     MODULE PROCEDURE ddsqr
-  END INTERFACE
-  INTERFACE NROOT
-     MODULE PROCEDURE ddnroot
-  END INTERFACE
+  interface sin
+     module procedure ddsin
+  end interface
+  interface cos
+     module procedure ddcos
+  end interface
+  interface tan
+     module procedure ddtan
+  end interface
+  interface sincos
+     module procedure ddsincos
+  end interface
+  interface ddcssnf
+     module procedure ddcossin
+  end interface
 
-  INTERFACE SINH
-     MODULE PROCEDURE ddsinh
-  END INTERFACE
-  INTERFACE COSH
-     MODULE PROCEDURE ddcosh
-  END INTERFACE
-  INTERFACE TANH
-     MODULE PROCEDURE ddtanh
-  END INTERFACE
-  INTERFACE SINCOSH
-     MODULE PROCEDURE ddsincosh
-  END INTERFACE
-  INTERFACE ddcsshf
-     MODULE PROCEDURE ddcossinh
-  END INTERFACE
+  interface asin
+     module procedure ddasin
+  end interface
+  interface acos
+     module procedure ddacos
+  end interface
+  interface atan
+     module procedure ddatan
+  end interface
+  interface atan2
+     module procedure ddatan2
+  end interface
 
-  INTERFACE ASINH
-     MODULE PROCEDURE ddasinh
-  END INTERFACE
-  INTERFACE ACOSH
-     MODULE PROCEDURE ddacosh
-  END INTERFACE
-  INTERFACE ATANH
-     MODULE PROCEDURE ddatanh
-  END INTERFACE
+  interface exp
+     module procedure ddexp
+  end interface
+  interface log
+     module procedure ddlog
+  end interface
+  interface log10
+     module procedure ddlog10
+  end interface
 
-  INTERFACE AINT
-     MODULE PROCEDURE ddaint
-  END INTERFACE
+  interface sqrt
+     module procedure ddsqrt
+  end interface
+  interface sqr
+     module procedure ddsqr
+  end interface
+  interface nroot
+     module procedure ddnroot
+  end interface
 
-  INTERFACE ANINT
-     MODULE PROCEDURE ddanint
-  END INTERFACE
+  interface sinh
+     module procedure ddsinh
+  end interface
+  interface cosh
+     module procedure ddcosh
+  end interface
+  interface tanh
+     module procedure ddtanh
+  end interface
+  interface sincosh
+     module procedure ddsincosh
+  end interface
+  interface ddcsshf
+     module procedure ddcossinh
+  end interface
 
-  INTERFACE ABS
-     MODULE PROCEDURE ddabs
-  END INTERFACE
+  interface asinh
+     module procedure ddasinh
+  end interface
+  interface acosh
+     module procedure ddacosh
+  end interface
+  interface atanh
+     module procedure ddatanh
+  end interface
 
-  INTERFACE DDRAND
-     MODULE PROCEDURE ddrand
-  END INTERFACE
+  interface aint
+     module procedure ddaint
+  end interface
 
-  INTERFACE OPERATOR (==)
-     MODULE PROCEDURE eq_dd
-     MODULE PROCEDURE eq_dd_d
-     MODULE PROCEDURE eq_d_dd
-  END INTERFACE
+  interface anint
+     module procedure ddanint
+  end interface
 
-  INTERFACE OPERATOR (/=)
-     MODULE PROCEDURE ne_dd
-     MODULE PROCEDURE ne_dd_d
-     MODULE PROCEDURE ne_d_dd
-  END INTERFACE
+  interface nint
+     module procedure ddnint
+  end interface
 
-  INTERFACE OPERATOR (>)
-     MODULE PROCEDURE gt_dd
-     MODULE PROCEDURE gt_dd_d
-     MODULE PROCEDURE gt_d_dd
-  END INTERFACE
+  interface abs
+     module procedure ddabs
+  end interface
 
-  INTERFACE OPERATOR (<)
-     MODULE PROCEDURE lt_dd
-     MODULE PROCEDURE lt_dd_d
-     MODULE PROCEDURE lt_d_dd
-  END INTERFACE
+  interface sign
+     module procedure ddsign
+     module procedure ddsign_dd_d
+  end interface
 
-  INTERFACE OPERATOR (>=)
-     MODULE PROCEDURE ge_dd
-     MODULE PROCEDURE ge_dd_d
-     MODULE PROCEDURE ge_d_dd
-  END INTERFACE
+  interface ddrand
+     module procedure ddrand
+  end interface
 
-  INTERFACE OPERATOR (<=)
-     MODULE PROCEDURE le_dd
-     MODULE PROCEDURE le_dd_d
-     MODULE PROCEDURE le_d_dd
-  END INTERFACE
+  interface operator (==)
+     module procedure eq_dd
+     module procedure eq_dd_d
+     module procedure eq_d_dd
+     module procedure eq_dd_i
+     module procedure eq_i_dd
+  end interface
 
-  INTERFACE ddread
-     MODULE PROCEDURE ddinpq
-  END INTERFACE
+  interface operator (/=)
+     module procedure ne_dd
+     module procedure ne_dd_d
+     module procedure ne_d_dd
+     module procedure ne_dd_i
+     module procedure ne_i_dd
+  end interface
 
-  INTERFACE ddwrite
-     MODULE PROCEDURE ddoutq
-  END INTERFACE
+  interface operator (>)
+     module procedure gt_dd
+     module procedure gt_dd_d
+     module procedure gt_d_dd
+     module procedure gt_dd_i
+     module procedure gt_i_dd
+  end interface
 
-  INTERFACE dble
-     MODULE PROCEDURE dd_to_d
-  END INTERFACE
+  interface operator (<)
+     module procedure lt_dd
+     module procedure lt_dd_d
+     module procedure lt_d_dd
+     module procedure lt_dd_i
+     module procedure lt_i_dd
+  end interface
 
-  INTERFACE min
-     MODULE PROCEDURE ddmin
-     MODULE PROCEDURE ddmin3
-  END INTERFACE
-  INTERFACE max
-     MODULE PROCEDURE ddmax
-     MODULE PROCEDURE ddmax3
-  END INTERFACE
+  interface operator (>=)
+     module procedure ge_dd
+     module procedure ge_dd_d
+     module procedure ge_d_dd
+     module procedure ge_dd_i
+     module procedure ge_i_dd
+  end interface
 
-  INTERFACE ddpi
-     MODULE PROCEDURE dd_pi
-  END INTERFACE
+  interface operator (<=)
+     module procedure le_dd
+     module procedure le_dd_d
+     module procedure le_d_dd
+     module procedure le_dd_i
+     module procedure le_i_dd
+  end interface
 
-CONTAINS
+  interface ddread
+     module procedure ddinpq
+  end interface
+
+  interface ddwrite
+     module procedure ddoutq
+  end interface
+
+  interface dble
+     module procedure dd_to_d
+  end interface
+
+  interface min
+     module procedure ddmin
+     module procedure ddmin2
+  end interface
+  interface max
+     module procedure ddmax
+     module procedure ddmax2
+  end interface
+
+  interface ddpi
+     module procedure dd_pi
+  end interface
+
+  interface huge
+     module procedure ddhuge
+  end interface
+
+  interface tiny
+     module procedure ddtiny
+  end interface
+
+  interface epsilon
+     module procedure ddepsilon
+  end interface
+
+contains
 
 ! Assignments
-  SUBROUTINE assign_dd_str(a, s)
-    TYPE (dd_real), INTENT(INOUT) :: a
-    CHARACTER (LEN=*), INTENT(IN) :: s
+  subroutine assign_dd_str(a, s)
+    type (dd_real), intent(inout) :: a
+    character (len=*), intent(in) :: s
     character*80 t
     t = s
     call ddinpc (t, a%re(1))
-  END SUBROUTINE assign_dd_str
+  end subroutine assign_dd_str
 
-  SUBROUTINE assign_dd_d(a, d)
-    TYPE (dd_real), INTENT(INOUT) :: a
-    REAL*8, INTENT(IN) :: d
+  subroutine assign_dd_d(a, d)
+    type (dd_real), intent(inout) :: a
+    real*8, intent(in) :: d
     a%re(1) = d
     a%re(2) = 0.0d0
-  END SUBROUTINE assign_dd_d
+  end subroutine assign_dd_d
 
-  SUBROUTINE assign_d_dd(d, a)
-    REAL*8, INTENT(INOUT) :: d
-    TYPE (dd_real), INTENT(IN) :: a
+  subroutine assign_d_dd(d, a)
+    real*8, intent(inout) :: d
+    type (dd_real), intent(in) :: a
     d = a%re(1)
-  END SUBROUTINE assign_d_dd
+  end subroutine assign_d_dd
+
+  subroutine assign_dd_i(a, i)
+    type (dd_real), intent(inout) :: a
+    integer, intent(in) :: i
+    a%re(1) = i
+    a%re(2) = 0.0d0
+  end subroutine assign_dd_i
+
+  subroutine assign_i_dd(i, a)
+    integer, intent(inout) :: i
+    type (dd_real), intent(in) :: a
+    i = a%re(1)
+  end subroutine assign_i_dd
+
 
 ! Conversions
-  TYPE (dd_real) FUNCTION to_dd_d(a)
-    REAL*8, INTENT(IN) :: a
+
+  type (dd_real) function to_dd_i(ia)
+    integer, intent(in) :: ia
+    to_dd_i%re(1) = ia
+    to_dd_i%re(2) = 0.d0
+  end function to_dd_i
+
+  type (dd_real) function to_dd_d(a)
+    real*8, intent(in) :: a
     to_dd_d%re(1) = a
     to_dd_d%re(2) = 0.0d0
-  END FUNCTION to_dd_d
+  end function to_dd_d
 
-  REAL*8 FUNCTION to_real_dd(a) 
-    TYPE (dd_real), INTENT(IN) :: a
+  type (dd_real) function to_dd_dd(a)
+    type (dd_real), intent(in) :: a
+    to_dd_dd%re(1) = a%re(1)
+    to_dd_dd%re(2) = a%re(2)
+  end function to_dd_dd
+
+  real*8 function to_real_dd(a) 
+    type (dd_real), intent(in) :: a
     to_real_dd = a%re(1)
-  END FUNCTION to_real_dd
+  end function to_real_dd
 
-  TYPE (dd_real) FUNCTION to_dd_str(s)
-    CHARACTER (LEN=*), INTENT(IN) :: s
+  integer function to_int_dd(a) 
+    type (dd_real), intent(in) :: a
+    to_int_dd = a%re(1)
+  end function to_int_dd
+
+  type (dd_real) function to_dd_str(s)
+    character (len=*), intent(in) :: s
     character*80 t
     t = s
     call ddinpc (t, to_dd_str%re(1))
-  END FUNCTION to_dd_str
+  end function to_dd_str
 
 ! Additions
-  TYPE (dd_real) FUNCTION add_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    CALL f_dd_add(a, b, add_dd)
-  END FUNCTION add_dd
+  type (dd_real) function add_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    call f_dd_add(a, b, add_dd)
+  end function add_dd
 
-  TYPE (dd_real) FUNCTION add_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    CALL f_dd_add_dd_d(a, b, add_dd_d)
-  END FUNCTION add_dd_d
+  type (dd_real) function add_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    call f_dd_add_dd_d(a, b, add_dd_d)
+  end function add_dd_d
 
-  TYPE (dd_real) FUNCTION add_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    CALL f_dd_add_d_dd(a, b, add_d_dd)
-  END FUNCTION add_d_dd
+  type (dd_real) function add_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    call f_dd_add_d_dd(a, b, add_d_dd)
+  end function add_d_dd
+
+  type (dd_real) function add_i_dd(a, b)
+    integer, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    call f_dd_add_d_dd(dble(a), b, add_i_dd)
+  end function add_i_dd
+
+  type (dd_real) function add_dd_i(a, b)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: b
+    call f_dd_add_dd_d(a, dble(b), add_dd_i)
+  end function add_dd_i
 
 ! Subtractions
-  TYPE (dd_real) FUNCTION sub_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    CALL f_dd_sub(a, b, sub_dd)
-  END FUNCTION sub_dd
+  type (dd_real) function sub_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    call f_dd_sub(a, b, sub_dd)
+  end function sub_dd
 
-  TYPE (dd_real) FUNCTION sub_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    CALL f_dd_sub_dd_d(a, b, sub_dd_d)
-  END FUNCTION sub_dd_d
+  type (dd_real) function sub_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    call f_dd_sub_dd_d(a, b, sub_dd_d)
+  end function sub_dd_d
 
-  TYPE (dd_real) FUNCTION sub_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    CALL f_dd_sub_d_dd(a, b, sub_d_dd)
-  END FUNCTION sub_d_dd
+  type (dd_real) function sub_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    call f_dd_sub_d_dd(a, b, sub_d_dd)
+  end function sub_d_dd
 
 ! Unary Minus
-  TYPE (dd_real) FUNCTION neg_dd(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_neg(a, neg_dd)
-  END FUNCTION neg_dd
+  type (dd_real) function neg_dd(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_neg(a, neg_dd)
+  end function neg_dd
 
 
 ! Multiplications
-  TYPE (dd_real) FUNCTION mul_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    CALL f_dd_mul(a, b, mul_dd)
-  END FUNCTION mul_dd
+  type (dd_real) function mul_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    call f_dd_mul(a, b, mul_dd)
+  end function mul_dd
 
-  TYPE (dd_real) FUNCTION mul_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    CALL f_dd_mul_dd_d(a, b, mul_dd_d)
-  END FUNCTION mul_dd_d
+  type (dd_real) function mul_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    call f_dd_mul_dd_d(a, b, mul_dd_d)
+  end function mul_dd_d
 
-  TYPE (dd_real) FUNCTION mul_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    CALL f_dd_mul_d_dd(a, b, mul_d_dd)
-  END FUNCTION mul_d_dd
+  type (dd_real) function mul_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    call f_dd_mul_d_dd(a, b, mul_d_dd)
+  end function mul_d_dd
+
+  type (dd_real) function mul_dd_i(a, b)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: b
+    call f_dd_mul_dd_d(a, dble(b), mul_dd_i)
+  end function mul_dd_i
+
+  type (dd_real) function mul_i_dd(a, b)
+    integer, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    call f_dd_mul_d_dd(dble(a), b, mul_i_dd)
+  end function mul_i_dd
 
 
 ! Divisions
-  TYPE (dd_real) FUNCTION div_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    CALL f_dd_div(a, b, div_dd)
-  END FUNCTION div_dd
+  type (dd_real) function div_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    call f_dd_div(a, b, div_dd)
+  end function div_dd
 
-  TYPE (dd_real) FUNCTION div_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    CALL f_dd_div_dd_d(a, b, div_dd_d)
-  END FUNCTION div_dd_d
+  type (dd_real) function div_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    call f_dd_div_dd_d(a, b, div_dd_d)
+  end function div_dd_d
 
-  TYPE (dd_real) FUNCTION div_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    CALL f_dd_div_d_dd(a, b, div_d_dd)
-  END FUNCTION div_d_dd
+  type (dd_real) function div_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    call f_dd_div_d_dd(a, b, div_d_dd)
+  end function div_d_dd
+
+  type (dd_real) function div_dd_i(a, b)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: b
+    call f_dd_div_dd_d(a, dble(b), div_dd_i)
+  end function div_dd_i
+
+  type (dd_real) function div_i_dd(a, b)
+    integer, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    call f_dd_div_d_dd(dble(a), b, div_i_dd)
+  end function div_i_dd
 
 
 ! Power
-  TYPE (dd_real) FUNCTION pwr_dd (a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    TYPE (dd_real) q1, q2
-    CALL f_dd_log(a, q1)
-    CALL f_dd_mul(q1, b, q2)
-    CALL f_dd_exp(q2, pwr_dd)
-  END FUNCTION pwr_dd
+  type (dd_real) function pwr_dd (a, b)
+    type (dd_real), intent(in) :: a, b
+    type (dd_real) q1, q2
+    call f_dd_log(a, q1)
+    call f_dd_mul(q1, b, q2)
+    call f_dd_exp(q2, pwr_dd)
+  end function pwr_dd
 
-  TYPE (dd_real) FUNCTION pwr_dd_i(a, n)
-    TYPE (dd_real), INTENT(IN) :: a
-    INTEGER, INTENT(IN) :: n
-    CALL f_dd_npwr(a, n, pwr_dd_i)
-  END FUNCTION pwr_dd_i
+  type (dd_real) function pwr_dd_i(a, n)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: n
+    call f_dd_npwr(a, n, pwr_dd_i)
+  end function pwr_dd_i
 
-  TYPE (dd_real) FUNCTION pwr_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    TYPE (dd_real) q1, q2, q3
+  type (dd_real) function pwr_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    type (dd_real) q1, q2, q3
     q1%re(1) = a
     q1%re(2) = 0.d0
-    CALL f_dd_log(q1, q2)
-    CALL f_dd_mul(q2, b, q3)
-    CALL f_dd_exp(q3, pwr_d_dd)
-  END FUNCTION pwr_d_dd
+    call f_dd_log(q1, q2)
+    call f_dd_mul(q2, b, q3)
+    call f_dd_exp(q3, pwr_d_dd)
+  end function pwr_d_dd
 
 ! Trigonometric Functions
-  TYPE (dd_real) FUNCTION ddsin(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_sin(a, ddsin)
-  END FUNCTION ddsin
+  type (dd_real) function ddsin(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_sin(a, ddsin)
+  end function ddsin
 
-  TYPE (dd_real) FUNCTION ddcos(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_cos(a, ddcos)
-  END FUNCTION ddcos
+  type (dd_real) function ddcos(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_cos(a, ddcos)
+  end function ddcos
 
-  TYPE (dd_real) FUNCTION ddtan(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_tan(a, ddtan)
-  END FUNCTION ddtan
+  type (dd_real) function ddtan(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_tan(a, ddtan)
+  end function ddtan
 
-  SUBROUTINE ddsincos(a, s, c)
-    TYPE (dd_real), INTENT(IN) :: a
-    TYPE (dd_real), INTENT(OUT) :: s, c
-    CALL f_dd_sincos(a, s, c)
-  END SUBROUTINE ddsincos
+  subroutine ddsincos(a, s, c)
+    type (dd_real), intent(in) :: a
+    type (dd_real), intent(out) :: s, c
+    call f_dd_sincos(a, s, c)
+  end subroutine ddsincos
 
-  SUBROUTINE ddcossin(a, c, s)
-    TYPE (dd_real), INTENT(IN) :: a
-    TYPE (dd_real), INTENT(OUT) :: s, c
-    CALL f_dd_sincos(a, s, c)
-  END SUBROUTINE ddcossin
+  subroutine ddcossin(a, c, s)
+    type (dd_real), intent(in) :: a
+    type (dd_real), intent(out) :: s, c
+    call f_dd_sincos(a, s, c)
+  end subroutine ddcossin
 
 
 ! Inverse Trigonometric Functions
-  TYPE (dd_real) FUNCTION ddasin(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_asin(a, ddasin)
-  END FUNCTION ddasin
+  type (dd_real) function ddasin(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_asin(a, ddasin)
+  end function ddasin
 
-  TYPE (dd_real) FUNCTION ddacos(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_acos(a, ddacos)
-  END FUNCTION ddacos
+  type (dd_real) function ddacos(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_acos(a, ddacos)
+  end function ddacos
 
-  TYPE (dd_real) FUNCTION ddatan(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_atan(a, ddatan)
-  END FUNCTION ddatan
+  type (dd_real) function ddatan(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_atan(a, ddatan)
+  end function ddatan
 
-  TYPE (dd_real) FUNCTION ddatan2(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    CALL f_dd_atan2(a, b, ddatan2)
-  END FUNCTION ddatan2
+  type (dd_real) function ddatan2(a, b)
+    type (dd_real), intent(in) :: a, b
+    call f_dd_atan2(a, b, ddatan2)
+  end function ddatan2
 
 ! Exponential and Logarithms
-  TYPE (dd_real) FUNCTION ddexp(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_exp(a, ddexp)
-  END FUNCTION ddexp
+  type (dd_real) function ddexp(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_exp(a, ddexp)
+  end function ddexp
 
-  TYPE (dd_real) FUNCTION ddlog(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_log(a, ddlog)
-  END FUNCTION ddlog
+  type (dd_real) function ddlog(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_log(a, ddlog)
+  end function ddlog
 
-  TYPE (dd_real) FUNCTION ddlog10(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_log10(a, ddlog10)
-  END FUNCTION ddlog10
+  type (dd_real) function ddlog10(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_log10(a, ddlog10)
+  end function ddlog10
 
 
 ! SQRT, etc.
-  TYPE (dd_real) FUNCTION ddsqrt(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_sqrt(a, ddsqrt)
-  END FUNCTION ddsqrt
+  type (dd_real) function ddsqrt(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_sqrt(a, ddsqrt)
+  end function ddsqrt
 
-  TYPE (dd_real) FUNCTION ddsqr(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_sqr(a, ddsqr)
-  END FUNCTION ddsqr
+  type (dd_real) function ddsqr(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_sqr(a, ddsqr)
+  end function ddsqr
 
-  TYPE (dd_real) FUNCTION ddnroot(a, n)
-    TYPE (dd_real), INTENT(IN) :: a
-    INTEGER, INTENT(IN) :: n
-    CALL f_dd_nroot(a, n, ddnroot)
-  END FUNCTION ddnroot
+  type (dd_real) function ddnroot(a, n)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: n
+    call f_dd_nroot(a, n, ddnroot)
+  end function ddnroot
 
 
 ! Hyperbolic Functions
-  TYPE (dd_real) FUNCTION ddsinh(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_sinh(a, ddsinh)
-  END FUNCTION ddsinh
+  type (dd_real) function ddsinh(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_sinh(a, ddsinh)
+  end function ddsinh
 
-  TYPE (dd_real) FUNCTION ddcosh(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_cosh(a, ddcosh)
-  END FUNCTION ddcosh
+  type (dd_real) function ddcosh(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_cosh(a, ddcosh)
+  end function ddcosh
 
-  TYPE (dd_real) FUNCTION ddtanh(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_tanh(a, ddtanh)
-  END FUNCTION ddtanh
+  type (dd_real) function ddtanh(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_tanh(a, ddtanh)
+  end function ddtanh
 
-  SUBROUTINE ddsincosh(a, s, c)
-    TYPE (dd_real), INTENT(IN) :: a
-    TYPE (dd_real), INTENT(OUT) :: s, c
-    CALL f_dd_sincosh(a, s, c)
-  END SUBROUTINE ddsincosh
+  subroutine ddsincosh(a, s, c)
+    type (dd_real), intent(in) :: a
+    type (dd_real), intent(out) :: s, c
+    call f_dd_sincosh(a, s, c)
+  end subroutine ddsincosh
 
-  SUBROUTINE ddcossinh(a, c, s)
-    TYPE (dd_real), INTENT(IN) :: a
-    TYPE (dd_real), INTENT(OUT) :: s, c
-    CALL f_dd_sincosh(a, s, c)
-  END SUBROUTINE ddcossinh
+  subroutine ddcossinh(a, c, s)
+    type (dd_real), intent(in) :: a
+    type (dd_real), intent(out) :: s, c
+    call f_dd_sincosh(a, s, c)
+  end subroutine ddcossinh
 
 ! Inverse Hyperbolic Functions
-  TYPE (dd_real) FUNCTION ddasinh(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_asinh(a, ddasinh)
-  END FUNCTION ddasinh
+  type (dd_real) function ddasinh(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_asinh(a, ddasinh)
+  end function ddasinh
 
-  TYPE (dd_real) FUNCTION ddacosh(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_acosh(a, ddacosh)
-  END FUNCTION ddacosh
+  type (dd_real) function ddacosh(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_acosh(a, ddacosh)
+  end function ddacosh
 
-  TYPE (dd_real) FUNCTION ddatanh(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_atanh(a, ddatanh)
-  END FUNCTION ddatanh
+  type (dd_real) function ddatanh(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_atanh(a, ddatanh)
+  end function ddatanh
 
 
 ! Rounding
-  TYPE (dd_real) FUNCTION ddaint(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_aint(a, ddaint)
-  END FUNCTION ddaint
+  type (dd_real) function ddaint(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_aint(a, ddaint)
+  end function ddaint
 
-  TYPE (dd_real) FUNCTION ddanint(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_nint(a, ddanint)
-  END FUNCTION ddanint
+  type (dd_real) function ddanint(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_nint(a, ddanint)
+  end function ddanint
+
+  integer function ddnint(a)
+    type (dd_real), intent(in) :: a
+    ddnint = to_int_dd(ddaint(a));
+  end function ddnint
 
 
 ! Random Number Generator
-  TYPE (dd_real) FUNCTION ddrand()
-    CALL f_dd_rand(ddrand)
-  END FUNCTION ddrand
+  type (dd_real) function ddrand()
+    call f_dd_rand(ddrand)
+  end function ddrand
 
 
 ! Equality
-  LOGICAL FUNCTION eq_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_dd_comp(a, b, r)
-    IF (r == 0) THEN
-       eq_dd = .TRUE.
-    ELSE
-       eq_dd = .FALSE.
-    END IF
-  END FUNCTION eq_dd
+  logical function eq_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    integer :: r
+    call f_dd_comp(a, b, r)
+    if (r == 0) then
+       eq_dd = .true.
+    else
+       eq_dd = .false.
+    end if
+  end function eq_dd
 
-  LOGICAL FUNCTION eq_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_dd_d(a, b, r)
-    IF (r == 0) THEN
-       eq_dd_d = .TRUE.
-    ELSE
-       eq_dd_d = .FALSE.
-    END IF
-  END FUNCTION eq_dd_d
+  logical function eq_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_dd_comp_dd_d(a, b, r)
+    if (r == 0) then
+       eq_dd_d = .true.
+    else
+       eq_dd_d = .false.
+    end if
+  end function eq_dd_d
 
-  LOGICAL FUNCTION eq_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_d_dd(a, b, r)
-    IF (r == 0) THEN
-       eq_d_dd = .TRUE.
-    ELSE
-       eq_d_dd = .FALSE.
-    END IF
-  END FUNCTION eq_d_dd
+  logical function eq_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    integer :: r
+    call f_dd_comp_d_dd(a, b, r)
+    if (r == 0) then
+       eq_d_dd = .true.
+    else
+       eq_d_dd = .false.
+    end if
+  end function eq_d_dd
+
+  logical function eq_dd_i(a, b)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: b
+    eq_dd_i = eq_dd_d(a, dble(b))
+  end function eq_dd_i
+
+  logical function eq_i_dd(a, b)
+    integer, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    eq_i_dd = eq_d_dd(dble(a), b)
+  end function eq_i_dd
 
 
 ! Non-Equality
-  LOGICAL FUNCTION ne_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_dd_comp(a, b, r)
-    IF (r == 0) THEN
-       ne_dd = .FALSE.
-    ELSE
-       ne_dd = .TRUE.
-    END IF
-  END FUNCTION ne_dd
+  logical function ne_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    integer :: r
+    call f_dd_comp(a, b, r)
+    if (r == 0) then
+       ne_dd = .false.
+    else
+       ne_dd = .true.
+    end if
+  end function ne_dd
 
-  LOGICAL FUNCTION ne_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_dd_d(a, b, r)
-    IF (r == 0) THEN
-       ne_dd_d = .FALSE.
-    ELSE
-       ne_dd_d = .TRUE.
-    END IF
-  END FUNCTION ne_dd_d
+  logical function ne_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_dd_comp_dd_d(a, b, r)
+    if (r == 0) then
+       ne_dd_d = .false.
+    else
+       ne_dd_d = .true.
+    end if
+  end function ne_dd_d
 
-  LOGICAL FUNCTION ne_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_d_dd(a, b, r)
-    IF (r == 0) THEN
-       ne_d_dd = .FALSE.
-    ELSE
-       ne_d_dd = .TRUE.
-    END IF
-  END FUNCTION ne_d_dd
+  logical function ne_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    integer :: r
+    call f_dd_comp_d_dd(a, b, r)
+    if (r == 0) then
+       ne_d_dd = .false.
+    else
+       ne_d_dd = .true.
+    end if
+  end function ne_d_dd
+
+  logical function ne_dd_i(a, b)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: b
+    ne_dd_i = ne_dd_d(a, dble(b))
+  end function ne_dd_i
+
+  logical function ne_i_dd(a, b)
+    integer, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    ne_i_dd = ne_d_dd(dble(a), b)
+  end function ne_i_dd
 
 ! Greater-Than
-  LOGICAL FUNCTION gt_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_dd_comp(a, b, r)
-    IF (r == 1) THEN
-       gt_dd = .TRUE.
-    ELSE
-       gt_dd = .FALSE.
-    END IF
-  END FUNCTION gt_dd
+  logical function gt_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    integer :: r
+    call f_dd_comp(a, b, r)
+    if (r == 1) then
+       gt_dd = .true.
+    else
+       gt_dd = .false.
+    end if
+  end function gt_dd
 
-  LOGICAL FUNCTION gt_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_dd_d(a, b, r)
-    IF (r == 1) THEN
-       gt_dd_d = .TRUE.
-    ELSE
-       gt_dd_d = .FALSE.
-    END IF
-  END FUNCTION gt_dd_d
+  logical function gt_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_dd_comp_dd_d(a, b, r)
+    if (r == 1) then
+       gt_dd_d = .true.
+    else
+       gt_dd_d = .false.
+    end if
+  end function gt_dd_d
 
-  LOGICAL FUNCTION gt_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_d_dd(a, b, r)
-    IF (r == 1) THEN
-       gt_d_dd = .TRUE.
-    ELSE
-       gt_d_dd = .FALSE.
-    END IF
-  END FUNCTION gt_d_dd
+  logical function gt_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    integer :: r
+    call f_dd_comp_d_dd(a, b, r)
+    if (r == 1) then
+       gt_d_dd = .true.
+    else
+       gt_d_dd = .false.
+    end if
+  end function gt_d_dd
+
+  logical function gt_dd_i(a, b)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: b
+    gt_dd_i = gt_dd_d(a, dble(b))
+  end function gt_dd_i
+
+  logical function gt_i_dd(a, b)
+    integer, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    gt_i_dd = gt_d_dd(dble(a), b)
+  end function gt_i_dd
 
 
 ! Less-Than
-  LOGICAL FUNCTION lt_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_dd_comp(a, b, r)
-    IF (r == -1) THEN
-       lt_dd = .TRUE.
-    ELSE
-       lt_dd = .FALSE.
-    END IF
-  END FUNCTION lt_dd
+  logical function lt_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    integer :: r
+    call f_dd_comp(a, b, r)
+    if (r == -1) then
+       lt_dd = .true.
+    else
+       lt_dd = .false.
+    end if
+  end function lt_dd
 
-  LOGICAL FUNCTION lt_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_dd_d(a, b, r)
-    IF (r == -1) THEN
-       lt_dd_d = .TRUE.
-    ELSE
-       lt_dd_d = .FALSE.
-    END IF
-  END FUNCTION lt_dd_d
+  logical function lt_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_dd_comp_dd_d(a, b, r)
+    if (r == -1) then
+       lt_dd_d = .true.
+    else
+       lt_dd_d = .false.
+    end if
+  end function lt_dd_d
 
-  LOGICAL FUNCTION lt_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_d_dd(a, b, r)
-    IF (r == -1) THEN
-       lt_d_dd = .TRUE.
-    ELSE
-       lt_d_dd = .FALSE.
-    END IF
-  END FUNCTION lt_d_dd
+  logical function lt_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    integer :: r
+    call f_dd_comp_d_dd(a, b, r)
+    if (r == -1) then
+       lt_d_dd = .true.
+    else
+       lt_d_dd = .false.
+    end if
+  end function lt_d_dd
+
+  logical function lt_dd_i(a, b)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: b
+    lt_dd_i = lt_dd_d(a, dble(b))
+  end function lt_dd_i
+
+  logical function lt_i_dd(a, b)
+    integer, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    lt_i_dd = lt_d_dd(dble(a), b)
+  end function lt_i_dd
 
 ! Greater-Than-Or-Equal-To
-  LOGICAL FUNCTION ge_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_dd_comp(a, b, r)
-    IF (r >= 0) THEN
-       ge_dd = .TRUE.
-    ELSE
-       ge_dd = .FALSE.
-    END IF
-  END FUNCTION ge_dd
+  logical function ge_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    integer :: r
+    call f_dd_comp(a, b, r)
+    if (r >= 0) then
+       ge_dd = .true.
+    else
+       ge_dd = .false.
+    end if
+  end function ge_dd
 
-  LOGICAL FUNCTION ge_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_dd_d(a, b, r)
-    IF (r >= 0) THEN
-       ge_dd_d = .TRUE.
-    ELSE
-       ge_dd_d = .FALSE.
-    END IF
-  END FUNCTION ge_dd_d
+  logical function ge_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_dd_comp_dd_d(a, b, r)
+    if (r >= 0) then
+       ge_dd_d = .true.
+    else
+       ge_dd_d = .false.
+    end if
+  end function ge_dd_d
 
-  LOGICAL FUNCTION ge_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_d_dd(a, b, r)
-    IF (r >= 0) THEN
-       ge_d_dd = .TRUE.
-    ELSE
-       ge_d_dd = .FALSE.
-    END IF
-  END FUNCTION ge_d_dd
+  logical function ge_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    integer :: r
+    call f_dd_comp_d_dd(a, b, r)
+    if (r >= 0) then
+       ge_d_dd = .true.
+    else
+       ge_d_dd = .false.
+    end if
+  end function ge_d_dd
+
+  logical function ge_dd_i(a, b)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: b
+    ge_dd_i = ge_dd_d(a, dble(b))
+  end function ge_dd_i
+
+  logical function ge_i_dd(a, b)
+    integer, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    ge_i_dd = ge_d_dd(dble(a), b)
+  end function ge_i_dd
 
 ! Less-Than-Or-Equal-To
-  LOGICAL FUNCTION le_dd(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_dd_comp(a, b, r)
-    IF (r <= 0) THEN
-       le_dd = .TRUE.
-    ELSE
-       le_dd = .FALSE.
-    END IF
-  END FUNCTION le_dd
+  logical function le_dd(a, b)
+    type (dd_real), intent(in) :: a, b
+    integer :: r
+    call f_dd_comp(a, b, r)
+    if (r <= 0) then
+       le_dd = .true.
+    else
+       le_dd = .false.
+    end if
+  end function le_dd
 
-  LOGICAL FUNCTION le_dd_d(a, b)
-    TYPE (dd_real), INTENT(IN) :: a
-    REAL*8, INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_dd_d(a, b, r)
-    IF (r <= 0) THEN
-       le_dd_d = .TRUE.
-    ELSE
-       le_dd_d = .FALSE.
-    END IF
-  END FUNCTION le_dd_d
+  logical function le_dd_d(a, b)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) :: b
+    integer :: r
+    call f_dd_comp_dd_d(a, b, r)
+    if (r <= 0) then
+       le_dd_d = .true.
+    else
+       le_dd_d = .false.
+    end if
+  end function le_dd_d
 
-  LOGICAL FUNCTION le_d_dd(a, b)
-    REAL*8, INTENT(IN) :: a
-    TYPE (dd_real), INTENT(IN) :: b
-    INTEGER :: r
-    CALL f_dd_comp_d_dd(a, b, r)
-    IF (r <= 0) THEN
-       le_d_dd = .TRUE.
-    ELSE
-       le_d_dd = .FALSE.
-    END IF
-  END FUNCTION le_d_dd
+  logical function le_d_dd(a, b)
+    real*8, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    integer :: r
+    call f_dd_comp_d_dd(a, b, r)
+    if (r <= 0) then
+       le_d_dd = .true.
+    else
+       le_d_dd = .false.
+    end if
+  end function le_d_dd
 
+  logical function le_dd_i(a, b)
+    type (dd_real), intent(in) :: a
+    integer, intent(in) :: b
+    le_dd_i = le_dd_d(a, dble(b))
+  end function le_dd_i
+
+  logical function le_i_dd(a, b)
+    integer, intent(in) :: a
+    type (dd_real), intent(in) :: b
+    le_i_dd = le_d_dd(dble(a), b)
+  end function le_i_dd
 
 ! Absolute Value
-  TYPE (dd_real) FUNCTION ddabs(a)
-    TYPE (dd_real), INTENT(IN) :: a
-    CALL f_dd_abs(a, ddabs)
-  END FUNCTION ddabs
+  type (dd_real) function ddabs(a)
+    type (dd_real), intent(in) :: a
+    call f_dd_abs(a, ddabs)
+  end function ddabs
+
+! Sign transfer
+  type (dd_real) function ddsign(a, b) result (c)
+    type (dd_real), intent(in) :: a, b
+    integer :: r
+    if (b%re(1) .gt. 0.0d0) then
+      c%re(1) = abs(a%re(1))
+      c%re(2) = abs(a%re(2))
+    else
+      c%re(1) = -abs(a%re(1))
+      c%re(2) = -abs(a%re(2))
+    endif
+  end function ddsign
+
+  type (dd_real) function ddsign_dd_d(a, b) result (c)
+    type (dd_real), intent(in) :: a
+    real*8, intent(in) ::  b
+    integer :: r
+    if (b .gt. 0.0d0) then
+      c%re(1) = abs(a%re(1))
+      c%re(2) = abs(a%re(2))
+    else
+      c%re(1) = -abs(a%re(1))
+      c%re(2) = -abs(a%re(2))
+    endif
+  end function ddsign_dd_d
 
 ! Input
-  SUBROUTINE ddinpq(u, q1, q2, q3, q4, q5, q6, q7, q8, q9)
-    INTEGER, INTENT(IN) :: u
-    TYPE (dd_real), INTENT(IN) :: q1
-    TYPE (dd_real), INTENT(IN), OPTIONAL :: q2, q3, q4, q5, q6, q7, q8, q9
+  subroutine ddinpq(u, q1, q2, q3, q4, q5, q6, q7, q8, q9)
+    integer, intent(in) :: u
+    type (dd_real), intent(in) :: q1
+    type (dd_real), intent(in), optional :: q2, q3, q4, q5, q6, q7, q8, q9
 !    CHARACTER (LEN=72) :: str
 
     call ddinp (u, q1%re(1))
 
-    IF (PRESENT(q2)) THEN
+    if (present(q2)) then
       call ddinp (u, q2%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q3)) THEN
+    if (present(q3)) then
       call ddinp (u, q3%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q4)) THEN
+    if (present(q4)) then
       call ddinp (u, q4%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q5)) THEN
+    if (present(q5)) then
       call ddinp (u, q5%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q6)) THEN
+    if (present(q6)) then
       call ddinp (u, q6%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q7)) THEN
+    if (present(q7)) then
       call ddinp (u, q7%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q8)) THEN
+    if (present(q8)) then
       call ddinp (u, q8%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q9)) THEN
+    if (present(q9)) then
       call ddinp (u, q9%re(1))
-   END IF
+   end if
 
-  END SUBROUTINE ddinpq
+  end subroutine ddinpq
 
 ! Output
-  SUBROUTINE ddoutq(u, q1, q2, q3, q4, q5, q6, q7, q8, q9)
-    INTEGER, INTENT(IN) :: u
-    TYPE (dd_real), INTENT(IN) :: q1
-    TYPE (dd_real), INTENT(IN), OPTIONAL :: q2, q3, q4, q5, q6, q7, q8, q9
+  subroutine ddoutq(u, q1, q2, q3, q4, q5, q6, q7, q8, q9)
+    integer, intent(in) :: u
+    type (dd_real), intent(in) :: q1
+    type (dd_real), intent(in), optional :: q2, q3, q4, q5, q6, q7, q8, q9
 !    CHARACTER (LEN=72) :: str
 
     call ddout (u, q1%re(1))
 
-    IF (PRESENT(q2)) THEN
+    if (present(q2)) then
       call ddout (u, q2%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q3)) THEN
+    if (present(q3)) then
       call ddout (u, q3%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q4)) THEN
+    if (present(q4)) then
       call ddout (u, q4%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q5)) THEN
+    if (present(q5)) then
       call ddout (u, q5%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q6)) THEN
+    if (present(q6)) then
       call ddout (u, q6%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q7)) THEN
+    if (present(q7)) then
       call ddout (u, q7%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q8)) THEN
+    if (present(q8)) then
       call ddout (u, q8%re(1))
-    END IF
+    end if
 
-    IF (PRESENT(q9)) THEN
+    if (present(q9)) then
       call ddout (u, q9%re(1))
-   END IF
+   end if
 
-  END SUBROUTINE ddoutq
+  end subroutine ddoutq
 
-  REAL*8 FUNCTION dd_to_d(a)
-    TYPE (dd_real), INTENT(IN) :: a
+  real*8 function dd_to_d(a)
+    type (dd_real), intent(in) :: a
     dd_to_d = a%re(1)
-  END FUNCTION dd_to_d
+  end function dd_to_d
 
-  TYPE (dd_real) FUNCTION ddmin(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_dd_comp(a, b, r)
-    IF (r == 1) THEN
-       ddmin = b
-    ELSE
-       ddmin = a
-    END IF
-  END FUNCTION ddmin
+  type (dd_real) function ddmin2(a, b)
+    type (dd_real), intent(in) :: a, b
+    integer :: r
+    call f_dd_comp(a, b, r)
+    if (r == 1) then
+       ddmin2 = b
+    else
+       ddmin2 = a
+    end if
+  end function ddmin2
 
-  TYPE (dd_real) FUNCTION ddmin3(a, b, c)
-    TYPE (dd_real), INTENT(IN) :: a, b, c
-    INTEGER r
-    CALL f_dd_comp(a, b, r)
-    IF (r == 1) THEN
-       ! b < a.  
-       CALL f_dd_comp(b, c, r)
-       IF (r == 1) THEN
-          ddmin3 = c
-       ELSE
-          ddmin3 = b
-       END IF
-    ELSE
-       ! b > a
-       CALL f_dd_comp(a, c, r)
-       IF (r == 1) THEN 
-          ddmin3 = c
-       ELSE
-          ddmin3 = a
-       END IF
-    END IF
-  END FUNCTION ddmin3
+  type (dd_real) function ddmin(a1, a2, a3, a4, a5, a6, a7, a8, a9)
+    type (dd_real), intent(in) :: a1, a2, a3
+    type (dd_real), intent(in), optional :: a4, a5, a6, a7, a8, a9
+    ddmin = ddmin2(ddmin2(a1, a2), a3)
+    if (present(a4)) ddmin = ddmin2(ddmin, a4)
+    if (present(a5)) ddmin = ddmin2(ddmin, a5)
+    if (present(a6)) ddmin = ddmin2(ddmin, a6)
+    if (present(a7)) ddmin = ddmin2(ddmin, a7)
+    if (present(a8)) ddmin = ddmin2(ddmin, a8)
+    if (present(a9)) ddmin = ddmin2(ddmin, a9)
+  end function ddmin
 
-  TYPE (dd_real) FUNCTION ddmax(a, b)
-    TYPE (dd_real), INTENT(IN) :: a, b
-    INTEGER :: r
-    CALL f_dd_comp(a, b, r)
-    IF (r == -1) THEN
-       ddmax = b
-    ELSE
-       ddmax = a
-    END IF
-  END FUNCTION ddmax
+  type (dd_real) function ddmax2(a, b)
+    type (dd_real), intent(in) :: a, b
+    integer :: r
+    call f_dd_comp(a, b, r)
+    if (r == -1) then
+       ddmax2 = b
+    else
+       ddmax2 = a
+    end if
+  end function ddmax2
 
-  TYPE (dd_real) FUNCTION ddmax3(a, b, c)
-    TYPE (dd_real), INTENT(IN) :: a, b, c
-    INTEGER r
-    CALL f_dd_comp(a, b, r)
-    IF (r == -1) THEN
-       ! b > a.  
-       CALL f_dd_comp(b, c, r)
-       IF (r == -1) THEN
-          ddmax3 = c
-       ELSE
-          ddmax3 = b
-       END IF
-    ELSE
-       ! b < a
-       CALL f_dd_comp(a, c, r)
-       IF (r == -1) THEN 
-          ddmax3 = c
-       ELSE
-          ddmax3 = a
-       END IF
-    END IF
-  END FUNCTION ddmax3
+  type (dd_real) function ddmax(a1, a2, a3, a4, a5, a6, a7, a8, a9)
+    type (dd_real), intent(in) :: a1, a2, a3
+    type (dd_real), intent(in), optional :: a4, a5, a6, a7, a8, a9
+    ddmax = ddmax2(ddmax2(a1, a2), a3)
+    if (present(a4)) ddmax = ddmax2(ddmax, a4)
+    if (present(a5)) ddmax = ddmax2(ddmax, a5)
+    if (present(a6)) ddmax = ddmax2(ddmax, a6)
+    if (present(a7)) ddmax = ddmax2(ddmax, a7)
+    if (present(a8)) ddmax = ddmax2(ddmax, a8)
+    if (present(a9)) ddmax = ddmax2(ddmax, a9)
+  end function ddmax
 
-  TYPE (dd_real) FUNCTION dd_pi()
-    CALL f_dd_pi(dd_pi)
-  END FUNCTION dd_pi
+  type (dd_real) function dd_pi()
+    call f_dd_pi(dd_pi)
+  end function dd_pi
 
 subroutine ddinp (iu, a)
 
@@ -919,7 +1126,7 @@ call ddinpc (cs, a)
 goto 110
 
 100 write (6, 1)
-1  format ('*** DDINP: End-of-file encountered.')
+1  format ('*** ddinp: End-of-file encountered.')
 ! call ddabrt
 stop
 
@@ -931,7 +1138,7 @@ subroutine ddinpc (a, b)
 !   Converts the CHARACTER*80 array A into the DD number B.
 
 implicit none
-integer i, ib, id, ie, inz, ip, is, ix, k, ln, lnn
+integer i, ib, id, ie, inz, ip, is, ix, k, ln, lnn, beg
 parameter (ln = 80)
 real*8 bi
 character*80 a
@@ -948,20 +1155,29 @@ inz = 0
 s1(1) = 0.d0
 s1(2) = 0.d0
 
-do i = 80, 1, -1
-  if (a(i:i) /= ' ') goto 90
-enddo
+do i = 1, 80
+  if (a(i:i) /= ' ') then
+    beg = i
+    goto 80
+  end if
+end do
+80 continue
 
+do i = beg, 80
+  if (a(i:i) == ' ') then
+    lnn = i-1
+    goto 90
+  end if
+ enddo
+
+lnn = 80
 90 continue
-
-lnn = i
 
 !   Scan for digits, looking for the period also.
 
-do i = 1, lnn
+do i = beg, lnn
   ai = a(i:i)
-  if (ai .eq. ' ' .and. id == 0) then
-  elseif (ai .eq. '.') then
+  if (ai .eq. '.') then
     if (ip >= 0) goto 210
     ip = id
     inz = 1
@@ -1034,7 +1250,7 @@ call f_dd_mul (s1, s2, b)
 goto 220
 
 210  write (6, 1)
-1 format ('*** DDINPC: Syntax error in literal string.')
+1 format ('*** ddinpc: Syntax error in literal string.')
 ! call ddabrt
 stop
 
@@ -1275,6 +1491,21 @@ end subroutine
     return
   end function
 
-END MODULE ddmodule
+type (dd_real) function ddhuge(a) 
+  type (dd_real), intent(in) :: a
+  ddhuge = dd_huge
+end function ddhuge
+
+type (dd_real) function ddtiny(a) 
+  type (dd_real), intent(in) :: a
+  ddtiny = dd_tiny
+end function ddtiny
+
+type (dd_real) function ddepsilon(a) 
+  type (dd_real), intent(in) :: a
+  ddepsilon = dd_eps
+end function ddepsilon
+
+end module ddmodule
 
 

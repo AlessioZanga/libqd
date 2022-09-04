@@ -19,7 +19,38 @@
 
 #include <cmath>
 
+#if defined(_MSC_VER) && (_MSC_VER <= 1200)
+/* For some reason VC++ 6.0 doesn't include these in std namespace */
+#define _QD_STD_FLOOR(x)     floor(x)
+#define _QD_STD_CEIL(x)      ceil(x)
+#define _QD_STD_SINH(x)      sinh(x)
+#define _QD_STD_COSH(x)      cosh(x)
+#define _QD_STD_ABS(x)       fabs(x)
+#define _QD_STD_LDEXP(x, y)  ldexp(x, y)
+#define _QD_STD_SQRT(x)      sqrt(x)
+#define _QD_STD_EXP(x)       exp(x)
+#define _QD_STD_LOG(x)       log(x)
+#define _QD_STD_LOG10(x)     log10(x)
+#define _QD_STD_ATAN2(x, y)  atan2(x, y)
+#define _QD_STD_POW(x, y)    pow(x, y)
+#else
+#define _QD_STD_FLOOR(x)     std::floor(x)
+#define _QD_STD_CEIL(x)      std::ceil(x)
+#define _QD_STD_SINH(x)      std::sinh(x)
+#define _QD_STD_COSH(x)      std::cosh(x)
+#define _QD_STD_ABS(x)       std::abs(x)
+#define _QD_STD_LDEXP(x, y)  std::ldexp(x, y)
+#define _QD_STD_SQRT(x)      std::sqrt(x)
+#define _QD_STD_EXP(x)       std::exp(x)
+#define _QD_STD_LOG(x)       std::log(x)
+#define _QD_STD_LOG10(x)     std::log10(x)
+#define _QD_STD_ATAN2(x, y)  std::atan2(x, y)
+#define _QD_STD_POW(x, y)    std::pow(x, y)
+#endif
+
 namespace qd {
+
+static const double _d_nan = 0.0 / 0.0;
 
 /*********** Basic Functions ************/
 /* Computes fl(a+b) and err(a+b).  Assumes |a| >= |b|. */
@@ -95,21 +126,21 @@ inline double two_sqr(double a, double &err) {
 
 /* Computes the nearest integer to d. */
 inline double nint(double d) {
-  if (d == std::floor(d))
+  if (d == _QD_STD_FLOOR(d))
     return d;
-  return std::floor(d + 0.5);
+  return _QD_STD_FLOOR(d + 0.5);
 }
 
 /* Computes the truncated integer. */
 inline double aint(double d) {
-  return (d >= 0.0) ? std::floor(d) : std::ceil(d);
+  return (d >= 0.0) ? _QD_STD_FLOOR(d) : _QD_STD_CEIL(d);
 }
 
 /* These are provided to give consistent 
    interface for double with double-double and quad-double. */
 inline void sincosh(double t, double &sinh_t, double &cosh_t) {
-  sinh_t = std::sinh(t);
-  cosh_t = std::cosh(t);
+  sinh_t = _QD_STD_SINH(t);
+  cosh_t = _QD_STD_COSH(t);
 }
 
 inline double sqr(double t) {

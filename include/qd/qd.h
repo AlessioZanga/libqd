@@ -24,6 +24,7 @@
 #define _QD_QD_H
 
 #include <iostream>
+#include <string>
 #include <qd/qd_config.h>
 #include <qd/dd.h>
 
@@ -67,8 +68,10 @@ public:
   static const qd_real _e;
   static const qd_real _log2;
   static const qd_real _log10;
+  static const qd_real _nan;
 
   static const double _eps;      /* = 2^-212. */
+  static const int _ndigits;     /* = 64.     */
 
   /* Constructors */
   qd_real();
@@ -80,7 +83,7 @@ public:
   /* Member Access */
   double operator[](int i) const;
 
-  static void abort();
+  static void abort(const char *msg);
 
   /* Addition */
   friend qd_real operator+(const qd_real &a, const qd_real &b);
@@ -134,6 +137,7 @@ public:
   friend qd_real sqr(const qd_real &a);
   friend qd_real sqrt(const qd_real &a);
   friend qd_real pow(const qd_real &a, int n);
+  friend qd_real pow(const qd_real &a, const qd_real &b);
   friend qd_real npwr(const qd_real &a, int n);
   qd_real operator^(int n) const;
   friend qd_real nroot(const qd_real &a, int n);
@@ -266,7 +270,14 @@ public:
   friend std::ostream &operator<<(std::ostream &s, const qd_real &a);
   friend std::istream &operator>>(std::istream &s, qd_real &a);
   
-  void write(char *s, int d = 64) const;  /* Note: s must hold d+8 chars. */
+  void to_digits(char *s, int &expn, int precision = _ndigits) const;
+  void write(char *s, int precision = _ndigits, 
+      bool showpos = false, bool uppercase = false) const;  
+      /* Note: s must hold d+8 chars. */
+  std::string write(int precision = _ndigits, int width = 0, 
+      std::ios_base::fmtflags floatfield = (std::ios_base::fmtflags) 0, 
+      std::ios_base::fmtflags adjustfield = (std::ios_base::fmtflags) 0, 
+      bool showpos = false, bool uppercase = false, char fill = ' ') const;
   static int read(const char *s, qd_real &a);
 
 #ifdef QD_DEBUG
