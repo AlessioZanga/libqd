@@ -438,8 +438,8 @@ string qd_real::to_string(int precision, int width, ios_base::fmtflags fmt,
           for (i = 1; i <= precision; i++)
             s += t[i];
 
-          delete [] t;
         }
+		delete [] t;
       }
     }
 
