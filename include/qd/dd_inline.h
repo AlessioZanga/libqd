@@ -32,38 +32,43 @@ inline dd_real dd_real::add(double a, double b) {
 /* double-double + double */
 inline dd_real operator+(const dd_real &a, double b) {
   double s1, s2;
-  s1 = qd::two_sum(a.hi, b, s2);
-  s2 += a.lo;
+  s1 = qd::two_sum(a.x[0], b, s2);
+  s2 += a.x[1];
   s1 = qd::quick_two_sum(s1, s2, s2);
   return dd_real(s1, s2);
 }
 
 /* double-double + double-double */
-inline dd_real operator+(const dd_real &a, const dd_real &b) {
-#ifndef QD_IEEE_ADD
-
-  /* This is the less accurate version ... obeys Cray-style
-     error bound. */
-  double s, e;
-
-  s = qd::two_sum(a.hi, b.hi, e);
-  e += a.lo;
-  e += b.lo;
-  s = qd::quick_two_sum(s, e, e);
-  return dd_real(s, e);
-#else
-
+inline dd_real dd_real::ieee_add(const dd_real &a, const dd_real &b) {
   /* This one satisfies IEEE style error bound, 
      due to K. Briggs and W. Kahan.                   */
   double s1, s2, t1, t2;
 
-  s1 = qd::two_sum(a.hi, b.hi, s2);
-  t1 = qd::two_sum(a.lo, b.lo, t2);
+  s1 = qd::two_sum(a.x[0], b.x[0], s2);
+  t1 = qd::two_sum(a.x[1], b.x[1], t2);
   s2 += t1;
   s1 = qd::quick_two_sum(s1, s2, s2);
   s2 += t2;
   s1 = qd::quick_two_sum(s1, s2, s2);
   return dd_real(s1, s2);
+}
+
+inline dd_real dd_real::sloppy_add(const dd_real &a, const dd_real &b) {
+  /* This is the less accurate version ... obeys Cray-style
+     error bound. */
+  double s, e;
+
+  s = qd::two_sum(a.x[0], b.x[0], e);
+  e += (a.x[1] + b.x[1]);
+  s = qd::quick_two_sum(s, e, e);
+  return dd_real(s, e);
+}
+
+inline dd_real operator+(const dd_real &a, const dd_real &b) {
+#ifndef QD_IEEE_ADD
+  return dd_real::sloppy_add(a, b);
+#else
+  return dd_real::ieee_add(a, b);
 #endif
 }
 
@@ -77,9 +82,9 @@ inline dd_real operator+(double a, const dd_real &b) {
 /* double-double += double */
 inline dd_real &dd_real::operator+=(double a) {
   double s1, s2;
-  s1 = qd::two_sum(hi, a, s2);
-  s2 += lo;
-  hi = qd::quick_two_sum(s1, s2, lo);
+  s1 = qd::two_sum(x[0], a, s2);
+  s2 += x[1];
+  x[0] = qd::quick_two_sum(s1, s2, x[1]);
   return *this;
 }
 
@@ -87,19 +92,19 @@ inline dd_real &dd_real::operator+=(double a) {
 inline dd_real &dd_real::operator+=(const dd_real &a) {
 #ifndef QD_IEEE_ADD
   double s, e;
-  s = qd::two_sum(hi, a.hi, e);
-  e += lo;
-  e += a.lo;
-  hi = qd::quick_two_sum(s, e, lo);
+  s = qd::two_sum(x[0], a.x[0], e);
+  e += x[1];
+  e += a.x[1];
+  x[0] = qd::quick_two_sum(s, e, x[1]);
   return *this;
 #else
   double s1, s2, t1, t2;
-  s1 = qd::two_sum(hi, a.hi, s2);
-  t1 = qd::two_sum(lo, a.lo, t2);
+  s1 = qd::two_sum(x[0], a.x[0], s2);
+  t1 = qd::two_sum(x[1], a.x[1], t2);
   s2 += t1;
   s1 = qd::quick_two_sum(s1, s2, s2);
   s2 += t2;
-  hi = qd::quick_two_sum(s1, s2, lo);
+  x[0] = qd::quick_two_sum(s1, s2, x[1]);
   return *this;
 #endif
 }
@@ -115,8 +120,8 @@ inline dd_real dd_real::sub(double a, double b) {
 /* double-double - double */
 inline dd_real operator-(const dd_real &a, double b) {
   double s1, s2;
-  s1 = qd::two_diff(a.hi, b, s2);
-  s2 += a.lo;
+  s1 = qd::two_diff(a.x[0], b, s2);
+  s2 += a.x[1];
   s1 = qd::quick_two_sum(s1, s2, s2);
   return dd_real(s1, s2);
 }
@@ -125,15 +130,15 @@ inline dd_real operator-(const dd_real &a, double b) {
 inline dd_real operator-(const dd_real &a, const dd_real &b) {
 #ifndef QD_IEEE_ADD
   double s, e;
-  s = qd::two_diff(a.hi, b.hi, e);
-  e += a.lo;
-  e -= b.lo;
+  s = qd::two_diff(a.x[0], b.x[0], e);
+  e += a.x[1];
+  e -= b.x[1];
   s = qd::quick_two_sum(s, e, e);
   return dd_real(s, e);
 #else
   double s1, s2, t1, t2;
-  s1 = qd::two_diff(a.hi, b.hi, s2);
-  t1 = qd::two_diff(a.lo, b.lo, t2);
+  s1 = qd::two_diff(a.x[0], b.x[0], s2);
+  t1 = qd::two_diff(a.x[1], b.x[1], t2);
   s2 += t1;
   s1 = qd::quick_two_sum(s1, s2, s2);
   s2 += t2;
@@ -145,8 +150,8 @@ inline dd_real operator-(const dd_real &a, const dd_real &b) {
 /* double - double-double */
 inline dd_real operator-(double a, const dd_real &b) {
   double s1, s2;
-  s1 = qd::two_diff(a, b.hi, s2);
-  s2 -= b.lo;
+  s1 = qd::two_diff(a, b.x[0], s2);
+  s2 -= b.x[1];
   s1 = qd::quick_two_sum(s1, s2, s2);
   return dd_real(s1, s2);
 }
@@ -155,9 +160,9 @@ inline dd_real operator-(double a, const dd_real &b) {
 /* double-double -= double */
 inline dd_real &dd_real::operator-=(double a) {
   double s1, s2;
-  s1 = qd::two_diff(hi, a, s2);
-  s2 += lo;
-  hi = qd::quick_two_sum(s1, s2, lo);
+  s1 = qd::two_diff(x[0], a, s2);
+  s2 += x[1];
+  x[0] = qd::quick_two_sum(s1, s2, x[1]);
   return *this;
 }
 
@@ -165,26 +170,26 @@ inline dd_real &dd_real::operator-=(double a) {
 inline dd_real &dd_real::operator-=(const dd_real &a) {
 #ifndef QD_IEEE_ADD
   double s, e;
-  s = qd::two_diff(hi, a.hi, e);
-  e += lo;
-  e -= a.lo;
-  hi = qd::quick_two_sum(s, e, lo);
+  s = qd::two_diff(x[0], a.x[0], e);
+  e += x[1];
+  e -= a.x[1];
+  x[0] = qd::quick_two_sum(s, e, x[1]);
   return *this;
 #else
   double s1, s2, t1, t2;
-  s1 = qd::two_diff(hi, a.hi, s2);
-  t1 = qd::two_diff(lo, a.lo, t2);
+  s1 = qd::two_diff(x[0], a.x[0], s2);
+  t1 = qd::two_diff(x[1], a.x[1], t2);
   s2 += t1;
   s1 = qd::quick_two_sum(s1, s2, s2);
   s2 += t2;
-  hi = qd::quick_two_sum(s1, s2, lo);
+  x[0] = qd::quick_two_sum(s1, s2, x[1]);
   return *this;
 #endif
 }
 
 /*********** Unary Minus ***********/
 inline dd_real dd_real::operator-() const {
-  return dd_real(-hi, -lo);
+  return dd_real(-x[0], -x[1]);
 }
 
 /*********** Multiplications ************/
@@ -197,20 +202,20 @@ inline dd_real dd_real::mul(double a, double b) {
 
 /* double-double * (2.0 ^ exp) */
 inline dd_real ldexp(const dd_real &a, int exp) {
-  return dd_real(_QD_STD_LDEXP(a.hi, exp), _QD_STD_LDEXP(a.lo, exp));
+  return dd_real(std::ldexp(a.x[0], exp), std::ldexp(a.x[1], exp));
 }
 
 /* double-double * double,  where double is a power of 2. */
 inline dd_real mul_pwr2(const dd_real &a, double b) {
-  return dd_real(a.hi * b, a.lo * b);
+  return dd_real(a.x[0] * b, a.x[1] * b);
 }
 
 /* double-double * double */
 inline dd_real operator*(const dd_real &a, double b) {
   double p1, p2;
 
-  p1 = qd::two_prod(a.hi, b, p2);
-  p2 += (a.lo * b);
+  p1 = qd::two_prod(a.x[0], b, p2);
+  p2 += (a.x[1] * b);
   p1 = qd::quick_two_sum(p1, p2, p2);
   return dd_real(p1, p2);
 }
@@ -219,9 +224,8 @@ inline dd_real operator*(const dd_real &a, double b) {
 inline dd_real operator*(const dd_real &a, const dd_real &b) {
   double p1, p2;
 
-  p1 = qd::two_prod(a.hi, b.hi, p2);
-  p2 += a.hi * b.lo;
-  p2 += a.lo * b.hi;
+  p1 = qd::two_prod(a.x[0], b.x[0], p2);
+  p2 += (a.x[0] * b.x[1] + a.x[1] * b.x[0]);
   p1 = qd::quick_two_sum(p1, p2, p2);
   return dd_real(p1, p2);
 }
@@ -235,19 +239,19 @@ inline dd_real operator*(double a, const dd_real &b) {
 /* double-double *= double */
 inline dd_real &dd_real::operator*=(double a) {
   double p1, p2;
-  p1 = qd::two_prod(hi, a, p2);
-  p2 += lo * a;
-  hi = qd::quick_two_sum(p1, p2, lo);
+  p1 = qd::two_prod(x[0], a, p2);
+  p2 += x[1] * a;
+  x[0] = qd::quick_two_sum(p1, p2, x[1]);
   return *this;
 }
 
 /* double-double *= double-double */
 inline dd_real &dd_real::operator*=(const dd_real &a) {
   double p1, p2;
-  p1 = qd::two_prod(hi, a.hi, p2);
-  p2 += a.lo * hi;
-  p2 += a.hi * lo;
-  hi = qd::quick_two_sum(p1, p2, lo);
+  p1 = qd::two_prod(x[0], a.x[0], p2);
+  p2 += a.x[1] * x[0];
+  p2 += a.x[0] * x[1];
+  x[0] = qd::quick_two_sum(p1, p2, x[1]);
   return *this;
 }
 
@@ -280,57 +284,68 @@ inline dd_real operator/(const dd_real &a, double b) {
   double s, e;
   dd_real r;
   
-  q1 = a.hi / b;   /* approximate quotient. */
+  q1 = a.x[0] / b;   /* approximate quotient. */
 
   /* Compute  this - q1 * d */
   p1 = qd::two_prod(q1, b, p2);
-  s = qd::two_diff(a.hi, p1, e);
-  e += a.lo;
+  s = qd::two_diff(a.x[0], p1, e);
+  e += a.x[1];
   e -= p2;
   
   /* get next approximation. */
   q2 = (s + e) / b;
 
   /* renormalize */
-  r.hi = qd::quick_two_sum(q1, q2, r.lo);
+  r.x[0] = qd::quick_two_sum(q1, q2, r.x[1]);
 
+  return r;
+}
+
+inline dd_real dd_real::sloppy_div(const dd_real &a, const dd_real &b) {
+  double s1, s2;
+  double q1, q2;
+  dd_real r;
+
+  q1 = a.x[0] / b.x[0];  /* approximate quotient */
+
+  /* compute  this - q1 * dd */
+  r = b * q1;
+  s1 = qd::two_diff(a.x[0], r.x[0], s2);
+  s2 -= r.x[1];
+  s2 += a.x[1];
+
+  /* get next approximation */
+  q2 = (s1 + s2) / b.x[0];
+
+  /* renormalize */
+  r.x[0] = qd::quick_two_sum(q1, q2, r.x[1]);
+  return r;
+}
+
+inline dd_real dd_real::accurate_div(const dd_real &a, const dd_real &b) {
+  double q1, q2, q3;
+  dd_real r;
+
+  q1 = a.x[0] / b.x[0];  /* approximate quotient */
+
+  r = a - q1 * b;
+  
+  q2 = r.x[0] / b.x[0];
+  r -= (q2 * b);
+
+  q3 = r.x[0] / b.x[0];
+
+  q1 = qd::quick_two_sum(q1, q2, q2);
+  r = dd_real(q1, q2) + q3;
   return r;
 }
 
 /* double-double / double-double */
 inline dd_real operator/(const dd_real &a, const dd_real &b) {
-  double q1, q2;
-  dd_real r;
-
-  q1 = a.hi / b.hi;  /* approximate quotient */
-
 #ifdef QD_SLOPPY_DIV
-  double s1, s2;
-
-  /* compute  this - q1 * dd */
-  r = b * q1;
-  s1 = qd::two_diff(a.hi, r.hi, s2);
-  s2 -= r.lo;
-  s2 += a.lo;
-
-  /* get next approximation */
-  q2 = (s1 + s2) / b.hi;
-
-  /* renormalize */
-  r.hi = qd::quick_two_sum(q1, q2, r.lo);
-  return r;
+  return dd_real::sloppy_div(a, b);
 #else
-  double q3;
-  r = a - q1 * b;
-  
-  q2 = r.hi / b.hi;
-  r -= (q2 * b);
-
-  q3 = r.hi / b.hi;
-
-  q1 = qd::quick_two_sum(q1, q2, q2);
-  r = dd_real(q1, q2) + q3;
-  return r;
+  return dd_real::accurate_div(a, b);
 #endif
 }
 
@@ -372,9 +387,9 @@ inline dd_real divrem(const dd_real &a, const dd_real &b, dd_real &r) {
 inline dd_real sqr(const dd_real &a) {
   double p1, p2;
   double s1, s2;
-  p1 = qd::two_sqr(a.hi, p2);
-  p2 += 2.0 * a.hi * a.lo;
-  p2 += a.lo * a.lo;
+  p1 = qd::two_sqr(a.x[0], p2);
+  p2 += 2.0 * a.x[0] * a.x[1];
+  p2 += a.x[1] * a.x[1];
   s1 = qd::quick_two_sum(p1, p2, s2);
   return dd_real(s1, s2);
 }
@@ -395,68 +410,68 @@ inline dd_real dd_real::operator^(int n) {
 /*********** Assignments ************/
 /* double-double = double */
 inline dd_real &dd_real::operator=(double a) {
-  hi = a;
-  lo = 0.0;
+  x[0] = a;
+  x[1] = 0.0;
   return *this;
 }
 
 /*********** Equality Comparisons ************/
 /* double-double == double */
 inline bool operator==(const dd_real &a, double b) {
-  return (a.hi == b && a.lo == 0.0);
+  return (a.x[0] == b && a.x[1] == 0.0);
 }
 
 /* double-double == double-double */
 inline bool operator==(const dd_real &a, const dd_real &b) {
-  return (a.hi == b.hi && a.lo == b.lo);
+  return (a.x[0] == b.x[0] && a.x[1] == b.x[1]);
 }
 
 /* double == double-double */
 inline bool operator==(double a, const dd_real &b) {
-  return (a == b.hi && b.lo == 0.0);
+  return (a == b.x[0] && b.x[1] == 0.0);
 }
 
 /*********** Greater-Than Comparisons ************/
 /* double-double > double */
 inline bool operator>(const dd_real &a, double b) {
-  return (a.hi > b || (a.hi == b && a.lo > 0.0));
+  return (a.x[0] > b || (a.x[0] == b && a.x[1] > 0.0));
 }
 
 /* double-double > double-double */
 inline bool operator>(const dd_real &a, const dd_real &b) {
-  return (a.hi > b.hi || (a.hi == b.hi && a.lo > b.lo));
+  return (a.x[0] > b.x[0] || (a.x[0] == b.x[0] && a.x[1] > b.x[1]));
 }
 
 /* double > double-double */
 inline bool operator>(double a, const dd_real &b) {
-  return (a > b.hi || (a == b.hi && b.lo < 0.0));
+  return (a > b.x[0] || (a == b.x[0] && b.x[1] < 0.0));
 }
 
 /*********** Less-Than Comparisons ************/
 /* double-double < double */
 inline bool operator<(const dd_real &a, double b) {
-  return (a.hi < b || (a.hi == b && a.lo < 0.0));
+  return (a.x[0] < b || (a.x[0] == b && a.x[1] < 0.0));
 }
 
 /* double-double < double-double */
 inline bool operator<(const dd_real &a, const dd_real &b) {
-  return (a.hi < b.hi || (a.hi == b.hi && a.lo < b.lo));
+  return (a.x[0] < b.x[0] || (a.x[0] == b.x[0] && a.x[1] < b.x[1]));
 }
 
 /* double < double-double */
 inline bool operator<(double a, const dd_real &b) {
-  return (a < b.hi || (a == b.hi && b.lo > 0.0));
+  return (a < b.x[0] || (a == b.x[0] && b.x[1] > 0.0));
 }
 
 /*********** Greater-Than-Or-Equal-To Comparisons ************/
 /* double-double >= double */
 inline bool operator>=(const dd_real &a, double b) {
-  return (a.hi > b || (a.hi == b && a.lo >= 0.0));
+  return (a.x[0] > b || (a.x[0] == b && a.x[1] >= 0.0));
 }
 
 /* double-double >= double-double */
 inline bool operator>=(const dd_real &a, const dd_real &b) {
-  return (a.hi > b.hi || (a.hi == b.hi && a.lo >= b.lo));
+  return (a.x[0] > b.x[0] || (a.x[0] == b.x[0] && a.x[1] >= b.x[1]));
 }
 
 /* double >= double-double */
@@ -467,12 +482,12 @@ inline bool operator>=(double a, const dd_real &b) {
 /*********** Less-Than-Or-Equal-To Comparisons ************/
 /* double-double <= double */
 inline bool operator<=(const dd_real &a, double b) {
-  return (a.hi < b || (a.hi == b && a.lo <= 0.0));
+  return (a.x[0] < b || (a.x[0] == b && a.x[1] <= 0.0));
 }
 
 /* double-double <= double-double */
 inline bool operator<=(const dd_real &a, const dd_real &b) {
-  return (a.hi < b.hi || (a.hi == b.hi && a.lo <= b.lo));
+  return (a.x[0] < b.x[0] || (a.x[0] == b.x[0] && a.x[1] <= b.x[1]));
 }
 
 /* double <= double-double */
@@ -483,43 +498,43 @@ inline bool operator<=(double a, const dd_real &b) {
 /*********** Not-Equal-To Comparisons ************/
 /* double-double != double */
 inline bool operator!=(const dd_real &a, double b) {
-  return (a.hi != b || a.lo != 0.0);
+  return (a.x[0] != b || a.x[1] != 0.0);
 }
 
 /* double-double != double-double */
 inline bool operator!=(const dd_real &a, const dd_real &b) {
-  return (a.hi != b.hi || a.lo != b.lo);
+  return (a.x[0] != b.x[0] || a.x[1] != b.x[1]);
 }
 
 /* double != double-double */
 inline bool operator!=(double a, const dd_real &b) {
-  return (a != b.hi || b.lo != 0.0);
+  return (a != b.x[0] || b.x[1] != 0.0);
 }
 
 /*********** Micellaneous ************/
 /*  this == 0 */
 inline bool dd_real::is_zero() const {
-  return (hi == 0.0);
+  return (x[0] == 0.0);
 }
 
 /*  this == 1 */
 inline bool dd_real::is_one() const {
-  return (hi == 1.0 && lo == 0.0);
+  return (x[0] == 1.0 && x[1] == 0.0);
 }
 
 /*  this > 0 */
 inline bool dd_real::is_positive() const {
-  return (hi > 0.0);
+  return (x[0] > 0.0);
 }
 
 /* this < 0 */
 inline bool dd_real::is_negative() const {
-  return (hi < 0.0);
+  return (x[0] < 0.0);
 }
 
 /* Absolute value */
 inline dd_real abs(const dd_real &a) {
-  return (a.hi < 0.0) ? -a : a;
+  return (a.x[0] < 0.0) ? -a : a;
 }
 
 inline dd_real fabs(const dd_real &a) {
@@ -528,19 +543,19 @@ inline dd_real fabs(const dd_real &a) {
 
 /* Round to Nearest integer */
 inline dd_real nint(const dd_real &a) {
-  double hi = qd::nint(a.hi);
+  double hi = qd::nint(a.x[0]);
   double lo;
 
-  if (hi == a.hi) {
+  if (hi == a.x[0]) {
     /* High word is an integer already.  Round the low word.*/
-    lo = qd::nint(a.lo);
+    lo = qd::nint(a.x[1]);
     
-    /* Renormalize. This is needed if hi = some integer, lo = 1/2.*/
+    /* Renormalize. This is needed if x[0] = some integer, x[1] = 1/2.*/
     hi = qd::quick_two_sum(hi, lo, lo);
   } else {
     /* High word is not an integer. */
     lo = 0.0;
-    if (_QD_STD_ABS(hi-a.hi) == 0.5 && a.lo < 0.0) {
+    if (std::abs(hi-a.x[0]) == 0.5 && a.x[1] < 0.0) {
       /* There is a tie in the high word, consult the low word 
          to break the tie. */
       hi -= 1.0;      /* NOTE: This does not cause INEXACT. */
@@ -551,12 +566,12 @@ inline dd_real nint(const dd_real &a) {
 }
 
 inline dd_real floor(const dd_real &a) {
-  double hi = floor(a.hi);
+  double hi = std::floor(a.x[0]);
   double lo = 0.0;
 
-  if (hi == a.hi) {
+  if (hi == a.x[0]) {
     /* High word is integer already.  Round the low word. */
-    lo = floor(a.lo);
+    lo = std::floor(a.x[1]);
     hi = qd::quick_two_sum(hi, lo, lo);
   }
 
@@ -564,12 +579,12 @@ inline dd_real floor(const dd_real &a) {
 }
 
 inline dd_real ceil(const dd_real &a) {
-  double hi = ceil(a.hi);
+  double hi = std::ceil(a.x[0]);
   double lo = 0.0;
 
-  if (hi == a.hi) {
+  if (hi == a.x[0]) {
     /* High word is integer already.  Round the low word. */
-    lo = ceil(a.lo);
+    lo = std::ceil(a.x[1]);
     hi = qd::quick_two_sum(hi, lo, lo);
   }
 
@@ -577,17 +592,17 @@ inline dd_real ceil(const dd_real &a) {
 }
 
 inline dd_real aint(const dd_real &a) {
-  return (a.hi >= 0.0) ? floor(a) : ceil(a);
+  return (a.x[0] >= 0.0) ? floor(a) : ceil(a);
 }
 
 /* Cast to double. */
-inline dd_real::operator double() const {
-  return hi;
+inline double to_double(const dd_real &a) {
+  return a.x[0];
 }
 
 /* Cast to int. */
-inline dd_real::operator int() const {
-  return (int) hi;
+inline int to_int(const dd_real &a) {
+  return static_cast<int>(a.x[0]);
 }
 
 /* Random number generator */

@@ -11,4 +11,6 @@ Contributors
 ------------
 Yves Renard      <Yves.Renard@gmm.insa-tlse.fr>
   - provided initial autotoolization (autoconf / automake / libool)
+E. Jason Riedy   <ejr@cs.berkeley.edu>
+  - various bug fixes and code cleanup.
 

@@ -10,21 +10,35 @@
  * Contains function used for timing.
  */
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#ifndef TICTOC_H__
+#define TICTOC_H__
 
 #include "config.h"
 
-#ifdef HAVE_SYS_TIME_H
+#ifdef _WIN32
+
+#include <windows.h>
+typedef DWORD tictoc;
+#else
+
+#ifdef HAVE_CLOCK_GETTIME
+#include <time.h>
+typedef struct timespec tictoc;
+#else
+
+#ifdef HAVE_GETTIMEOFDAY
 #include <sys/time.h>
-typedef struct timeval TimeVal;
+typedef struct timeval tictoc;
 #else
 #include <ctime>
-typedef time_t TimeVal;
+typedef time_t tictoc;
 #endif
 
-void   tic(TimeVal *tv);   /* start timing. */
-double toc(TimeVal *tv);   /* stop  timing. */
+#endif
 
-#endif  /* _TIMER_H_ */
+#endif
 
+void   tic(tictoc *tv);   /* start timing. */
+double toc(tictoc *tv);   /* stop  timing. */
+
+#endif

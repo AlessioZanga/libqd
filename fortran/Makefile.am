@@ -1,50 +1,80 @@
 if HAVE_FORTRAN
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_builddir)/include -I$(top_srcdir)/include
-LDADD=-L. -lqdmod -L$(top_builddir)/src -lqd $(FCLIBS)
+LDADD=libqdmod.a libqd_f_main.a $(top_builddir)/src/libqd.a $(FCLIBS)
 
 if UPCASE_MODULE
+DDEXT=DDEXT.$(module_ext)
+QDEXT=QDEXT.$(module_ext)
 QDMOD=QDMODULE.$(module_ext)
 DDMOD=DDMODULE.$(module_ext)
 else
+DDEXT=ddext.$(module_ext)
+QDEXT=qdext.$(module_ext)
 QDMOD=qdmodule.$(module_ext)
 DDMOD=ddmodule.$(module_ext)
 endif
 
-lib_LIBRARIES = libqdmod.a
-libqdmod_a_SOURCES = ddmod.f90 qdmod.f90 main.cpp
+lib_LIBRARIES = libqdmod.a libqd_f_main.a
+libqdmod_a_SOURCES = ddext.f ddmod.f qdext.f qdmod.f f_dd.cpp f_qd.cpp
+libqd_f_main_a_SOURCES = main.cpp
+ddmod.o: ddext.o
+qdmod.o: ddmod.o qdext.o
+$(QDMOD): qdmod.o
+$(DDMOD): ddmod.o
+$(DDEXT): ddext.o
+$(QDEXT): qdext.o
 
-pkglib_DATA = $(QDMOD) $(DDMOD)
+pkglib_DATA = $(QDMOD) $(QDEXT) $(DDMOD) $(DDEXT)
 
-check_PROGRAMS = fortran_test
-fortran_test_SOURCES = fortran_test.f90
-fortran_test_LINK=$(CXXLINK)
+DEMO=quaderq$(EXEEXT) quadgsq2d$(EXEEXT) quadgsq$(EXEEXT) \
+     quadtsq$(EXEEXT) quadtsq2d$(EXEEXT)
+TIMER = dd_timer$(EXEEXT) qd_timer$(EXEEXT)
+EXTRA_PROGRAMS=$(DEMO) $(TIMER)
 
-TESTS=fortran_test
-
-EXTRA_PROGRAMS = quaderq quaderq2d quadgsq quadtsq quadtsq2d
-
-quaderq_SOURCES = tquaderq.f90
-nodist_quaderq_SOURCES=second.f90
+quaderq_SOURCES = tquaderq.f
+nodist_quaderq_SOURCES=second.f
 quaderq_LINK=$(CXXLINK)
 
-quaderq2d_SOURCES = tquaderq2d.f90
-nodist_quaderq2d_SOURCES=second.f90
-quaderq2d_LINK=$(CXXLINK)
+quadgsq2d_SOURCES = tquadgsq2d.f
+nodist_quadgsq2d_SOURCES=second.f
+quadgsq2d_LINK=$(CXXLINK)
 
-quadgsq_SOURCES = tquadgsq.f90
-nodist_quadgsq_SOURCES=second.f90
+quadgsq_SOURCES = tquadgsq.f
+nodist_quadgsq_SOURCES=second.f
 quadgsq_LINK=$(CXXLINK)
 
-quadtsq_SOURCES = tquadtsq.f90
-nodist_quadtsq_SOURCES=second.f90
+quadtsq_SOURCES = tquadtsq.f
+nodist_quadtsq_SOURCES=second.f
 quadtsq_LINK=$(CXXLINK)
 
-quadtsq2d_SOURCES = tquadtsq2d.f90
-nodist_quadtsq2d_SOURCES=second.f90
+quadtsq2d_SOURCES = tquadtsq2d.f
+nodist_quadtsq2d_SOURCES=second.f
 quadtsq2d_LINK=$(CXXLINK)
+
+dd_timer_SOURCES = dd_timer.f
+nodist_dd_timer_SOURCES = second.f
+dd_timer_LINK=$(CXXLINK)
+
+qd_timer_SOURCES = qd_timer.f
+nodist_qd_timer_SOURCES = second.f
+qd_timer_LINK=$(CXXLINK)
+
+demo: $(DEMO)
 
 CLEANFILES = $(EXTRA_PROGRAMS) *.mod
 
-demo: $(EXTRA_PROGRAMS)
-
 endif
+
+MAINTAINERCLEANFILES = dd_timer.f qd_timer.f
+EXTRA_DIST = dd_timer.f qd_timer.f zz_timer.f Makefile.sample
+
+dd_timer.f: zz_timer.f
+	sed -e 's/@@/dd/' zz_timer.f >dd_timer.f
+
+qd_timer.f: zz_timer.f
+	sed -e 's/@@/qd/' zz_timer.f >qd_timer.f
+
+if HAVE_FORTRAN
+.PHONY: demo
+endif
+

@@ -18,14 +18,8 @@
    the Fortran libraries. */
 #undef FC_MAIN
 
-/* Define to 1 if you have the `copysign' function. */
-#undef HAVE_COPYSIGN
-
-/* Define to 1 if you have the <dlfcn.h> header file. */
-#undef HAVE_DLFCN_H
-
-/* Define to 1 if you have the `finite' function. */
-#undef HAVE_FINITE
+/* Define to 1 if your system has the clock_gettime function. */
+#undef HAVE_CLOCK_GETTIME
 
 /* Define to 1 if Fortran interface is to be compiled. */
 #undef HAVE_FORTRAN
@@ -41,9 +35,6 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
-
-/* Define to 1 if you have the `isnan' function. */
-#undef HAVE_ISNAN
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -65,9 +56,6 @@
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
-
-/* Define to 1 if you have the <sys/time.h> header file. */
-#undef HAVE_SYS_TIME_H
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
@@ -105,12 +93,21 @@
 /* qd patch number (sub minor version) */
 #undef PATCH_VERSION
 
+/* Any special symbols needed for exporting APIs. */
+#undef QD_API
+
+/* Define this macro to be the copysign(x, y) function. */
+#undef QD_COPYSIGN
+
 /* Define to 1 to enable debugging code. */
 #undef QD_DEBUG
 
-/* Define to 1 if your compiler automatically generates fused
-   multiply-accumulate instructions. Use this with care. */
-#undef QD_HAS_FMA
+/* If fused multiply-add is available, define correct macro for using it. */
+#undef QD_FMA
+
+/* If fused multiply-subtract is available, define correct macro for using it.
+   */
+#undef QD_FMS
 
 /* Define to 1 if your compiler have the C++ standard include files. */
 #undef QD_HAVE_STD
@@ -121,6 +118,15 @@
 /* Define to 1 to inline commonly used functions. */
 #undef QD_INLINE
 
+/* Define this macro to be the isfinite(x) function. */
+#undef QD_ISFINITE
+
+/* Define this macro to be the isinf(x) function. */
+#undef QD_ISINF
+
+/* Define this macro to be the isnan(x) function. */
+#undef QD_ISNAN
+
 /* Define to 1 to use sloppy division (which is faster by slightly
    inaccurate). */
 #undef QD_SLOPPY_DIV
@@ -128,6 +134,9 @@
 /* Define to 1 to use sloppy multiplication (which is faster by slightly
    inaccurate). */
 #undef QD_SLOPPY_MUL
+
+/* Set to 1 if using VisualAge C++ compiler for __fmadd builtin. */
+#undef QD_VACPP_BUILTINS_H
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

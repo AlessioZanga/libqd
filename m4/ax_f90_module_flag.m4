@@ -46,7 +46,7 @@ for ax_flag in "-I " "-M" "-p"; do
   fi
 done
 rm -fr tmpdir_$i
-if test "$ax_flag" = "not found" ; then
+if test "$ax_modflag" = "not found" ; then
   AC_MSG_ERROR([unable to find compiler flag for modules inclusion])
 fi
 AC_LANG_POP(Fortran)

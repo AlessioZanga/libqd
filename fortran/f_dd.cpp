@@ -14,17 +14,12 @@
 #ifdef HAVE_FORTRAN
 #include <cstring>
 
-#ifdef CRAY_STRINGS
-#include <fortran.h>
-#endif
-
 #include "config.h"
-#include <qd/dd.h>
+#include <qd/dd_real.h>
 #include <qd/c_dd.h>
 
 #define f_dd_add          FC_FUNC_(f_dd_add, F_DD_ADD)
 #define f_dd_add_dd_d     FC_FUNC_(f_dd_add_dd_d, F_DD_ADD_DD_D)
-#define f_dd_add_d_dd     FC_FUNC_(f_dd_add_d_dd, F_DD_ADD_D_DD)
 
 #define f_dd_sub          FC_FUNC_(f_dd_sub, F_DD_SUB)
 #define f_dd_sub_dd_d     FC_FUNC_(f_dd_sub_dd_d, F_DD_SUB_DD_D)
@@ -32,14 +27,10 @@
 
 #define f_dd_mul          FC_FUNC_(f_dd_mul, F_DD_MUL)
 #define f_dd_mul_dd_d     FC_FUNC_(f_dd_mul_dd_d, F_DD_MUL_DD_D)
-#define f_dd_mul_d_dd     FC_FUNC_(f_dd_mul_d_dd, F_DD_MUL_D_DD)
 
 #define f_dd_div          FC_FUNC_(f_dd_div, F_DD_DIV)
 #define f_dd_div_dd_d     FC_FUNC_(f_dd_div_dd_d, F_DD_DIV_DD_D)
 #define f_dd_div_d_dd     FC_FUNC_(f_dd_div_d_dd, F_DD_DIV_D_DD)
-
-#define f_dd_copy         FC_FUNC_(f_dd_copy, F_DD_COPY)
-#define f_dd_copy_d       FC_FUNC_(f_dd_copy_d, F_DD_COPY_D)
 
 #define f_dd_sqrt         FC_FUNC_(f_dd_sqrt, F_DD_SQRT)
 #define f_dd_sqr          FC_FUNC_(f_dd_sqr, F_DD_SQR)
@@ -78,7 +69,6 @@
 #define f_dd_sincos       FC_FUNC_(f_dd_sincos, F_DD_SINCOS)
 #define f_dd_sincosh      FC_FUNC_(f_dd_sincosh, F_DD_SINCOSH)
 
-#define f_dd_read         FC_FUNC_(f_dd_read, F_DD_READ)
 #define f_dd_swrite       FC_FUNC_(f_dd_swrite, F_DD_SWRITE)
 #define f_dd_write        FC_FUNC_(f_dd_write, F_DD_WRITE)
 
@@ -86,10 +76,11 @@
 #define f_dd_rand         FC_FUNC_(f_dd_rand, F_DD_RAND)
 #define f_dd_comp         FC_FUNC_(f_dd_comp, F_DD_COMP)
 #define f_dd_comp_dd_d    FC_FUNC_(f_dd_comp_dd_d, F_DD_COMP_DD_D)
-#define f_dd_comp_d_dd    FC_FUNC_(f_dd_comp_d_dd, F_DD_COMP_D_DD)
-#define f_dd_pi           FC_FUNC_(f_dd_pi, F_DD_PI)
 
-#define TO_DOUBLE_PTR(x, ptr) ptr[0] = x.hi; ptr[1] = x.lo;
+#define f_dd_pi           FC_FUNC_(f_dd_pi, F_DD_PI)
+#define f_dd_nan          FC_FUNC_(f_dd_nan, F_DD_NAN)
+
+#define TO_DOUBLE_PTR(a, ptr) ptr[0] = a.x[0]; ptr[1] = a.x[1];
 
 extern "C" {
 
@@ -102,11 +93,6 @@ void f_dd_add(const double *a, const double *b, double *c) {
 void f_dd_add_dd_d(const double *a, const double *b, double *c) {
   dd_real cc;
   cc = dd_real(a) + *b;
-  TO_DOUBLE_PTR(cc, c);
-}
-void f_dd_add_d_dd(const double *a, const double *b, double *c) {
-  dd_real cc;
-  cc = *a + dd_real(b);
   TO_DOUBLE_PTR(cc, c);
 }
 
@@ -140,11 +126,6 @@ void f_dd_mul_dd_d(const double *a, const double *b, double *c) {
   cc = dd_real(a) * *b;
   TO_DOUBLE_PTR(cc, c);
 }
-void f_dd_mul_d_dd(const double *a, const double *b, double *c) {
-  dd_real cc;
-  cc = *a * dd_real(b);
-  TO_DOUBLE_PTR(cc, c);
-}
 
 
 /* div */
@@ -162,17 +143,6 @@ void f_dd_div_d_dd(const double *a, const double *b, double *c) {
   dd_real cc;
   cc = *a / dd_real(b);
   TO_DOUBLE_PTR(cc, c);
-}
-
-
-/* copy */
-void f_dd_copy(const double *a, double *b) {
-  b[0] = a[0];
-  b[1] = a[1];
-}
-void f_dd_copy_d(const double *a, double *b) {
-  b[0] = *a;
-  b[1] = 0.0;
 }
 
 
@@ -326,35 +296,27 @@ void f_dd_sincosh(const double *a, double *s, double *c) {
   TO_DOUBLE_PTR(cc, c);
 }
 
-#ifdef CRAY_STRINGS
-void f_dd_read(_fcd s, double *a) {
-  int slen = _fcdlen(s);
-  char *ss = new char[slen+1];
-  dd_real aa;
-  memcpy(ss, _fcdtocp(s), slen);
-  ss[slen] = '\0';
-  aa = dd_real(ss);
-  delete [] ss;
-  TO_DOUBLE_PTR(aa, a);
-}
-#else
-void f_dd_read(const char *s, double *a, int slen) {
-  char *ss = new char[slen+1];
-  dd_real aa;
-  std::memcpy(ss, s, slen);
-  ss[slen] = '\0';
-  aa = dd_real(ss);
-  delete [] ss;
-  TO_DOUBLE_PTR(aa, a);
-}
-#endif
+/* Writes a dd_real into a character array of length maxlen, with
+ * the given precision.   The rest of the array will be filled with
+ * spaces.  Parameter maxlen should at least be precision + 7 
+ * characters.  Prec can be zero to put out the defaut number of 
+ * digits. */
+void f_dd_swrite(const double *a, int *precision, char *s, int *maxlen) {
+  int prec = *precision;
+  if (prec <= 0 || prec > dd_real::_ndigits) prec = dd_real::_ndigits;
+  std::ios_base::fmtflags fmt = static_cast<std::ios_base::fmtflags>(0);
+  std::string str = dd_real(a).to_string(prec, 0, fmt, false, true);
 
-void f_dd_swrite(const double *a, char *s) {
-  int slen;
+  int len = 0;
+  if (a[0] < 0.0) {
+    strncpy(&s[len], str.c_str(), *maxlen - len);
+  } else {
+    s[len++] = ' ';
+    strncpy(&s[len], str.c_str(), *maxlen - len);
+  }
 
-  dd_real(a).write(s);
-  slen = std::strlen(s);
-  for (int i = slen; i < 72; i++)
+  len += str.length();
+  for (int i = len; i < *maxlen; i++)
     s[i] = ' ';
 }
 
@@ -405,6 +367,10 @@ void f_dd_comp_d_dd(const double *a, const double *b, int *result) {
 
 void f_dd_pi(double *a) {
   TO_DOUBLE_PTR(dd_real::_pi, a);
+}
+
+void f_dd_nan(double *a) {
+  TO_DOUBLE_PTR(dd_real::_nan, a);
 }
 
 }

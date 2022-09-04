@@ -16,17 +16,11 @@
 #include <cstring>
 
 #include "config.h"
-#include <qd/qd.h>
+#include <qd/qd_real.h>
 #include <qd/c_qd.h>
 
-#ifdef CRAY_STRINGS
-#include <fortran.h>
-#endif
-
 #define f_qd_add          FC_FUNC_(f_qd_add, F_QD_ADD)
-#define f_qd_add_dd_qd    FC_FUNC_(f_qd_add_dd_qd, F_QD_ADD_DD_QD)
 #define f_qd_add_qd_dd    FC_FUNC_(f_qd_add_qd_dd, F_QD_ADD_QD_DD)
-#define f_qd_add_d_qd     FC_FUNC_(f_qd_add_d_qd, F_QD_ADD_D_QD)
 #define f_qd_add_qd_d     FC_FUNC_(f_qd_add_qd_d, F_QD_ADD_QD_D)
 
 #define f_qd_sub          FC_FUNC_(f_qd_sub, F_QD_SUB)
@@ -36,9 +30,7 @@
 #define f_qd_sub_qd_d     FC_FUNC_(f_qd_sub_qd_d, F_QD_SUB_QD_D)
 
 #define f_qd_mul          FC_FUNC_(f_qd_mul, F_QD_MUL)
-#define f_qd_mul_dd_qd    FC_FUNC_(f_qd_mul_dd_qd, F_QD_MUL_DD_QD)
 #define f_qd_mul_qd_dd    FC_FUNC_(f_qd_mul_qd_dd, F_QD_MUL_QD_DD)
-#define f_qd_mul_d_qd     FC_FUNC_(f_qd_mul_d_qd, F_QD_MUL_D_QD)
 #define f_qd_mul_qd_d     FC_FUNC_(f_qd_mul_qd_d, F_QD_MUL_QD_D)
 
 #define f_qd_div          FC_FUNC_(f_qd_div, F_QD_DIV)
@@ -46,10 +38,6 @@
 #define f_qd_div_qd_dd    FC_FUNC_(f_qd_div_qd_dd, F_QD_DIV_QD_DD)
 #define f_qd_div_d_qd     FC_FUNC_(f_qd_div_d_qd, F_QD_DIV_D_QD)
 #define f_qd_div_qd_d     FC_FUNC_(f_qd_div_qd_d, F_QD_DIV_QD_D)
-
-#define f_qd_copy         FC_FUNC_(f_qd_copy, F_QD_COPY)
-#define f_qd_copy_dd      FC_FUNC_(f_qd_copy_dd, F_QD_COPY_DD)
-#define f_qd_copy_d       FC_FUNC_(f_qd_copy_d, F_QD_COPY_D)
 
 #define f_qd_sqrt         FC_FUNC_(f_qd_sqrt, F_QD_SQRT)
 #define f_qd_sqr          FC_FUNC_(f_qd_sqr, F_QD_SQR)
@@ -88,7 +76,6 @@
 #define f_qd_sincos       FC_FUNC_(f_qd_sincos, F_QD_SINCOS)
 #define f_qd_sincosh      FC_FUNC_(f_qd_sincosh, F_QD_SINCOSH)
 
-#define f_qd_read         FC_FUNC_(f_qd_read, F_QD_READ)
 #define f_qd_swrite       FC_FUNC_(f_qd_swrite, F_QD_SWRITE)
 #define f_qd_write        FC_FUNC_(f_qd_write, F_QD_WRITE)
 
@@ -96,8 +83,9 @@
 #define f_qd_rand         FC_FUNC_(f_qd_rand, F_QD_RAND)
 #define f_qd_comp         FC_FUNC_(f_qd_comp, F_QD_COMP)
 #define f_qd_comp_qd_d    FC_FUNC_(f_qd_comp_qd_d, F_QD_COMP_QD_D)
-#define f_qd_comp_d_qd    FC_FUNC_(f_qd_comp_d_qd, F_QD_COMP_D_QD)
+
 #define f_qd_pi           FC_FUNC_(f_qd_pi, F_QD_PI)
+#define f_qd_nan          FC_FUNC_(f_qd_nan, F_QD_NAN)
 
 #define TO_DOUBLE_PTR(a, ptr) ptr[0] = a.x[0]; ptr[1] = a.x[1]; \
                               ptr[2] = a.x[2]; ptr[3] = a.x[3];
@@ -117,19 +105,9 @@ void f_qd_add_qd_dd(const double *a, const double *b, double *c) {
   cc = qd_real(a) + dd_real(b);
   TO_DOUBLE_PTR(cc, c);
 }
-void f_qd_add_dd_qd(const double *a, const double *b, double *c) {
-  qd_real cc;
-  cc = dd_real(a) + qd_real(b);
-  TO_DOUBLE_PTR(cc, c);
-}
 void f_qd_add_qd_d(const double *a, const double *b, double *c) {
   qd_real cc;
   cc = qd_real(a) + *b;
-  TO_DOUBLE_PTR(cc, c);
-}
-void f_qd_add_d_qd(const double *a, const double *b, double *c) {
-  qd_real cc;
-  cc = *a + qd_real(b);
   TO_DOUBLE_PTR(cc, c);
 }
 
@@ -175,19 +153,9 @@ void f_qd_mul_qd_dd(const double *a, const double *b, double *c) {
   cc = qd_real(a) * dd_real(b);
   TO_DOUBLE_PTR(cc, c);
 }
-void f_qd_mul_dd_qd(const double *a, const double *b, double *c) {
-  qd_real cc;
-  cc = dd_real(a) * qd_real(b);
-  TO_DOUBLE_PTR(cc, c);
-}
 void f_qd_mul_qd_d(const double *a, const double *b, double *c) {
   qd_real cc;
   cc = qd_real(a) * *b;
-  TO_DOUBLE_PTR(cc, c);
-}
-void f_qd_mul_d_qd(const double *a, const double *b, double *c) {
-  qd_real cc;
-  cc = *a * qd_real(b);
   TO_DOUBLE_PTR(cc, c);
 }
 
@@ -297,27 +265,6 @@ void f_qd_selfdiv_d(const double *a, double *b) {
   TO_DOUBLE_PTR(bb, b);
 }
 
-
-
-/* copy */
-void f_qd_copy(const double *a, double *b) {
-  b[0] = a[0];
-  b[1] = a[1];
-  b[2] = a[2];
-  b[3] = a[3];
-}
-void f_qd_copy_dd(const double *a, double *b) {
-  b[0] = a[0];
-  b[1] = a[1];
-  b[2] = 0.0;
-  b[3] = 0.0;
-}
-void f_qd_copy_d(const double *a, double *b) {
-  b[0] = *a;
-  b[1] = 0.0;
-  b[2] = 0.0;
-  b[3] = 0.0;
-}
 
 
 void f_qd_sqrt(const double *a, double *b) {
@@ -470,36 +417,27 @@ void f_qd_sincosh(const double *a, double *s, double *c) {
   TO_DOUBLE_PTR(ss, s);
 }
 
-#ifdef CRAY_STRINGS
-void f_qd_read(_fcd s, double *a) {
-  int slen = _fcdlen(s);
-  char *ss = new char[slen+1];
-  qd_real aa;
-  std::memcpy(ss, _fcdtocp(s), slen);
-  ss[slen] = '\0';
-  aa = qd_real(ss);
-  delete [] ss;
-  TO_DOUBLE_PTR(aa, a);
-}
-#else
-void f_qd_read(const char *s, double *a, int slen) {
-  char *ss = new char[slen+1];
-  qd_real aa;
-  std::memcpy(ss, s, slen);
-  ss[slen] = '\0';
-  aa = qd_real(ss);
-  delete [] ss;
-  TO_DOUBLE_PTR(aa, a);
-}
-#endif
+/* Writes a dd_real into a character array of length maxlen, with
+ * the given precision.   The rest of the array will be filled with
+ * spaces.  Parameter maxlen should at least be precision + 7 
+ * characters.  Prec can be zero to put out the defaut number of 
+ * digits. */
+void f_qd_swrite(const double *a, int *precision, char *s, int *maxlen) {
+  int prec = *precision;
+  if (prec <= 0 || prec > qd_real::_ndigits) prec = qd_real::_ndigits;
+  std::ios_base::fmtflags fmt = static_cast<std::ios_base::fmtflags>(0);
+  std::string str = qd_real(a).to_string(prec, 0, fmt, false, true);
 
-void f_qd_swrite(const double *a, char *s) {
-  int slen;
-  qd_real aa(a);
+  int len = 0;
+  if (a[0] < 0.0) {
+    strncpy(&s[len], str.c_str(), *maxlen - len);
+  } else {
+    s[len++] = ' ';
+    strncpy(&s[len], str.c_str(), *maxlen - len);
+  }
 
-  aa.write(s);
-  slen = std::strlen(s);
-  for (int i = slen; i < 72; i++)
+  len += str.length();
+  for (int i = len; i < *maxlen; i++)
     s[i] = ' ';
 }
 
@@ -552,6 +490,10 @@ void f_qd_comp_d_qd(const double *a, const double *b, int *result) {
 
 void f_qd_pi(double *a) {
   TO_DOUBLE_PTR(qd_real::_pi, a);
+}
+
+void f_qd_nan(double *a) {
+  TO_DOUBLE_PTR(qd_real::_nan, a);
 }
 
 }

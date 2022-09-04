@@ -64,7 +64,7 @@ void fpu_fix_start(unsigned int *old_cw) {
 #endif
 #else
   /* Linux */
-  int cw, new_cw;
+  volatile unsigned short cw, new_cw;
   _FPU_GETCW(cw);
 
   new_cw = (cw & ~_FPU_EXTENDED) | _FPU_DOUBLE;
