@@ -1,0 +1,16 @@
+name: tests
+on: [ push ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: apt-get install -y build-essential
+      - run: autoreconf
+      - run: ./configure --enable-fortran=no
+      - run: make -j$(nproc)
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - run: make demo -j$(nproc)
+      - run: ./tests/qd_test
