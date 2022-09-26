@@ -1,7 +1,7 @@
 name: tests
 on: [ push ]
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -9,13 +9,7 @@ jobs:
       - run: autoreconf
       - run: ./configure --enable-fortran=no
       - run: make -j$(nproc)
-  tests:
-    runs-on: ubuntu-latest
-    steps:
       - run: make demo -j$(nproc)
       - run: ./tests/qd_test
-  timer:
-    runs-on: ubuntu-latest
-    steps:
       - run: make time -j$(nproc)
       - run: ./tests/qd_timer
