@@ -128,3 +128,4 @@ dkms.conf
 
 # Executables
 build/
+docs/html/
