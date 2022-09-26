@@ -54,6 +54,7 @@ public:
   bool test6();
   bool test7();
   bool test8();
+  bool _test();
   bool testall();
 };
 
@@ -426,6 +427,154 @@ bool TestSuite<T>::test8() {
 }
 
 template <class T>
+bool TestSuite<T>::_test() {
+    srand(31);
+    cout.precision(18);
+
+    cout << "two_quick_sum:" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+        double b = ((double)rand() / (double)rand());
+
+        // quick_two_sum assume |a| > |b|.
+        if (std::fabs(a) < std::fabs(b)) {
+            double tmp = a;
+            a = b;
+            b = tmp;
+        }
+
+        double s, e;
+
+        s = qd::quick_two_sum(a, b, e);
+
+        cout << "((" << a << ", " << b << "), (" << s << ", " << e << "))," << endl;
+    }
+    cout << endl;
+
+    cout << "two_sum:" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+        double b = ((double)rand() / (double)rand());
+
+        double s, e;
+
+        s = qd::two_sum(a, b, e);
+
+        cout << "((" << a << ", " << b << "), (" << s << ", " << e << "))," << endl;
+    }
+    cout << endl;
+
+    cout << "two_diff:" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+        double b = ((double)rand() / (double)rand());
+
+        double s, e;
+
+        s = qd::two_diff(a, b, e);
+
+        cout << "((" << a << ", " << b << "), (" << s << ", " << e << "))," << endl;
+    }
+    cout << endl;
+
+    cout << "split:" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+
+        double hi, lo;
+
+        qd::split(a, hi, lo);
+
+        cout << "(" << a << ", (" << hi << ", " << lo << "))," << endl;
+    }
+    cout << endl;
+
+    cout << "two_prod:" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+        double b = ((double)rand() / (double)rand());
+
+        double s, e;
+
+        s = qd::two_prod(a, b, e);
+
+        cout << "((" << a << ", " << b << "), (" << s << ", " << e << "))," << endl;
+    }
+    cout << endl;
+
+    cout << "new:" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+        double b = ((double)rand() / (double)rand());
+
+        dd_real f = dd_real(a, b);
+
+        cout << "((" << a << ", " << b << "), (" << f._hi() << ", " << f._lo() << "))," << endl;
+    }
+    cout << endl;
+
+    cout << "f128.eq(&f64):" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+        double b = ((double)rand() / (double)rand());
+        double c = (((double)rand() / RAND_MAX) > 0.5 ? a : ((double)rand() / RAND_MAX));
+
+        dd_real f = dd_real(a, (((double)rand() / RAND_MAX) > 0.5 ? b : 0.0));
+
+        cout << "((" << f._hi() << ", " << f._lo() << "), " << c << ", " << ((f == c) ? "true" : "false") << "),"
+             << endl;
+    }
+    cout << endl;
+
+    cout << "f128.eq(&f128):" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+        double b = ((double)rand() / (double)rand());
+        double c = (((double)rand() / RAND_MAX) > 0.5 ? a : ((double)rand() / RAND_MAX));
+        double d = (((double)rand() / RAND_MAX) > 0.5 ? b : ((double)rand() / RAND_MAX));
+
+        dd_real f = dd_real(a, b);
+        dd_real g = dd_real(c, d);
+
+        cout << "((" << a << ", " << b << "), (" << c << ", " << d << "), " << ((f == g) ? "true" : "false") << "),"
+             << endl;
+    }
+    cout << endl;
+
+    cout << "f128.partial_cmp(&f64):" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+        double b = ((double)rand() / (double)rand());
+        double c = (((double)rand() / RAND_MAX) > 0.5 ? a : ((double)rand() / RAND_MAX));
+
+        dd_real f = dd_real(a, (((double)rand() / RAND_MAX) > 0.5 ? b : 0.0));
+
+        auto ordering = (f < c) ? "Less" : ((f > c) ? "Greater" : "Equal");
+
+        cout << "((" << f._hi() << ", " << f._lo() << "), " << c << ", Ordering::" << ordering << ")," << endl;
+    }
+    cout << endl;
+
+    cout << "f128.partial_cmp(&f128):" << endl;
+    for (int i = 0; i < 30; i++) {
+        double a = ((double)rand() / (double)rand());
+        double b = ((double)rand() / (double)rand());
+        double c = (((double)rand() / RAND_MAX) > 0.5 ? a : ((double)rand() / RAND_MAX));
+        double d = (((double)rand() / RAND_MAX) > 0.5 ? b : ((double)rand() / RAND_MAX));
+
+        dd_real f = dd_real(a, b);
+        dd_real g = dd_real(c, d);
+
+        auto ordering = (f < g) ? "Less" : ((f > g) ? "Greater" : "Equal");
+
+        cout << "((" << a << ", " << b << "), (" << c << ", " << d << "), Ordering::" << ordering << ")," << endl;
+    }
+    cout << endl;
+
+    return true;
+}
+
+template <class T>
 bool TestSuite<T>::testall() {
   bool pass = true;
   pass &= print_result(test1());
@@ -436,6 +585,7 @@ bool TestSuite<T>::testall() {
   pass &= print_result(test6());
   pass &= print_result(test7());
   pass &= print_result(test8());
+    _test();
   return pass;
 }
 
